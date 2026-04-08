@@ -55,6 +55,8 @@ struct
 Socket *socket_open(SocketAddressFamily af, SocketType type, SocketProtocol protocol);
 bool socket_close(Socket *socket);
 bool socket_listen(Socket *socket, int backlog);
+bool socket_connect(Socket *socket, const char *address, unsigned short port);
+bool socket_bind(Socket *socket, const char *address, unsigned short port);
 
 #ifdef __cplusplus
     }
