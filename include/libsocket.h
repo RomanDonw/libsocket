@@ -15,13 +15,13 @@
 #ifdef OS_WINDOWS
     #include <winsock2.h>
 
-    typedef SOCKET Socket;
-    #define InvalidSocket INVALID_SOCKET;
+    typedef SOCKET SOCKETDESCRIPTOR;
+    #define InvalidSocket INVALID_SOCKET
 #else
     #include <sys/socket.h>
     #include <netinet/in.h>
 
-    typedef int Socket;
+    typedef int SOCKETDESCRIPTOR;
     #define InvalidSocket -1
 #endif
 
@@ -43,8 +43,18 @@ enum
     UDP = IPPROTO_UDP
 } typedef SocketProtocol;
 
-Socket socket_open(SocketAddressFamily af, SocketType type, SocketProtocol protocol);
-bool socket_close(Socket socket);
+struct
+{
+    SOCKETDESCRIPTOR desc;
+
+    SocketAddressFamily af;
+    SocketType type;
+    SocketProtocol protocol;
+} typedef Socket;
+
+Socket *socket_open(SocketAddressFamily af, SocketType type, SocketProtocol protocol);
+bool socket_close(Socket *socket);
+bool socket_listen(Socket *socket, int backlog);
 
 #ifdef __cplusplus
     }

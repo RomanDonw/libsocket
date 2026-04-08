@@ -21,16 +21,38 @@
     #include <unistd.h>
 #endif
 
-Socket socket_open(SocketAddressFamily af, SocketType type, SocketProtocol protocol)
+Socket *socket_open(SocketAddressFamily af, SocketType type, SocketProtocol protocol)
 {
-    return socket(af, type, protocol);
+    Socket *ret = malloc(sizeof(Socket));
+    if (!ret) return NULL;
+
+    ret->af = af;
+    ret->type = type;
+    ret->protocol = protocol;
+
+    SOCKETDESCRIPTOR desc;
+    if ((desc = socket(af, type, protocol)) == InvalidSocket)
+    {
+        free(ret);
+        return NULL;
+    }
+
+    ret->desc = desc;
+
+    return ret;
 }
 
-bool socket_close(Socket socket)
+bool socket_close(Socket *socket)
 {
     #ifdef OS_WINDOWS
-        return !closesocket(socket);
+        if (closesocket(socket->desc)) return false;
     #else
-        return !close(socket);
+        if (close(socket->desc)) return false;
     #endif
+
+    free(socket);
+
+    return true;
 }
+
+bool socket_listen(Socket *socket, int backlog) { return !listen(socket->desc, backlog); }
