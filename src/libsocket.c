@@ -17,4 +17,20 @@
     {
         WSACleanup();
     }
+#else
+    #include <unistd.h>
 #endif
+
+Socket socket_open(SocketAddressFamily af, SocketType type, SocketProtocol protocol)
+{
+    return socket(af, type, protocol);
+}
+
+bool socket_close(Socket socket)
+{
+    #ifdef OS_WINDOWS
+        return !closesocket(socket);
+    #else
+        return !close(socket);
+    #endif
+}
