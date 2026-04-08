@@ -34,7 +34,7 @@ int fillsockaddrstruct(struct sockaddr *out_sockaddr, SocketAddressFamily af, co
 
     switch (af)
     {
-        case IPv4:
+        case IPv4:;
             struct sockaddr_in sa;
             sa.sin_family = af;
             sa.sin_port = htons(port);
@@ -44,7 +44,7 @@ int fillsockaddrstruct(struct sockaddr *out_sockaddr, SocketAddressFamily af, co
             *out_sockaddr = *((struct sockaddr *)(&sa));
             break;
 
-        case IPv6:
+        case IPv6:;
             struct sockaddr_in6 sa6;
             sa6.sin6_family = af;
             sa6.sin6_port = htons(port);
