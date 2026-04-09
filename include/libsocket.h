@@ -57,6 +57,7 @@ bool socket_close(Socket *socket);
 bool socket_listen(Socket *socket, int backlog);
 bool socket_connect(Socket *socket, const char *address, unsigned short port);
 bool socket_bind(Socket *socket, const char *address, unsigned short port);
+Socket *socket_accept(Socket *socket);
 
 #ifdef __cplusplus
     }
