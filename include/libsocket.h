@@ -16,13 +16,11 @@
     #include <winsock2.h>
 
     typedef SOCKET SOCKETDESCRIPTOR;
-    //#define InvalidSocket INVALID_SOCKET
 #else
     #include <sys/socket.h>
     #include <netinet/in.h>
 
     typedef int SOCKETDESCRIPTOR;
-    //#define InvalidSocket -1
     #define INVALID_SOCKET -1
 #endif
 
