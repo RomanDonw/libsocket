@@ -60,7 +60,7 @@ int fillsockaddrstruct(struct sockaddr *out_sockaddr, SocketAddressFamily af, co
 Socket *socket_open(SocketAddressFamily af, SocketType type, SocketProtocol protocol)
 {
     SOCKETDESCRIPTOR desc;
-    if ((desc = socket(af, type, protocol)) == InvalidSocket) return NULL;
+    if ((desc = socket(af, type, protocol)) == INVALID_SOCKET) return NULL;
 
     Socket *ret = malloc(sizeof(Socket));
     if (!ret) return NULL;
@@ -105,7 +105,7 @@ bool socket_bind(Socket *socket, const char *address, unsigned short port)
 Socket *socket_accept(Socket *socket)
 {
     SOCKETDESCRIPTOR desc;
-    if ((desc = accept(socket->desc, NULL, NULL)) == InvalidSocket) return NULL;
+    if ((desc = accept(socket->desc, NULL, NULL)) == INVALID_SOCKET) return NULL;
 
     Socket *ret = malloc(sizeof(Socket));
     if (!ret) return NULL;
