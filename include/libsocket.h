@@ -13,6 +13,8 @@
 #endif
 
 #ifdef OS_WINDOWS
+    // windows env.
+
     #include <winsock2.h>
     typedef SSIZE_T ssize_t;
 
@@ -24,7 +26,10 @@
         OnlySend = SD_SEND,
         Both = SD_BOTH
     } typedef SocketShutdownMode;
+
 #else
+    // unix env.
+
     #include <sys/socket.h>
     #include <netinet/in.h>
 
@@ -37,6 +42,7 @@
         OnlySend = SHUT_WR,
         Both = SHUT_RDWR
     } typedef SocketShutdownMode;
+
 #endif
 
 enum
