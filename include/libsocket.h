@@ -14,6 +14,7 @@
 
 #ifdef OS_WINDOWS
     #include <winsock2.h>
+    typedef SSIZE_T ssize_t;
 
     typedef SOCKET SOCKETDESCRIPTOR;
 #else
@@ -42,6 +43,12 @@ enum
     UDP = IPPROTO_UDP
 } typedef SocketProtocol;
 
+enum
+{
+    NonBlockingIO = FIONBIO,
+    AvailableDataToRead = FIONREAD
+} typedef SocketIOCTLOption;
+
 struct
 {
     SOCKETDESCRIPTOR desc;
@@ -53,10 +60,18 @@ struct
 
 Socket *socket_open(SocketAddressFamily af, SocketType type, SocketProtocol protocol);
 bool socket_close(Socket *socket);
-bool socket_listen(Socket *socket, int backlog);
+
 bool socket_connect(Socket *socket, const char *address, unsigned short port);
+
 bool socket_bind(Socket *socket, const char *address, unsigned short port);
+bool socket_listen(Socket *socket, int backlog);
 Socket *socket_accept(Socket *socket);
+
+// add flags arg. to this functions:
+ssize_t socket_recv(Socket *socket, void *buffer, size_t len);
+ssize_t socket_send(Socket *socket, const void *data, size_t len);
+
+bool socket_ioctl(Socket *socket, SocketIOCTLOption option, void *value);
 
 #ifdef __cplusplus
     }

@@ -22,8 +22,8 @@
     }
 #else
     #include <unistd.h>
-    #include <netinet/in.h>
     #include <arpa/inet.h>
+    #include <sys/ioctl.h>
 #endif
 
 int fillsockaddrstruct(struct sockaddr *out_sockaddr, SocketAddressFamily af, const char *addr, unsigned short port)
@@ -116,4 +116,16 @@ Socket *socket_accept(Socket *socket)
     ret->desc = desc;
 
     return ret;
+}
+
+ssize_t socket_recv(Socket *socket, void *buffer, size_t len) { return recv(socket->desc, buffer, len, 0); }
+ssize_t socket_send(Socket *socket, const void *data, size_t len) { return send(socket->desc, data, len, 0); }
+
+bool socket_ioctl(Socket *socket, SocketIOCTLOption option, void *value)
+{
+    #ifdef OS_WINDOWS
+        return !ioctlsocket(socket->desc, option, value);
+    #else
+        return !ioctl(socket->desc, option, value);
+    #endif
 }
