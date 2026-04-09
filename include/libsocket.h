@@ -17,12 +17,26 @@
     typedef SSIZE_T ssize_t;
 
     typedef SOCKET SOCKETDESCRIPTOR;
+
+    enum
+    {
+        OnlyRecv = SD_RECEIVE,
+        OnlySend = SD_SEND,
+        Both = SD_BOTH
+    } typedef SocketShutdownMode;
 #else
     #include <sys/socket.h>
     #include <netinet/in.h>
 
     typedef int SOCKETDESCRIPTOR;
     #define INVALID_SOCKET -1
+
+    enum
+    {
+        OnlyRecv = SHUT_RD,
+        OnlySend = SHUT_WR,
+        Both = SHUT_RDWR
+    } typedef SocketShutdownMode;
 #endif
 
 enum
@@ -72,6 +86,7 @@ ssize_t socket_recv(Socket *socket, void *buffer, size_t len);
 ssize_t socket_send(Socket *socket, const void *data, size_t len);
 
 bool socket_ioctl(Socket *socket, SocketIOCTLOption option, void *value);
+bool socket_shutdown(Socket *socket, SocketShutdownMode mode);
 
 #ifdef __cplusplus
     }

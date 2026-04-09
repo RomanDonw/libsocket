@@ -129,3 +129,5 @@ bool socket_ioctl(Socket *socket, SocketIOCTLOption option, void *value)
         return !ioctl(socket->desc, option, value);
     #endif
 }
+
+bool socket_shutdown(Socket *socket, SocketShutdownMode mode) { return !shutdown(socket->desc, mode); }
