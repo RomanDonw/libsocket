@@ -32,6 +32,7 @@
 
     #include <sys/socket.h>
     #include <netinet/in.h>
+    #include <sys/ioctl.h>
 
     typedef int SOCKETDESCRIPTOR;
     #define INVALID_SOCKET -1

@@ -23,7 +23,6 @@
 #else
     #include <unistd.h>
     #include <arpa/inet.h>
-    #include <sys/ioctl.h>
 #endif
 
 int fillsockaddrstruct(struct sockaddr *out_sockaddr, SocketAddressFamily af, const char *addr, unsigned short port)
