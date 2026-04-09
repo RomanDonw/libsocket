@@ -4,10 +4,26 @@ project(socket)
 #set(BUILD_SHARED_LIBS OFF)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.h" "src/*.c")
+file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "include/*.h")
 
 add_library(socket STATIC ${SOURCES})
 
+set_target_properties(socket PROPERTIES PUBLIC_HEADER ${HEADERS})
 target_include_directories(socket PUBLIC "include")
+
+install(TARGETS socket
+    EXPORT libsocketTargets
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(EXPORT libsocketTargets
+    FILE libsocketTargets.cmake
+    NAMESPACE libsocket::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/libsocket
+)
 
 # ===== TESTS =====
 
