@@ -16,6 +16,8 @@
     // windows env.
 
     #include <winsock2.h>
+    #include <ws2tcpip.h>
+
     typedef SSIZE_T ssize_t;
 
     typedef SOCKET SOCKETDESCRIPTOR;
@@ -70,6 +72,22 @@ enum
     AvailableDataToRead = FIONREAD
 } typedef SocketIOCTLOption;
 
+enum
+{
+    SocketLevel = SOL_SOCKET
+} typedef SocketOptionLevel;
+
+enum
+{
+    // SocketLevel
+    RevcBufferSize = SO_RCVBUF, // int, readable/writable.
+    SendBufferSize = SO_SNDBUF, // int, readable/writable.
+    KeepAliveConnection = SO_KEEPALIVE, // int (bool), readable/writable.
+    AcceptConnections = SO_ACCEPTCONN, // int (bool), readonly.
+    InternalError = SO_ERROR, // int, readonly.
+    AllowReuseAddress = SO_REUSEADDR // int (bool), readable/writable.
+} typedef SocketOptionName;
+
 #define RECV_NOFLAGS 0
 #define RECV_FLAG_PEEK MSG_PEEK
 #define RECV_FLAG_WAITALL MSG_WAITALL
@@ -94,6 +112,9 @@ bool socket_shutdown(const Socket *socket, SocketShutdownMode mode);
 SocketAddressFamily socket_getaf(const Socket *socket);
 SocketType socket_gettype(const Socket *socket);
 SocketProtocol socket_getprotocol(const Socket *socket);
+
+bool socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, void *optval, socklen_t *optlen);
+bool socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, const void *optval, socklen_t optlen);
 
 #ifdef __cplusplus
     }

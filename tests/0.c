@@ -11,10 +11,30 @@
     #define MILLIS(x) usleep(x * 1000)
 #endif
 
+int getsocksendbuffsize(const Socket *s)
+{
+    int sendbuffsize;
+    
+    socklen_t sendbuffsize_len = sizeof(sendbuffsize);
+    if (!socket_getopt(s, SocketLevel, SendBufferSize, &sendbuffsize, &sendbuffsize_len)) { puts("socket_getopt error"); abort(); }
+    if (sendbuffsize_len != sizeof(sendbuffsize)) { puts("sendbuffsize_len != sizeof(sendbuffsize). Abort."); abort(); }
+
+    return sendbuffsize;
+}
+
+void setsocksendbuffsize(const Socket *s, int size)
+{
+    if (!socket_setopt(s, SocketLevel, SendBufferSize, &size, sizeof(size))) { puts("socket_setopt error. Abort."); abort(); }
+}
+
 int main(void)
 {
     Socket *s = socket_open(IPv4, Stream, TCP);
     if (!s) { puts("socket_open error"); abort(); }
+
+    printf("Old send buffer size: %i\n", getsocksendbuffsize(s));
+    setsocksendbuffsize(s, 4096);
+    printf("New send buffer size: %i\n", getsocksendbuffsize(s));
 
     if (!socket_connect(s, "127.0.0.1", 8000)) { puts("socket_connect error"); abort(); }
 

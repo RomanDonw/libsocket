@@ -4,8 +4,6 @@
 #include <string.h>
 
 #ifdef OS_WINDOWS
-    #include <ws2tcpip.h>
-
     void __attribute__((constructor(101))) init()
     {
         const WORD version = MAKEWORD(2, 2);
@@ -143,3 +141,9 @@ bool socket_shutdown(const Socket *socket, SocketShutdownMode mode) { return !sh
 SocketAddressFamily socket_getaf(const Socket *socket) { return socket->af; }
 SocketType socket_gettype(const Socket *socket) { return socket->type; }
 SocketProtocol socket_getprotocol(const Socket *socket) { return socket->protocol; }
+
+bool socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, void *optval, socklen_t *optlen)
+{ return !getsockopt(socket->desc, level, optname, optval, optlen); }
+
+bool socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, const void *optval, socklen_t optlen)
+{ return !setsockopt(socket->desc, level, optname, optval, optlen); }
