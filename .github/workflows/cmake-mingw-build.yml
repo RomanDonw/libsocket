@@ -27,11 +27,21 @@ jobs:
           cmake -S .. -G "MinGW Makefiles"
           mingw32-make
           
+      - name: Prepare to Upload Artifact
+        run: |
+          cd ..
+
+          mkdir lib
+          mv ./build/*.a ./lib/
+
+          mkdir bin
+          mv ./build/*.exe ./bin/
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: win
           path: |
-            build/*.a
-            build/*.exe
+            bin/*.exe
+            lib/*.a
             include/*.h
