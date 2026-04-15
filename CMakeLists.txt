@@ -12,6 +12,10 @@ target_include_directories(socket PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
+if(WIN32)
+    target_link_libraries(socket PUBLIC "ws2_32")
+endif()
+
 install(TARGETS socket
     EXPORT libsocketTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -30,8 +34,4 @@ install(EXPORT libsocketTargets
 
 add_executable(test0 "tests/0.c")
 
-if(WIN32)
-    set(TESTEXELIBS -lws2_32)
-endif()
-
-target_link_libraries(test0 PRIVATE socket ${TESTEXELIBS})
+target_link_libraries(test0 PRIVATE socket)
