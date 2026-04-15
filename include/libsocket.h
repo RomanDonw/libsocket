@@ -70,30 +70,27 @@ enum
     AvailableDataToRead = FIONREAD
 } typedef SocketIOCTLOption;
 
-struct
-{
-    SOCKETDESCRIPTOR desc;
-
-    SocketAddressFamily af;
-    SocketType type;
-    SocketProtocol protocol;
-} typedef Socket;
+typedef struct Socket Socket;
 
 Socket *socket_open(SocketAddressFamily af, SocketType type, SocketProtocol protocol);
 bool socket_close(Socket *socket);
 
-bool socket_connect(Socket *socket, const char *address, unsigned short port);
+bool socket_connect(const Socket *socket, const char *address, unsigned short port);
 
-bool socket_bind(Socket *socket, const char *address, unsigned short port);
-bool socket_listen(Socket *socket, int backlog);
-Socket *socket_accept(Socket *socket);
+bool socket_bind(const Socket *socket, const char *address, unsigned short port);
+bool socket_listen(const Socket *socket, int backlog);
+Socket *socket_accept(const Socket *socket);
 
 // add flags arg. to this functions:
-ssize_t socket_recv(Socket *socket, void *buffer, size_t len);
-ssize_t socket_send(Socket *socket, const void *data, size_t len);
+ssize_t socket_recv(const Socket *socket, void *buffer, size_t len);
+ssize_t socket_send(const Socket *socket, const void *data, size_t len);
 
-bool socket_ioctl(Socket *socket, SocketIOCTLOption option, void *value);
-bool socket_shutdown(Socket *socket, SocketShutdownMode mode);
+bool socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value);
+bool socket_shutdown(const Socket *socket, SocketShutdownMode mode);
+
+SocketAddressFamily socket_getaf(const Socket *socket);
+SocketType socket_gettype(const Socket *socket);
+SocketProtocol socket_getprotocol(const Socket *socket);
 
 #ifdef __cplusplus
     }

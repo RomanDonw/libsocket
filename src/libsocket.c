@@ -25,6 +25,15 @@
     #include <arpa/inet.h>
 #endif
 
+struct Socket
+{
+    SOCKETDESCRIPTOR desc;
+
+    SocketAddressFamily af;
+    SocketType type;
+    SocketProtocol protocol;
+};
+
 int fillsockaddrstruct(struct sockaddr *out_sockaddr, SocketAddressFamily af, const char *addr, unsigned short port)
 {
     int ret;
@@ -85,23 +94,23 @@ bool socket_close(Socket *socket)
     return true;
 }
 
-bool socket_listen(Socket *socket, int backlog) { return !listen(socket->desc, backlog); }
+bool socket_listen(const Socket *socket, int backlog) { return !listen(socket->desc, backlog); }
 
-bool socket_connect(Socket *socket, const char *address, unsigned short port)
+bool socket_connect(const Socket *socket, const char *address, unsigned short port)
 {
     struct sockaddr sa;
     if (fillsockaddrstruct(&sa, socket->af, address, port) <= 0) return false;
     return !connect(socket->desc, &sa, sizeof(sa));
 }
 
-bool socket_bind(Socket *socket, const char *address, unsigned short port)
+bool socket_bind(const Socket *socket, const char *address, unsigned short port)
 {
     struct sockaddr sa;
     if (fillsockaddrstruct(&sa, socket->af, address, port) <= 0) return false;
     return !bind(socket->desc, &sa, sizeof(sa));
 }
 
-Socket *socket_accept(Socket *socket)
+Socket *socket_accept(const Socket *socket)
 {
     SOCKETDESCRIPTOR desc;
     if ((desc = accept(socket->desc, NULL, NULL)) == INVALID_SOCKET) return NULL;
@@ -117,10 +126,10 @@ Socket *socket_accept(Socket *socket)
     return ret;
 }
 
-ssize_t socket_recv(Socket *socket, void *buffer, size_t len) { return recv(socket->desc, buffer, len, 0); }
-ssize_t socket_send(Socket *socket, const void *data, size_t len) { return send(socket->desc, data, len, 0); }
+ssize_t socket_recv(const Socket *socket, void *buffer, size_t len) { return recv(socket->desc, buffer, len, 0); }
+ssize_t socket_send(const Socket *socket, const void *data, size_t len) { return send(socket->desc, data, len, 0); }
 
-bool socket_ioctl(Socket *socket, SocketIOCTLOption option, void *value)
+bool socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value)
 {
     #ifdef OS_WINDOWS
         return !ioctlsocket(socket->desc, option, value);
@@ -129,4 +138,8 @@ bool socket_ioctl(Socket *socket, SocketIOCTLOption option, void *value)
     #endif
 }
 
-bool socket_shutdown(Socket *socket, SocketShutdownMode mode) { return !shutdown(socket->desc, mode); }
+bool socket_shutdown(const Socket *socket, SocketShutdownMode mode) { return !shutdown(socket->desc, mode); }
+
+SocketAddressFamily socket_getaf(const Socket *socket) { return socket->af; }
+SocketType socket_gettype(const Socket *socket) { return socket->type; }
+SocketProtocol socket_getprotocol(const Socket *socket) { return socket->protocol; }
