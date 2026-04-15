@@ -26,9 +26,7 @@ jobs:
           
           cmake -S .. -G "MinGW Makefiles"
           mingw32-make
-          
-      - name: Prepare to Upload Artifact
-        run: |
+
           cd ..
 
           mkdir lib
