@@ -30,7 +30,7 @@ int main(void)
     const size_t BUFFER_SIZE = 512;
     char buffer[BUFFER_SIZE];
     ssize_t readbytes;
-    while ((readbytes = socket_recv(s, buffer, BUFFER_SIZE)) > 0)
+    while ((readbytes = socket_recv(s, buffer, BUFFER_SIZE, RECV_NOFLAGS)) > 0)
     {
         for (size_t i = 0; i < readbytes; i++) putchar(buffer[i]);
     }

@@ -70,6 +70,10 @@ enum
     AvailableDataToRead = FIONREAD
 } typedef SocketIOCTLOption;
 
+#define RECV_NOFLAGS 0
+#define RECV_FLAG_PEEK MSG_PEEK
+#define RECV_FLAG_WAITALL MSG_WAITALL
+
 typedef struct Socket Socket;
 
 Socket *socket_open(SocketAddressFamily af, SocketType type, SocketProtocol protocol);
@@ -81,8 +85,7 @@ bool socket_bind(const Socket *socket, const char *address, unsigned short port)
 bool socket_listen(const Socket *socket, int backlog);
 Socket *socket_accept(const Socket *socket);
 
-// add flags arg. to this functions:
-ssize_t socket_recv(const Socket *socket, void *buffer, size_t len);
+ssize_t socket_recv(const Socket *socket, void *buffer, size_t len, int flags);
 ssize_t socket_send(const Socket *socket, const void *data, size_t len);
 
 bool socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value);

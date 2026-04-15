@@ -126,7 +126,7 @@ Socket *socket_accept(const Socket *socket)
     return ret;
 }
 
-ssize_t socket_recv(const Socket *socket, void *buffer, size_t len) { return recv(socket->desc, buffer, len, 0); }
+ssize_t socket_recv(const Socket *socket, void *buffer, size_t len, int flags) { return recv(socket->desc, buffer, len, flags); }
 ssize_t socket_send(const Socket *socket, const void *data, size_t len) { return send(socket->desc, data, len, 0); }
 
 bool socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value)
