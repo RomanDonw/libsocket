@@ -25,7 +25,7 @@ jobs:
           cd build
           
           cmake -S .. -G "MinGW Makefiles"
-          make
+          mingw32-make
           
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
