@@ -14,9 +14,9 @@ jobs:
           msystem: UCRT64
           update: true
           install: >-
-            mingw-ucrt46-x86_64-gcc
-            mingw-ucrt64-x86_64-cmake
-            mingw-ucrt64-x86_64-make
+            mingw-w64-ucrt64-x86_64-gcc
+            mingw-w64-ucrt64-x86_64-cmake
+            mingw-w64-ucrt64-x86_64-make
 
       - name: Configure and Build
         shell: msys2 {0}
