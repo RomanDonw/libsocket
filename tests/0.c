@@ -16,7 +16,7 @@ int main(void)
     Socket *s = socket_open(IPv4, Stream, TCP);
     if (!s) { puts("socket_open error"); abort(); }
 
-    if (!socket_connect(s, "127.0.0.1", 80)) { puts("socket_connect error"); abort(); }
+    if (!socket_connect(s, "127.0.0.1", 8000)) { puts("socket_connect error"); abort(); }
 
     const char *request = "GET / HTTP/1.0\r\n\r\n";
     if (!socket_send(s, request, strlen(request))) { puts("socket_send abort"); abort(); }
