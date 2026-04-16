@@ -116,6 +116,10 @@ SocketProtocol socket_getprotocol(const Socket *socket);
 bool socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, void *optval, socklen_t *optlen);
 bool socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, const void *optval, socklen_t optlen);
 
+#ifdef LIBSOCKET_ALLOWUNSAFEACCESS
+    SOCKETDESCRIPTOR socket_gethandle(const Socket *socket);
+#endif
+
 #ifdef __cplusplus
     }
 #endif

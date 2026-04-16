@@ -147,3 +147,5 @@ bool socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionNa
 
 bool socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, const void *optval, socklen_t optlen)
 { return !setsockopt(socket->desc, level, optname, optval, optlen); }
+
+SOCKETDESCRIPTOR socket_gethandle(const Socket *socket) { return socket->desc; }
