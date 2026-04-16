@@ -88,11 +88,34 @@ enum
     AllowReuseAddress = SO_REUSEADDR // int (bool), readable/writable.
 } typedef SocketOptionName;
 
+enum
+{
+    InternalUnknownError,
+
+    Interrupted, // EINTR
+    AccessDenied, // EACCES
+    InvalidAddress, // EFAULT
+    IncorrectArgumentValue, // EINVAL
+    TooManyOpenedSockets, // EMFILE
+    TemporaryUnavailable, // EAGAIN/EWOULDBLOCK
+    InExecutionProcess, // EALREADY
+    UnsupportedProtocol, // EPROTONOSUPPORT
+    UnsupportedSocketType, // ESOCKTNOSUPPORT
+    AddressInUsed, // EADDRINUSE
+    NetworkUnreachable, // ENETUNREACH
+    NetworkDown, // ENETDOWN
+    ConnectionReset, // ECONNRESET
+    ConnectionRefused, // ECONNREFUSED
+    ConnectionTimedOut, // ETIMEDOUT
+} typedef SocketError;
+
 #define RECV_NOFLAGS 0
 #define RECV_FLAG_PEEK MSG_PEEK
 #define RECV_FLAG_WAITALL MSG_WAITALL
 
 typedef struct Socket Socket;
+
+SocketError socket_getlasterror(void);
 
 Socket *socket_open(SocketAddressFamily af, SocketType type, SocketProtocol protocol);
 bool socket_close(Socket *socket);

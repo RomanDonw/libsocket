@@ -1,5 +1,7 @@
 #include "libsocket.h"
 
+#include "sockerrorcodes.h"
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -149,3 +151,18 @@ bool socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionNa
 { return !setsockopt(socket->desc, level, optname, optval, optlen); }
 
 SOCKETDESCRIPTOR socket_gethandle(const Socket *socket) { return socket->desc; }
+
+SocketError socket_getlasterror(void)
+{
+    #ifdef OS_WINDOWS
+        errno_t err = WSAGetLastError();
+    #else
+        errno_t err = errno;
+    #endif
+
+    switch (err)
+    {
+        default:
+            return 
+    }
+}
