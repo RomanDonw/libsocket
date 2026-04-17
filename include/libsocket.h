@@ -101,7 +101,7 @@ enum
     InExecutionProcess, // EALREADY
     UnsupportedProtocol, // EPROTONOSUPPORT
     UnsupportedSocketType, // ESOCKTNOSUPPORT
-    AddressInUsed, // EADDRINUSE
+    AddressInUse, // EADDRINUSE
     NetworkUnreachable, // ENETUNREACH
     NetworkDown, // ENETDOWN
     ConnectionReset, // ECONNRESET

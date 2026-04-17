@@ -160,9 +160,53 @@ SocketError socket_getlasterror(void)
         errno_t err = errno;
     #endif
 
+    if (err == SOCKERR_WOULDBLOCK || err == SOCKERR_AGAIN) return TemporaryUnavailable;
+
     switch (err)
     {
+        case SOCKERR_INTR:
+            return Interrupted;
+
+        case SOCKERR_ACCES:
+            return AccessDenied;
+
+        case SOCKERR_FAULT:
+            return InvalidAddress;
+
+        case SOCKERR_INVAL:
+            return IncorrectArgumentValue;
+
+        case SOCKERR_MFILE:
+            return TooManyOpenedSockets;
+
+        case SOCKERR_ALREADY:
+            return InExecutionProcess;
+
+        case SOCKERR_PROTONOSUPPORT:
+            return UnsupportedProtocol;
+
+        case SOCKERR_SOCKTNOSUPPORT:
+            return UnsupportedSocketType;
+
+        case SOCKERR_ADDRINUSE:
+            return AddressInUse;
+
+        case SOCKERR_NETUNREACH:
+            return NetworkUnreachable;
+        
+        case SOCKERR_NETDOWN:
+            return NetworkDown;
+
+        case SOCKERR_CONNRESET:
+            return ConnectionReset;
+
+        case SOCKERR_CONNREFUSED:
+            return ConnectionRefused;
+
+        case SOCKERR_TIMEDOUT:
+            return ConnectionTimedOut;
+
         default:
-            return 
+            return InternalUnknownError;
     }
 }
