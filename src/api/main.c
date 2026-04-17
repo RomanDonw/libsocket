@@ -23,7 +23,7 @@ struct Socket
 
 Socket *socket_open(SocketAddressFamily af, SocketType type, SocketProtocol protocol)
 {
-    ___ = NULL;
+    ENSURE_INIT;
 
     SOCKETDESCRIPTOR desc;
     if ((desc = socket(af, type, protocol)) == INVALID_SOCKET) return NULL;
@@ -41,7 +41,7 @@ Socket *socket_open(SocketAddressFamily af, SocketType type, SocketProtocol prot
 
 bool socket_close(Socket *socket)
 {
-    ___ = NULL;
+    ENSURE_INIT;
 
     #ifdef OS_WINDOWS
         if (closesocket(socket->desc)) return false;
@@ -54,11 +54,11 @@ bool socket_close(Socket *socket)
     return true;
 }
 
-bool socket_listen(const Socket *socket, int backlog) { ___ = NULL; return !listen(socket->desc, backlog); }
+bool socket_listen(const Socket *socket, int backlog) { ENSURE_INIT; return !listen(socket->desc, backlog); }
 
 bool socket_connect(const Socket *socket, const char *address, unsigned short port)
 {
-    ___ = NULL;
+    ENSURE_INIT;
 
     struct sockaddr sa;
     if (fillsockaddrstruct(&sa, socket->af, address, port) <= 0) return false;
@@ -67,7 +67,7 @@ bool socket_connect(const Socket *socket, const char *address, unsigned short po
 
 bool socket_bind(const Socket *socket, const char *address, unsigned short port)
 {
-    ___ = NULL;
+    ENSURE_INIT;
 
     struct sockaddr sa;
     if (fillsockaddrstruct(&sa, socket->af, address, port) <= 0) return false;
@@ -76,7 +76,7 @@ bool socket_bind(const Socket *socket, const char *address, unsigned short port)
 
 Socket *socket_accept(const Socket *socket)
 {
-    ___ = NULL;
+    ENSURE_INIT;
 
     SOCKETDESCRIPTOR desc;
     if ((desc = accept(socket->desc, NULL, NULL)) == INVALID_SOCKET) return NULL;
@@ -92,12 +92,12 @@ Socket *socket_accept(const Socket *socket)
     return ret;
 }
 
-ssize_t socket_recv(const Socket *socket, void *buffer, size_t len, int flags) { ___ = NULL; return recv(socket->desc, buffer, len, flags); }
-ssize_t socket_send(const Socket *socket, const void *data, size_t len) { ___ = NULL; return send(socket->desc, data, len, 0); }
+ssize_t socket_recv(const Socket *socket, void *buffer, size_t len, int flags) { ENSURE_INIT; return recv(socket->desc, buffer, len, flags); }
+ssize_t socket_send(const Socket *socket, const void *data, size_t len) { ENSURE_INIT; return send(socket->desc, data, len, 0); }
 
 bool socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value)
 {
-    ___ = NULL;
+    ENSURE_INIT;
 
     #ifdef OS_WINDOWS
         return !ioctlsocket(socket->desc, option, value);
@@ -106,16 +106,16 @@ bool socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value)
     #endif
 }
 
-bool socket_shutdown(const Socket *socket, SocketShutdownMode mode) { ___ = NULL; return !shutdown(socket->desc, mode); }
+bool socket_shutdown(const Socket *socket, SocketShutdownMode mode) { ENSURE_INIT; return !shutdown(socket->desc, mode); }
 
-SocketAddressFamily socket_getaf(const Socket *socket) { ___ = NULL; return socket->af; }
-SocketType socket_gettype(const Socket *socket) { ___ = NULL; return socket->type; }
-SocketProtocol socket_getprotocol(const Socket *socket) { ___ = NULL; return socket->protocol; }
+SocketAddressFamily socket_getaf(const Socket *socket) { ENSURE_INIT; return socket->af; }
+SocketType socket_gettype(const Socket *socket) { ENSURE_INIT; return socket->type; }
+SocketProtocol socket_getprotocol(const Socket *socket) { ENSURE_INIT; return socket->protocol; }
 
 bool socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, void *optval, socklen_t *optlen)
-{ ___ = NULL; return !getsockopt(socket->desc, level, optname, optval, optlen); }
+{ ENSURE_INIT; return !getsockopt(socket->desc, level, optname, optval, optlen); }
 
 bool socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, const void *optval, socklen_t optlen)
-{ ___ = NULL; return !setsockopt(socket->desc, level, optname, optval, optlen); }
+{ ENSURE_INIT; return !setsockopt(socket->desc, level, optname, optval, optlen); }
 
-SOCKETDESCRIPTOR socket_gethandle(const Socket *socket) { ___ = NULL; return socket->desc; }
+SOCKETDESCRIPTOR socket_gethandle(const Socket *socket) { ENSURE_INIT; return socket->desc; }

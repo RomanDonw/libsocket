@@ -5,7 +5,7 @@
 
 SocketError socket_getlasterror(void)
 {
-    ___ = NULL;
+    ENSURE_INIT;
 
     #ifdef OS_WINDOWS
         errno_t err = WSAGetLastError();

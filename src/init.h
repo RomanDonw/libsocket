@@ -3,4 +3,6 @@
 
 extern volatile void *___;
 
+#define ENSURE_INIT (___ = (void *)0)
+
 #endif
