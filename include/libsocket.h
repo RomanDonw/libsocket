@@ -85,7 +85,8 @@ enum
     KeepAliveConnection = SO_KEEPALIVE, // int (bool), readable/writable.
     AcceptConnections = SO_ACCEPTCONN, // int (bool), readonly.
     InternalError = SO_ERROR, // int, readonly.
-    AllowReuseAddress = SO_REUSEADDR // int (bool), readable/writable.
+    AllowReuseAddress = SO_REUSEADDR, // int (bool), readable/writable.
+    Broadcast = SO_BROADCAST // int (bool), readable/writable.
 } typedef SocketOptionName;
 
 enum
