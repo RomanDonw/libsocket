@@ -105,6 +105,7 @@ enum
     AddressInUse, // EADDRINUSE
     NetworkUnreachable, // ENETUNREACH
     NetworkDown, // ENETDOWN
+    NetworkReset, // ENETRESET
     ConnectionReset, // ECONNRESET
     ConnectionRefused, // ECONNREFUSED
     ConnectionTimedOut, // ETIMEDOUT

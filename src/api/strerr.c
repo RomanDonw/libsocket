@@ -49,6 +49,9 @@ const char *socket_strerror(SocketError errcode)
         case NetworkDown:
             return "network down";
 
+        case NetworkReset:
+            return "network reset";
+
         case ConnectionReset:
             return "connection reset";
 

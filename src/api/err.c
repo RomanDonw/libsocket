@@ -50,6 +50,9 @@ SocketError socket_getlasterror(void)
         case SOCKERR_NETDOWN:
             return NetworkDown;
 
+        case SOCKERR_NETRESET:
+            return NetworkReset;
+
         case SOCKERR_CONNRESET:
             return ConnectionReset;
 
