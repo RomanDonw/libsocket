@@ -37,7 +37,7 @@ int main(void)
     setsocksendbuffsize(s, 4096);
     printf("New send buffer size: %i\n", getsocksendbuffsize(s));
 
-    if (!socket_connect(s, "127.0.0.1", 8000)) { puts("socket_connect error"); abort(); }
+    if (!socket_connect(s, "127.0.0.1", 8000)) { printf("socket_connect error: %llu\n", socket_getlasterror()); abort(); }
 
     const char *request = "GET / HTTP/1.0\r\n\r\n";
     if (!socket_send(s, request, strlen(request))) { puts("socket_send abort"); abort(); }
