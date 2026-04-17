@@ -95,7 +95,7 @@ enum
 
     Interrupted, // EINTR
     AccessDenied, // EACCES
-    InvalidAddress, // EFAULT
+    Fault, // EFAULT
     IncorrectArgumentValue, // EINVAL
     TooManyOpenedSockets, // EMFILE
     TemporaryUnavailable, // EAGAIN/EWOULDBLOCK
@@ -109,6 +109,7 @@ enum
     ConnectionReset, // ECONNRESET
     ConnectionRefused, // ECONNREFUSED
     ConnectionTimedOut, // ETIMEDOUT
+    NotConnected, // ENOTCONN
 
     // Windows-specific
     InitializationError // WSANOTINITIALISED

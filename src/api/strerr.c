@@ -19,7 +19,7 @@ const char *socket_strerror(SocketError errcode)
         case AccessDenied:
             return "access denied";
 
-        case InvalidAddress:
+        case Fault:
             return "invalid or incorrect address";
         
         case IncorrectArgumentValue:
@@ -60,6 +60,9 @@ const char *socket_strerror(SocketError errcode)
 
         case ConnectionTimedOut:
             return "connection timed out";
+
+        case NotConnected:
+            return "not connected";
 
         // Windows-specific:
         case InitializationError:

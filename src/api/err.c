@@ -24,7 +24,7 @@ SocketError socket_getlasterror(void)
             return AccessDenied;
 
         case SOCKERR_FAULT:
-            return InvalidAddress;
+            return Fault;
 
         case SOCKERR_INVAL:
             return IncorrectArgumentValue;
@@ -61,6 +61,9 @@ SocketError socket_getlasterror(void)
 
         case SOCKERR_TIMEDOUT:
             return ConnectionTimedOut;
+
+        case SOCKERR_NOTCONN:
+            return NotConnected;
 
         #ifdef OS_WINDOWS
             case WSANOTINITIALISED:
