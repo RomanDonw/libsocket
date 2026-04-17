@@ -1,7 +1,11 @@
 #include "util.h"
 
+#include "init.h"
+
 int fillsockaddrstruct(struct sockaddr *out_sockaddr, SocketAddressFamily af, const char *addr, unsigned short port)
 {
+    ENSURE_INIT;
+
     int ret;
 
     memset(out_sockaddr, 0, sizeof(struct sockaddr));

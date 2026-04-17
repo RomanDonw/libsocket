@@ -119,6 +119,7 @@ enum
 typedef struct Socket Socket;
 
 SocketError socket_getlasterror(void);
+const char *socket_strerror(SocketError errcode);
 
 Socket *socket_open(SocketAddressFamily af, SocketType type, SocketProtocol protocol);
 bool socket_close(Socket *socket);
