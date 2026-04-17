@@ -107,6 +107,9 @@ enum
     ConnectionReset, // ECONNRESET
     ConnectionRefused, // ECONNREFUSED
     ConnectionTimedOut, // ETIMEDOUT
+
+    // Windows-specific
+    InitializationError // WSANOTINITIALISED
 } typedef SocketError;
 
 #define RECV_NOFLAGS 0
