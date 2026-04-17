@@ -2,15 +2,16 @@
 
 #define LIBSOCKET_ALLOWUNSAFEACCESS
 #include "libsocket.h"
+#include "util.h"
 
 int main(void)
 {
     Socket *s = socket_open(IPv4, Stream, TCP);
-    if (!s) { puts("socket_open error. Aborted."); return 1; }
+    if (!s) handleerror("socket_open");
 
     printf("Socket descriptor: %i\n", socket_gethandle(s));
 
-    if (!socket_close(s)) { puts("socket_close error. Aborted."); return 1; }
+    if (!socket_close(s)) handleerror("socket_close");
 
     return 0;
 }

@@ -58,6 +58,7 @@ const char *socket_strerror(SocketError errcode)
         case ConnectionTimedOut:
             return "connection timed out";
 
+        // Windows-specific:
         case InitializationError:
             return "WinSock not initialized";
 

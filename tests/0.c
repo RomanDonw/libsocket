@@ -3,6 +3,7 @@
 #include <time.h>
 
 #include "libsocket.h"
+#include "util.h"
 
 #ifdef OS_WINDOWS
     #include <windows.h>
@@ -31,21 +32,21 @@ void setsocksendbuffsize(const Socket *s, int size)
 int main(void)
 {
     Socket *s = socket_open(IPv4, Stream, TCP);
-    if (!s) { puts("socket_open error"); abort(); }
+    if (!s) handleerror("socket_open");
 
     printf("Old send buffer size: %i\n", getsocksendbuffsize(s));
     setsocksendbuffsize(s, 4096);
     printf("New send buffer size: %i\n", getsocksendbuffsize(s));
 
-    if (!socket_connect(s, "127.0.0.1", 8000)) { printf("socket_connect error: %llu\n", socket_getlasterror()); abort(); }
+    if (!socket_connect(s, "127.0.0.1", 8000)) handleerror("socket_connect");
 
     const char *request = "GET / HTTP/1.0\r\n\r\n";
-    if (!socket_send(s, request, strlen(request))) { puts("socket_send abort"); abort(); }
+    if (!socket_send(s, request, strlen(request))) handleerror("socket_send");
 
     MILLIS(100);
 
     unsigned long avail;
-    if (!socket_ioctl(s, AvailableDataToRead, &avail)) { puts("socket_ioctl error"); abort(); }
+    if (!socket_ioctl(s, AvailableDataToRead, &avail)) handleerror("socket_ioctl");
     printf("Available bytes: %lu\n", avail);
 
     const size_t BUFFER_SIZE = 512;
@@ -56,7 +57,7 @@ int main(void)
         for (size_t i = 0; i < readbytes; i++) putchar(buffer[i]);
     }
 
-    if (!socket_close(s)) { puts("socket_close error"); abort(); }
+    if (!socket_close(s)) handleerror("socket_close");
 
     return 0;
 }
