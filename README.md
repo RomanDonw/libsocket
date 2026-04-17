@@ -51,4 +51,5 @@ Tests are available in `/tests/` folder in the root of repo. You can also use th
 
 ### All tests short description:
 
-- Test 0 (0.c): HTTP 1.0 GET request test. 
+- Test 0 (0.c): HTTP 1.0 GET request test.
+- Test 1 (1.c): Unsafe API functions (for ex. socket_gethandle) test.
