@@ -17,6 +17,9 @@ SocketError socket_getlasterror(void)
 
     switch (err)
     {
+        case SOCKERR_NOMEM:
+            return MemoryAllocationFailed;
+
         case SOCKERR_INTR:
             return Interrupted;
 

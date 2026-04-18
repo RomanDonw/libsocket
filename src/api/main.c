@@ -6,6 +6,7 @@
 
 #include "../init.h"
 #include "../util.h"
+#include "err.h"
 
 #ifndef OS_WINDOWS
     #include <unistd.h>
@@ -29,7 +30,11 @@ Socket *socket_open(SocketAddressFamily af, SocketType type, SocketProtocol prot
     if ((desc = socket(af, type, protocol)) == INVALID_SOCKET) return NULL;
 
     Socket *ret = malloc(sizeof(Socket));
-    if (!ret) return NULL;
+    if (!ret)
+    {
+        SETLASTERROR(SOCKERR_NOMEM);
+        return NULL;
+    }
 
     ret->af = af;
     ret->type = type;
@@ -82,7 +87,11 @@ Socket *socket_accept(const Socket *socket)
     if ((desc = accept(socket->desc, NULL, NULL)) == INVALID_SOCKET) return NULL;
 
     Socket *ret = malloc(sizeof(Socket));
-    if (!ret) return NULL;
+    if (!ret)
+    {
+        SETLASTERROR(SOCKERR_NOMEM);
+        return NULL;
+    }
 
     ret->af = socket->af;
     ret->type = socket->type;

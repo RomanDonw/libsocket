@@ -91,8 +91,13 @@ enum
 
 enum
 {
+    // Internal (generated only by libsocket).
     InternalUnknownError,
 
+    // External with internal usage:
+    MemoryAllocationFailed, // ENOMEM
+
+    // "Pure-external" (cross-platform).
     Interrupted, // EINTR
     AccessDenied, // EACCES
     Fault, // EFAULT
@@ -112,7 +117,7 @@ enum
     NotConnected, // ENOTCONN
     InvalidDescriptor, // EBADF
 
-    // Windows-specific
+    // Windows-specific.
     InitializationError // WSANOTINITIALISED
 } typedef SocketError;
 

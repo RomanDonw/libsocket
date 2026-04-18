@@ -4,6 +4,14 @@
 #include "libsocket.h"
 
 #ifdef OS_WINDOWS
+    // macroses:
+
+    #define SETLASTERROR(x) (WSASetLastError(x))
+
+    // definitions:
+
+    #define SOCKERR_NOMEM WSA_NOT_ENOUGH_MEMORY
+
     #define SOCKERR_INTR WSAEINTR
     #define SOCKERR_ACCES WSAEACCES
     #define SOCKERR_FAULT WSAEFAULT
@@ -27,6 +35,14 @@
     #define SOCKERR_INVDESC WSA_INVALID_HANDLE
 #else
     #include <errno.h>
+
+    // macroses:
+
+    #define SETLASTERROR(x) (errno = x)
+
+    // definitions:
+
+    #define SOCKERR_NOMEM ENOMEM
 
     #define SOCKERR_INTR EINTR
     #define SOCKERR_ACCES EACCES
