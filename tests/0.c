@@ -18,7 +18,7 @@ int getsocksendbuffsize(const Socket *s)
     int sendbuffsize;
     
     socklen_t sendbuffsize_len = sizeof(sendbuffsize);
-    if (!socket_getopt(s, SocketLevel, SendBufferSize, &sendbuffsize, &sendbuffsize_len)) { puts("socket_getopt error"); abort(); }
+    if (!socket_getopt(s, SocketLevel, Socket_SendBufferSize, &sendbuffsize, &sendbuffsize_len)) { puts("socket_getopt error"); abort(); }
     if (sendbuffsize_len != sizeof(sendbuffsize)) { puts("sendbuffsize_len != sizeof(sendbuffsize). Abort."); abort(); }
 
     return sendbuffsize;
@@ -26,7 +26,7 @@ int getsocksendbuffsize(const Socket *s)
 
 void setsocksendbuffsize(const Socket *s, int size)
 {
-    if (!socket_setopt(s, SocketLevel, SendBufferSize, &size, sizeof(size))) { puts("socket_setopt error. Abort."); abort(); }
+    if (!socket_setopt(s, SocketLevel, Socket_SendBufferSize, &size, sizeof(size))) { puts("socket_setopt error. Abort."); abort(); }
 }
 
 int main(void)

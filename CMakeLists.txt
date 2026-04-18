@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.23)
 
 # ========== SETTINGS ==========
-set(PROJ_VERSION 1.0.0)
+set(PROJ_VERSION 1.0)
 set(VERSION_CHECK_METHOD SameMajorVersion)
 # ========== ======== ==========
 

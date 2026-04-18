@@ -74,19 +74,24 @@ enum
 
 enum
 {
-    SocketLevel = SOL_SOCKET
+    SocketLevel = SOL_SOCKET,
+    TCPLevel = IPPROTO_TCP
 } typedef SocketOptionLevel;
 
 enum
 {
     // SocketLevel
-    RevcBufferSize = SO_RCVBUF, // int, readable/writable.
-    SendBufferSize = SO_SNDBUF, // int, readable/writable.
-    KeepAliveConnection = SO_KEEPALIVE, // int (bool), readable/writable.
-    AcceptConnections = SO_ACCEPTCONN, // int (bool), readonly.
-    InternalError = SO_ERROR, // int, readonly.
-    AllowReuseAddress = SO_REUSEADDR, // int (bool), readable/writable.
-    Broadcast = SO_BROADCAST // int (bool), readable/writable.
+    Socket_RevcBufferSize = SO_RCVBUF, // int, readable/writable.
+    Socket_SendBufferSize = SO_SNDBUF, // int, readable/writable.
+    Socket_KeepAliveConnection = SO_KEEPALIVE, // int (bool), readable/writable.
+    Socket_AcceptConnections = SO_ACCEPTCONN, // int (bool), readonly.
+    Socket_InternalError = SO_ERROR, // int, readonly.
+    Socket_AllowReuseAddress = SO_REUSEADDR, // int (bool), readable/writable.
+    Socket_Broadcast = SO_BROADCAST, // int (bool), readable/writable.
+
+    // TCPLevel
+    TCP_DisableDelay = TCP_NODELAY,
+    TCP_MaximumDataSegmentSize = TCP_MAXSEG
 } typedef SocketOptionName;
 
 enum
