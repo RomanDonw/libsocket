@@ -1,6 +1,6 @@
 # Universal cross-platform C/C++ sockets library.
 
-This library provides universal cross-platform socket implementation. Supports Windows (MinGW, recommended UCRT64 env.; **MSVC doesn't support**), and any other OS that provides POSIX socket implementation.
+This library provides universal cross-platform network sockets implementation. Supports Windows (MinGW, recommended UCRT64 env.; **MSVC doesn't support**), and any other OS that provides POSIX socket implementation.
 
 ## Building the library
 
