@@ -42,7 +42,7 @@ If you using CMake in your project, add `libsocket` by same method or with using
 
 ```cmake
 find_package(libsocket REQUIRED)
-target_link_libraries(<project> PRIVATE libsocket::libsocket)
+target_link_libraries(<target> PRIVATE libsocket::libsocket)
 ```
 
 ## Tests
