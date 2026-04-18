@@ -38,6 +38,9 @@ SocketError socket_getlasterror(void)
         case SOCKERR_ALREADY:
             return InExecutionProcess;
 
+        case SOCKERR_AFNOSUPPORT:
+            return UnsupportedAddressFamily;
+
         case SOCKERR_PROTONOSUPPORT:
             return UnsupportedProtocol;
 

@@ -23,7 +23,7 @@ const char *socket_strerror(SocketError errcode)
             return "access denied";
 
         case Fault:
-            return "invalid or incorrect address";
+            return "fault";
         
         case IncorrectArgumentValue:
             return "incorrect argument value";
@@ -36,6 +36,9 @@ const char *socket_strerror(SocketError errcode)
 
         case InExecutionProcess:
             return "processing task";
+
+        case UnsupportedAddressFamily:
+            return "unsupported address family";
 
         case UnsupportedProtocol:
             return "unsupported network protocol";

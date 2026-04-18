@@ -105,6 +105,7 @@ enum
     TooManyOpenedSockets, // EMFILE
     TemporaryUnavailable, // EAGAIN/EWOULDBLOCK
     InExecutionProcess, // EALREADY
+    UnsupportedAddressFamily, // EAFNOSUPPORT
     UnsupportedProtocol, // EPROTONOSUPPORT
     UnsupportedSocketType, // ESOCKTNOSUPPORT
     AddressInUse, // EADDRINUSE
