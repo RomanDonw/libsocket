@@ -1,10 +1,16 @@
 cmake_minimum_required(VERSION 3.23)
-project(socket)
+
+# ========== SETTINGS ==========
+set(PROJ_VERSION 1.0.0)
+set(VERSION_CHECK_METHOD SameMajorVersion)
+# ========== ======== ==========
+
+project(socket VERSION ${PROJ_VERSION})
 
 include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.h" "src/*.c")
-file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "include/*.h")
 
 add_library(socket STATIC ${SOURCES})
 
@@ -26,6 +32,8 @@ install(TARGETS socket
 )
 install(DIRECTORY "include/" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/configure.cmake")
+
 install(EXPORT libsocketTargets
     FILE libsocketTargets.cmake
     NAMESPACE libsocket::
@@ -34,8 +42,4 @@ install(EXPORT libsocketTargets
 
 # ===== TESTS =====
 
-add_executable(test0 "tests/0.c")
-target_link_libraries(test0 PRIVATE socket)
-
-add_executable(test1 "tests/1.c")
-target_link_libraries(test1 PRIVATE socket)
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/tests.cmake")
