@@ -10,6 +10,8 @@
 
     // definitions:
 
+    // external:
+
     #define SOCKERR_NOMEM WSA_NOT_ENOUGH_MEMORY
 
     #define SOCKERR_INTR WSAEINTR
@@ -37,11 +39,17 @@
 #else
     #include <errno.h>
 
+    #if sizeof(errno_t) != sizeof(int)
+        #error "errno_t" type size doesnt match "int" type size
+    #endif
+
     // macroses:
 
     #define SETLASTERROR(x) (errno = x)
 
     // definitions:
+
+    // external:
 
     #define SOCKERR_NOMEM ENOMEM
 
@@ -68,5 +76,7 @@
     #define SOCKERR_NOTCONN ENOTCONN
     #define SOCKERR_INVDESC EBADF
 #endif
+
+#define SOCKERR_PARSEADDRFAIL -256
 
 #endif

@@ -1,6 +1,7 @@
 #include "util.h"
 
 #include "init.h"
+#include "err.h"
 
 #ifndef OS_WINDOWS
     #include <unistd.h>
@@ -37,5 +38,8 @@ int fillsockaddrstruct(struct sockaddr *out_sockaddr, SocketAddressFamily af, co
             *out_sockaddr = *((struct sockaddr *)(&sa6));
             break;
     }
+
+    if (ret == 0) SETLASTERROR(SOCKERR_PARSEADDRFAIL);
+
     return ret;
 }

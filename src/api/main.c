@@ -6,7 +6,7 @@
 
 #include "../init.h"
 #include "../util.h"
-#include "err.h"
+#include "../err.h"
 
 #ifndef OS_WINDOWS
     #include <unistd.h>

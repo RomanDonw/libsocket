@@ -16,6 +16,9 @@ const char *socket_strerror(SocketError errcode)
         case MemoryAllocationFailed:
             return "memory allocation failed";
 
+        case ParsingAddressFailed:
+            return "parsing address failed";
+
         case Interrupted:
             return "socket operation interrupted";
 

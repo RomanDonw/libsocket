@@ -1,5 +1,5 @@
 #include "libsocket.h"
-#include "err.h"
+#include "../err.h"
 
 #include "../init.h"
 
@@ -19,6 +19,9 @@ SocketError socket_getlasterror(void)
     {
         case SOCKERR_NOMEM:
             return MemoryAllocationFailed;
+
+        case SOCKERR_PARSEADDRFAIL:
+            return ParsingAddressFailed;
 
         case SOCKERR_INTR:
             return Interrupted;

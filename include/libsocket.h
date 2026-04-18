@@ -93,6 +93,7 @@ enum
 {
     // Internal (generated only by libsocket).
     InternalUnknownError,
+    ParsingAddressFailed,
 
     // External with internal usage:
     MemoryAllocationFailed, // ENOMEM
