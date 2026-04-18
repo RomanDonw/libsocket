@@ -65,6 +65,9 @@ SocketError socket_getlasterror(void)
         case SOCKERR_NOTCONN:
             return NotConnected;
 
+        case SOCKERR_INVDESC:
+            return InvalidDescriptor;
+
         #ifdef OS_WINDOWS
             case WSANOTINITIALISED:
                 return InitializationError;

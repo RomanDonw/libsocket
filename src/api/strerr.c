@@ -64,6 +64,9 @@ const char *socket_strerror(SocketError errcode)
         case NotConnected:
             return "not connected";
 
+        case InvalidDescriptor:
+            return "invalid descriptor";
+
         // Windows-specific:
         case InitializationError:
             return "WinSock not initialized";

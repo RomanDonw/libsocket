@@ -110,6 +110,7 @@ enum
     ConnectionRefused, // ECONNREFUSED
     ConnectionTimedOut, // ETIMEDOUT
     NotConnected, // ENOTCONN
+    InvalidDescriptor, // EBADF
 
     // Windows-specific
     InitializationError // WSANOTINITIALISED
