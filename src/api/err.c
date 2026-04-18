@@ -8,9 +8,9 @@ SocketError socket_getlasterror(void)
     ENSURE_INIT;
 
     #ifdef OS_WINDOWS
-        errno_t err = WSAGetLastError();
+        int err = WSAGetLastError();
     #else
-        errno_t err = errno;
+        int err = errno;
     #endif
 
     if (err == SOCKERR_WOULDBLOCK || err == SOCKERR_AGAIN) return TemporaryUnavailable;

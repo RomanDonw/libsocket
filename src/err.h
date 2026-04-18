@@ -39,10 +39,6 @@
 #else
     #include <errno.h>
 
-    #if sizeof(errno_t) != sizeof(int)
-        #error "errno_t" type size doesnt match "int" type size
-    #endif
-
     // macroses:
 
     #define SETLASTERROR(x) (errno = x)

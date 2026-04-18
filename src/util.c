@@ -1,5 +1,7 @@
 #include "util.h"
 
+#include <string.h>
+
 #include "init.h"
 #include "err.h"
 
