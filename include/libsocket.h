@@ -56,14 +56,14 @@ enum
 
 enum
 {
-    Stream = SOCK_STREAM,
-    Datagram = SOCK_DGRAM
+    Stream = SOCK_STREAM/*,
+    Datagram = SOCK_DGRAM*/
 } typedef SocketType;
 
 enum
 {
-    TCP = IPPROTO_TCP,
-    UDP = IPPROTO_UDP
+    TCP = IPPROTO_TCP/*,
+    UDP = IPPROTO_UDP*/
 } typedef SocketProtocol;
 
 enum
