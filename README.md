@@ -1,6 +1,6 @@
 # Universal cross-platform C/C++ sockets library.
 
-The library enables universal use of network sockets on Windows/UNIX-compatible platforms without the need to write a custom compatibility layer for different socket implementations on different operating systems. Written in pure C, it can theoretically be used in any programming language that supports C function bindings or FFIs. The Windows implementation uses the WinSock2 library, while UNIX-compatible operating systems use the POSIX socket implementation (<sys/socket.h> and other related files).
+This library provides universal cross-platform socket implementation. Supports Windows (MinGW, recommended UCRT64 env.; **MSVC doesn't support**), and any other OS that provides POSIX socket implementation.
 
 ## Building the library
 
@@ -52,4 +52,4 @@ Tests are available in `/tests/` folder in the root of repo. You can also use th
 ### All tests short description:
 
 - Test 0 (0.c): HTTP 1.0 GET request test.
-- Test 1 (1.c): Unsafe API functions (for ex. socket_gethandle) test.
+- Test 1 (1.c): Unsafe API functions (for ex. `socket_gethandle`) test.
