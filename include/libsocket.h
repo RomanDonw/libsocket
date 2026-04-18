@@ -90,8 +90,8 @@ enum
     Socket_Broadcast = SO_BROADCAST, // int (bool), readable/writable.
 
     // TCPLevel
-    TCP_DisableDelay = TCP_NODELAY,
-    TCP_MaximumDataSegmentSize = TCP_MAXSEG
+    TCP_DisableDelay = TCP_NODELAY, // int (bool), readable/writable.
+    TCP_MaximumDataSegmentSize = TCP_MAXSEG, // int, readable/writable.
 } typedef SocketOptionName;
 
 enum
