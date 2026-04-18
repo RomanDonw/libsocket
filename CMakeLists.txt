@@ -1,12 +1,13 @@
 cmake_minimum_required(VERSION 3.23)
 project(socket)
 
+include(GNUInstallDirs)
+
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.h" "src/*.c")
 file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "include/*.h")
 
 add_library(socket STATIC ${SOURCES})
 
-set_target_properties(socket PROPERTIES PUBLIC_HEADER ${HEADERS})
 target_include_directories(socket PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
@@ -23,6 +24,7 @@ install(TARGETS socket
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
+install(DIRECTORY "include/" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 install(EXPORT libsocketTargets
     FILE libsocketTargets.cmake
