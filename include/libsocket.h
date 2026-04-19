@@ -27,7 +27,6 @@
     #else
         #ifdef LIBSOCKET_EXPORT
             #define LIBSOCKET_API __declspec(dllexport)
-            #define LIBSOCKET_ALLOWUNSAFEACCESS
         #else
             #define LIBSOCKET_API __declspec(dllimport)
         #endif
@@ -179,7 +178,7 @@ LIBSOCKET_API SocketProtocol LIBSOCKET_ABI socket_getprotocol(const Socket *sock
 LIBSOCKET_API bool LIBSOCKET_ABI socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, void *optval, socklen_t *optlen);
 LIBSOCKET_API bool LIBSOCKET_ABI socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, const void *optval, socklen_t optlen);
 
-#ifdef LIBSOCKET_ALLOWUNSAFEACCESS
+#if defined(LIBSOCKET_ALLOWUNSAFEACCESS) || defined(LIBSOCKET_EXPORT)
     LIBSOCKET_API SOCKETDESCRIPTOR LIBSOCKET_ABI socket_gethandle(const Socket *socket);
 #endif
 
