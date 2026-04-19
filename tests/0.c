@@ -49,8 +49,9 @@ int main(void)
     if (!socket_ioctl(s, AvailableDataToRead, &avail)) handleerror("socket_ioctl");
     printf("Available bytes: %lu\n", avail);
 
-    const size_t BUFFER_SIZE = 512;
-    char buffer[BUFFER_SIZE];
+    //const size_t BUFFER_SIZE = 512;
+    #define BUFFER_SIZE 512
+    char buffer[BUFFER_SIZE];;
     ssize_t readbytes;
     while ((readbytes = socket_recv(s, buffer, BUFFER_SIZE, RECV_NOFLAGS)) > 0)
     {

@@ -23,7 +23,8 @@ volatile void *___ = NULL;
         const WORD version = MAKEWORD(2, 2);
 
         WSADATA data;
-        if (int err = WSAStartup(version, &data))
+        int err = WSAStartup(version, &data);
+        if (err)
         {
             fprintf(stderr, "[libsocket]: WSAStartup error %i. Application aborted.\n", err);
             abort();
@@ -50,7 +51,7 @@ volatile void *___ = NULL;
         static void libsocket_MSVCinit()
         {
             libsocket_WSAInit();
-            if (atexit())
+            if (atexit(libsocket_WSACleanup))
             {
                 fprintf(stderr, "[libsocket]: error binding library cleanup callback in \"atexit\" C function. Application aborted.\n");
                 libsocket_WSACleanup();
@@ -58,6 +59,7 @@ volatile void *___ = NULL;
             }
         }
 
-        __declspec(allocate(".CRT$XCU")) void (*libsocket_MSVCinit##__ptr)(void) = libsocket_MSVCinit;
+        #pragma section(".CRT$XCU", read)
+        __declspec(allocate(".CRT$XCU")) void (*libsocket_MSVCinit__ptr)(void) = libsocket_MSVCinit;
     #endif
 #endif
