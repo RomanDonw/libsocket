@@ -25,10 +25,14 @@
             #define LIBSOCKET_API __attribute__((visibility("default")))
         #endif
     #else
-        #ifdef LIBSOCKET_EXPORT
-            #define LIBSOCKET_API __declspec(dllexport)
+        #ifdef _MSC_VER
+            #ifdef LIBSOCKET_EXPORT
+                #define LIBSOCKET_API __declspec(dllexport)
+            #else
+                #define LIBSOCKET_API __declspec(dllimport)
+            #endif
         #else
-            #define LIBSOCKET_API __declspec(dllimport)
+            #define LIBSOCKET_API __attribute__((visibility("default")))
         #endif
     #endif
 
