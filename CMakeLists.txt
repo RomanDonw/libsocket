@@ -14,8 +14,6 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.h" "src/*.c")
 
 add_library(socket STATIC ${SOURCES})
 
-target_compile_options(socket PRIVATE -O2)
-
 target_include_directories(socket PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
