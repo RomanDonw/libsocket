@@ -6,8 +6,6 @@
 
 const char *socket_strerror(SocketError errcode)
 {
-    ENSURE_INIT;
-
     switch (errcode)
     {
         case InternalUnknownError:
