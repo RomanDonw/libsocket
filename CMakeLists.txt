@@ -22,14 +22,13 @@ add_library(socket ${SOURCES})
 
 target_compile_definitions(socket 
     PRIVATE $<$<BOOL:${BUILD_SHARED_LIBS}>:LIBSOCKET_EXPORTS>
-    INTERFACE $<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:LIBSOCKET_STATIC>
+    PUBLIC $<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:LIBSOCKET_STATIC>
 )
 
 message("============================================")
 if(BUILD_SHARED_LIBS)
     message("Building dynamic version of libsocket.")
 else()
-    target_compile_definitions(socket PUBLIC LIBSOCKET_STATIC)
     message("Building static version of libsocket.")
 endif()
 message("============================================")
