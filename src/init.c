@@ -6,10 +6,19 @@ volatile void *___ = NULL;
 #ifdef OS_WINDOWS
     #include <stdbool.h>
     #include <stdio.h>
+    #include <stdlib.h>
+
+    #ifndef _MSC_VER
+        #define LIBSOCKET_INITATTR __attribute__((constructor(101)))
+        #define LIBSOCKET_CLUPATTR __attribute__((destructor))
+    #else
+        #define LIBSOCKET_INITATTR
+        #define LIBSOCKET_CLUPATTR
+    #endif
 
     bool inited = false;
 
-    void __attribute__((constructor(101))) init()
+    static void LIBSOCKET_INITATTR libsocket_WSAInit(void)
     {
         const WORD version = MAKEWORD(2, 2);
 
@@ -31,9 +40,24 @@ volatile void *___ = NULL;
         inited = true;
     }
 
-    void __attribute__((destructor)) cleanup()
+    static void LIBSOCKET_CLUPATTR libsocket_WSACleanup(void)
     {
         WSACleanup();
         inited = false;
     }
+
+    #ifdef _MSC_VER
+        static void libsocket_MSVCinit()
+        {
+            libsocket_WSAInit();
+            if (atexit())
+            {
+                fprintf(stderr, "[libsocket]: error binding library cleanup callback in \"atexit\" C function. Application aborted.\n");
+                libsocket_WSACleanup();
+                abort();
+            }
+        }
+
+        __declspec(allocate(".CRT$XCU")) void (*libsocket_MSVCinit##__ptr)(void) = libsocket_MSVCinit;
+    #endif
 #endif
