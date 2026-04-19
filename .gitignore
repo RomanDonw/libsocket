@@ -4,3 +4,4 @@
 /out
 
 *.code-workspace
+CMakeSettings.json

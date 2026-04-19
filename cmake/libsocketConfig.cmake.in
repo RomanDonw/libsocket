@@ -4,4 +4,12 @@ include(CMakeFindDependencyMacro)
 
 include("${CMAKE_CURRENT_LIST_DIR}/libsocketTargets.cmake")
 
+message("============================================")
+if(BUILD_SHARED_LIBS)
+    message("Used dynamic version of libsocket.")
+else()
+    message("Used static version of libsocket.")
+endif()
+message("============================================")
+
 check_required_components(libsocket)

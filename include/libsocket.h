@@ -18,6 +18,21 @@
     #include <winsock2.h>
     #include <ws2tcpip.h>
 
+    #ifdef LIBSOCKET_STATIC
+        #ifdef _MSC_VER
+            #define LIBSOCKET_API
+        #else
+            #define LIBSOCKET_API __attribute__((visibility("default")))
+        #endif
+    #else
+        #ifdef LIBSOCKET_EXPORT
+            #define LIBSOCKET_API __declspec(dllexport)
+            #define LIBSOCKET_ALLOWUNSAFEACCESS
+        #else
+            #define LIBSOCKET_API __declspec(dllimport)
+        #endif
+    #endif
+
     typedef SSIZE_T ssize_t;
 
     typedef SOCKET SOCKETDESCRIPTOR;
@@ -37,6 +52,8 @@
     #include <sys/ioctl.h>
     #include <netinet/tcp.h>
 
+    #define LIBSOCKET_API __attribute__((visibility("default")))
+
     typedef int SOCKETDESCRIPTOR;
     #define INVALID_SOCKET -1
 
@@ -48,6 +65,8 @@
     } typedef SocketShutdownMode;
 
 #endif
+
+#define LIBSOCKET_ABI __cdecl
 
 enum
 {
@@ -135,33 +154,33 @@ enum
 
 typedef struct Socket Socket;
 
-SocketError socket_getlasterror(void);
-const char *socket_strerror(SocketError errcode);
+LIBSOCKET_API SocketError LIBSOCKET_ABI socket_getlasterror(void);
+LIBSOCKET_API const char * LIBSOCKET_ABI socket_strerror(SocketError errcode);
 
-Socket *socket_open(SocketAddressFamily af, SocketType type, SocketProtocol protocol);
-bool socket_close(Socket *socket);
+LIBSOCKET_API Socket * LIBSOCKET_ABI socket_open(SocketAddressFamily af, SocketType type, SocketProtocol protocol);
+LIBSOCKET_API bool LIBSOCKET_ABI socket_close(Socket *socket);
 
-bool socket_connect(const Socket *socket, const char *address, unsigned short port);
+LIBSOCKET_API bool LIBSOCKET_ABI socket_connect(const Socket *socket, const char *address, unsigned short port);
 
-bool socket_bind(const Socket *socket, const char *address, unsigned short port);
-bool socket_listen(const Socket *socket, int backlog);
-Socket *socket_accept(const Socket *socket);
+LIBSOCKET_API bool LIBSOCKET_ABI socket_bind(const Socket *socket, const char *address, unsigned short port);
+LIBSOCKET_API bool LIBSOCKET_ABI socket_listen(const Socket *socket, int backlog);
+LIBSOCKET_API Socket * LIBSOCKET_ABI socket_accept(const Socket *socket);
 
-ssize_t socket_recv(const Socket *socket, void *buffer, size_t len, int flags);
-ssize_t socket_send(const Socket *socket, const void *data, size_t len);
+LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_recv(const Socket *socket, void *buffer, size_t len, int flags);
+LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_send(const Socket *socket, const void *data, size_t len);
 
-bool socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value);
-bool socket_shutdown(const Socket *socket, SocketShutdownMode mode);
+LIBSOCKET_API bool LIBSOCKET_ABI socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value);
+LIBSOCKET_API bool LIBSOCKET_ABI socket_shutdown(const Socket *socket, SocketShutdownMode mode);
 
-SocketAddressFamily socket_getaf(const Socket *socket);
-SocketType socket_gettype(const Socket *socket);
-SocketProtocol socket_getprotocol(const Socket *socket);
+LIBSOCKET_API SocketAddressFamily LIBSOCKET_ABI socket_getaf(const Socket *socket);
+LIBSOCKET_API SocketType LIBSOCKET_ABI socket_gettype(const Socket *socket);
+LIBSOCKET_API SocketProtocol LIBSOCKET_ABI socket_getprotocol(const Socket *socket);
 
-bool socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, void *optval, socklen_t *optlen);
-bool socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, const void *optval, socklen_t optlen);
+LIBSOCKET_API bool LIBSOCKET_ABI socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, void *optval, socklen_t *optlen);
+LIBSOCKET_API bool LIBSOCKET_ABI socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, const void *optval, socklen_t optlen);
 
 #ifdef LIBSOCKET_ALLOWUNSAFEACCESS
-    SOCKETDESCRIPTOR socket_gethandle(const Socket *socket);
+    LIBSOCKET_API SOCKETDESCRIPTOR LIBSOCKET_ABI socket_gethandle(const Socket *socket);
 #endif
 
 #ifdef __cplusplus
