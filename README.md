@@ -1,4 +1,4 @@
-# Universal cross-platform C/C++ sockets library.
+# Universal cross-platform C99/C++ sockets library.
 
 This library provides universal cross-platform network sockets implementation. Supports Windows (recommended MinGW UCRT64 env., MSVC also supported), and any other OS that provides POSIX socket implementation. Also this library supports both static & dynamic linking and building (if set CMake `BUILD_SHARED_LIBS` to `ON`).
 

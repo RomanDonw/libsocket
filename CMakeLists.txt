@@ -4,6 +4,10 @@ cmake_minimum_required(VERSION 3.23)
 set(PROJ_VERSION 1.0)
 set(VERSION_CHECK_METHOD SameMajorVersion)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
 # ========== ======== ==========
 
 project(socket VERSION ${PROJ_VERSION})
