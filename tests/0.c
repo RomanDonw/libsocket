@@ -38,7 +38,10 @@ int main(void)
     setsocksendbuffsize(s, 4096);
     printf("New send buffer size: %i\n", getsocksendbuffsize(s));
 
-    if (!socket_connect(s, "127.0.0.1", 8000)) handleerror("socket_connect");
+    IPv4Address localhost = IPV4ADDRESS_LOOPBACK;
+    SocketAddress saddr;
+    socket_fillsockaddr(&saddr, IPv4, (IPAddressInterface *)&localhost, 8000);
+    if (!socket_connect(s, &saddr)) handleerror("socket_connect");
 
     const char *request = "GET / HTTP/1.0\r\n\r\n";
     if (!socket_send(s, request, strlen(request))) handleerror("socket_send");

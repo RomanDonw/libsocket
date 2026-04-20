@@ -160,13 +160,14 @@ typedef struct Socket Socket;
 typedef struct sockaddr_in SocketIPv4Address;
 typedef struct sockaddr_in6 SocketIPv6Address;
 typedef struct sockaddr_storage SocketAddressInterface;
+typedef SocketAddressInterface SocketAddress;
 
 typedef struct in_addr IPv4Address;
 typedef struct in6_addr IPv6Address;
 
-#define IPV4ADDRESS_ANY INADDR_ANY
-#define IPV4ADDRESS_LOOPBACK INADDR_LOOPBACK
-#define IPV4ADDRESS_BROADCAST INADDR_BROADCAST
+#define IPV4ADDRESS_ANY { .s_addr = htonl(INADDR_ANY) }
+#define IPV4ADDRESS_LOOPBACK { .s_addr = htonl(INADDR_LOOPBACK) }
+#define IPV4ADDRESS_BROADCAST { .s_addr = htonl(INADDR_BROADCAST) }
 
 #define IPV6ADDRESS_ANY IN6ADDR_ANY_INIT
 #define IPV6ADDRESS_LOOPBACK IN6ADDR_LOOPBACK_INIT
