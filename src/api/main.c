@@ -5,7 +5,6 @@
 #include <stdbool.h>
 
 #include "../init.h"
-#include "../util.h"
 #include "../err.h"
 
 #ifndef OS_WINDOWS
