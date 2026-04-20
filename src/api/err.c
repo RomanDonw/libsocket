@@ -11,8 +11,6 @@ SocketError socket_getlasterror(void)
         int err = WSAGetLastError();
     #else
         int err = errno;
-
-        if (err == SOCKERR_WOULDBLOCK || err == SOCKERR_AGAIN) return TemporaryUnavailable;
     #endif
 
     switch (err)
@@ -77,12 +75,13 @@ SocketError socket_getlasterror(void)
         case SOCKERR_INVDESC:
             return InvalidDescriptor;
 
+        case SOCKERR_AGAIN:
+        case SOCKERR_WOULDBLOCK:
+            return TemporaryUnavailable;
+
         #ifdef OS_WINDOWS
             case WSANOTINITIALISED:
                 return InitializationError;
-
-            case SOCKERR_WOULDBLOCK:
-                return TemporaryUnavailable;
         #endif
 
         default:

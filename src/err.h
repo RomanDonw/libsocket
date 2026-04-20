@@ -3,14 +3,12 @@
 
 #include "libsocket.h"
 
+#define CUSTOMERR_STARTOFFSET -256
+#define CUSTOMERR_STEP -1
+#define CUSTOMERR(index) (CUSTOMERR_STARTOFFSET + (CUSTOMERR_STEP) * index)
+
 #ifdef OS_WINDOWS
-    // macroses:
-
     #define SETLASTERROR(x) (WSASetLastError(x))
-
-    // definitions:
-
-    // external:
 
     #define SOCKERR_NOMEM WSA_NOT_ENOUGH_MEMORY
 
@@ -20,6 +18,7 @@
     #define SOCKERR_INVAL WSAEINVAL
     #define SOCKERR_MFILE WSAEMFILE
 
+    #define SOCKERR_AGAIN CUSTOMERR(1)
     #define SOCKERR_WOULDBLOCK WSAEWOULDBLOCK
 
     #define SOCKERR_ALREADY WSAEALREADY
@@ -38,13 +37,7 @@
 #else
     #include <errno.h>
 
-    // macroses:
-
     #define SETLASTERROR(x) (errno = x)
-
-    // definitions:
-
-    // external:
 
     #define SOCKERR_NOMEM ENOMEM
 
@@ -72,6 +65,6 @@
     #define SOCKERR_INVDESC EBADF
 #endif
 
-#define SOCKERR_PARSEADDRFAIL -256
+#define SOCKERR_PARSEADDRFAIL CUSTOMERR(0)
 
 #endif
