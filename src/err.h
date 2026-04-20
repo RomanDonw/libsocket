@@ -3,7 +3,7 @@
 
 #include "libsocket.h"
 
-#define CUSTOMERR_STARTOFFSET -256
+#define CUSTOMERR_STARTOFFSET -1024
 #define CUSTOMERR_STEP -1
 #define CUSTOMERR(index) (CUSTOMERR_STARTOFFSET + (CUSTOMERR_STEP) * index)
 

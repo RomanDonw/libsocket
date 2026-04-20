@@ -13,7 +13,7 @@
 #endif
 
 #ifdef OS_WINDOWS
-    // windows env.
+    // Windows environment.
 
     #include <winsock2.h>
     #include <ws2tcpip.h>
@@ -48,11 +48,11 @@
     } typedef SocketShutdownMode;
 
 #else
-    // unix env.
+    // POSIX environment.
 
     #include <sys/socket.h>
-    #include <netinet/in.h>
     #include <sys/ioctl.h>
+    #include <netinet/in.h>
     #include <netinet/tcp.h>
 
     #define LIBSOCKET_API __attribute__((visibility("default")))
@@ -157,15 +157,38 @@ enum
 
 typedef struct Socket Socket;
 
+typedef struct sockaddr_in SocketIPv4Address;
+typedef struct sockaddr_in6 SocketIPv6Address;
+typedef struct sockaddr_storage SocketAddressInterface;
+
+typedef struct in_addr IPv4Address;
+typedef struct in6_addr IPv6Address;
+
+#define IPV4ADDRESS_ANY INADDR_ANY
+#define IPV4ADDRESS_LOOPBACK INADDR_LOOPBACK
+#define IPV4ADDRESS_BROADCAST INADDR_BROADCAST
+
+#define IPV6ADDRESS_ANY IN6ADDR_ANY_INIT
+#define IPV6ADDRESS_LOOPBACK IN6ADDR_LOOPBACK_INIT
+
+union
+{
+    IPv4Address ipv4;
+    IPv6Address ipv6;
+} typedef IPAddressInterface;
+
 LIBSOCKET_API SocketError LIBSOCKET_ABI socket_getlasterror(void);
 LIBSOCKET_API const char * LIBSOCKET_ABI socket_strerror(SocketError errcode);
+
+LIBSOCKET_API bool LIBSOCKET_ABI socket_parseaddr(IPAddressInterface *addr, SocketAddressFamily af, const char *straddr);
+LIBSOCKET_API bool LIBSOCKET_ABI socket_fillsockaddr(SocketAddressInterface *sockaddr, SocketAddressFamily af, const IPAddressInterface *addr, unsigned short port);
 
 LIBSOCKET_API Socket * LIBSOCKET_ABI socket_open(SocketAddressFamily af, SocketType type, SocketProtocol protocol);
 LIBSOCKET_API bool LIBSOCKET_ABI socket_close(Socket *socket);
 
-LIBSOCKET_API bool LIBSOCKET_ABI socket_connect(const Socket *socket, const char *address, unsigned short port);
+LIBSOCKET_API bool LIBSOCKET_ABI socket_connect(const Socket *socket, const SocketAddressInterface *sockaddr);
+LIBSOCKET_API bool LIBSOCKET_ABI socket_bind(const Socket *socket, const SocketAddressInterface *sockaddr);
 
-LIBSOCKET_API bool LIBSOCKET_ABI socket_bind(const Socket *socket, const char *address, unsigned short port);
 LIBSOCKET_API bool LIBSOCKET_ABI socket_listen(const Socket *socket, int backlog);
 LIBSOCKET_API Socket * LIBSOCKET_ABI socket_accept(const Socket *socket);
 

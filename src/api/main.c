@@ -61,23 +61,11 @@ bool socket_close(Socket *socket)
 
 bool socket_listen(const Socket *socket, int backlog) { ENSURE_INIT; return !listen(socket->desc, backlog); }
 
-bool socket_connect(const Socket *socket, const char *address, unsigned short port)
-{
-    ENSURE_INIT;
+bool socket_connect(const Socket *socket, const SocketAddressInterface *sockaddr)
+{ ENSURE_INIT; return !connect(socket->desc, (struct sockaddr *)sockaddr, sizeof(SocketAddressInterface)); }
 
-    struct sockaddr sa;
-    if (fillsockaddrstruct(&sa, socket->af, address, port) <= 0) return false;
-    return !connect(socket->desc, &sa, sizeof(sa));
-}
-
-bool socket_bind(const Socket *socket, const char *address, unsigned short port)
-{
-    ENSURE_INIT;
-
-    struct sockaddr sa;
-    if (fillsockaddrstruct(&sa, socket->af, address, port) <= 0) return false;
-    return !bind(socket->desc, &sa, sizeof(sa));
-}
+bool socket_bind(const Socket *socket, const SocketAddressInterface *sockaddr)
+{ ENSURE_INIT; return !bind(socket->desc, (struct sockaddr *)sockaddr, sizeof(SocketAddressInterface)); }
 
 Socket *socket_accept(const Socket *socket)
 {
@@ -126,5 +114,43 @@ bool socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionNa
 
 bool socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, const void *optval, socklen_t optlen)
 { ENSURE_INIT; return !setsockopt(socket->desc, level, optname, optval, optlen); }
+
+bool socket_parseaddr(IPAddressInterface *addr, SocketAddressFamily af, const char *straddr)
+{
+    ENSURE_INIT;
+
+    int ret = inet_pton(af, straddr, addr);
+    if (ret == 0) SETLASTERROR(SOCKERR_PARSEADDRFAIL);
+    return ret == 1;
+}
+
+LIBSOCKET_API bool LIBSOCKET_ABI socket_fillsockaddr(SocketAddressInterface *sockaddr, SocketAddressFamily af, const IPAddressInterface *addr, unsigned short port)
+{
+    ENSURE_INIT;
+
+    memset(sockaddr, 0, sizeof(SocketAddressInterface));
+    sockaddr->ss_family = af;
+
+    switch (af)
+    {
+        case IPv4:;
+            SocketIPv4Address *sa4 = (SocketIPv4Address *)sockaddr;
+            sa4->sin_addr = *((IPv4Address *)addr);
+            sa4->sin_port = htons(port);
+            break;
+
+        case IPv6:;
+            SocketIPv6Address *sa6 = (SocketIPv6Address *)sockaddr;
+            sa6->sin6_addr = *((IPv6Address *)addr);
+            sa6->sin6_port = htons(port);
+            break;
+
+        default:
+            SETLASTERROR(SOCKERR_AFNOSUPPORT);
+            return false;
+    }
+
+    return true;
+}
 
 SOCKETDESCRIPTOR socket_gethandle(const Socket *socket) { ENSURE_INIT; return socket->desc; }
