@@ -35,6 +35,9 @@ const char *socket_strerror(SocketError errcode)
         case TemporaryUnavailable:
             return "temporary unavailable";
 
+	case OperationInProgress:
+	    return "operation in progress";
+
         case InExecutionProcess:
             return "processing task";
 

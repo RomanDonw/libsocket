@@ -133,6 +133,7 @@ enum
     IncorrectArgumentValue, // EINVAL
     TooManyOpenedSockets, // EMFILE
     TemporaryUnavailable, // EAGAIN/EWOULDBLOCK
+    OperationInProgress, // EINPROGRESS
     InExecutionProcess, // EALREADY
     UnsupportedAddressFamily, // EAFNOSUPPORT
     UnsupportedProtocol, // EPROTONOSUPPORT
