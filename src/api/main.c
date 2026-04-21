@@ -123,6 +123,17 @@ bool socket_parseaddr(IPAddressInterface *addr, SocketAddressFamily af, const ch
     return ret == 1;
 }
 
+bool socket_addrtostr(const IPAddressInterface *addr, SocketAddressFamily af, char *straddr, socklen_t size)
+{
+    ENSURE_INIT;
+
+    bool res = inet_ntop(af, addr, straddr, size);
+    #ifdef OS_WINDOWS
+        if (!res && socket_getlasterror() == ERROR_INVALID_PARAMETER) SETLASTERROR(SOCKERR_NOSPC);
+    #endif
+    return res;
+}
+
 LIBSOCKET_API bool LIBSOCKET_ABI socket_fillsockaddr(SocketAddressInterface *sockaddr, SocketAddressFamily af, const IPAddressInterface *addr, unsigned short port)
 {
     ENSURE_INIT;

@@ -147,6 +147,7 @@ enum
     ConnectionTimedOut, // ETIMEDOUT
     NotConnected, // ENOTCONN
     InvalidDescriptor, // EBADF
+    NoSpaceLeft, // ENOSPC
 
     // Windows-specific.
     InitializationError // WSANOTINITIALISED
@@ -185,6 +186,7 @@ LIBSOCKET_API SocketError LIBSOCKET_ABI socket_getlasterror(void);
 LIBSOCKET_API const char * LIBSOCKET_ABI socket_strerror(SocketError errcode);
 
 LIBSOCKET_API bool LIBSOCKET_ABI socket_parseaddr(IPAddressInterface *addr, SocketAddressFamily af, const char *straddr);
+LIBSOCKET_API bool LIBSOCKET_ABI socket_addrtostr(const IPAddressInterface *addr, SocketAddressFamily af, char *straddr, socklen_t size);
 LIBSOCKET_API bool LIBSOCKET_ABI socket_fillsockaddr(SocketAddressInterface *sockaddr, SocketAddressFamily af, const IPAddressInterface *addr, unsigned short port);
 
 LIBSOCKET_API Socket * LIBSOCKET_ABI socket_open(SocketAddressFamily af, SocketType type, SocketProtocol protocol);

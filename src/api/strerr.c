@@ -35,8 +35,8 @@ const char *socket_strerror(SocketError errcode)
         case TemporaryUnavailable:
             return "temporary unavailable";
 
-	case OperationInProgress:
-	    return "operation in progress";
+        case OperationInProgress:
+            return "operation in progress";
 
         case InExecutionProcess:
             return "processing task";
@@ -76,6 +76,9 @@ const char *socket_strerror(SocketError errcode)
 
         case InvalidDescriptor:
             return "invalid descriptor";
+
+        case NoSpaceLeft:
+            return "no space left";
 
         // Windows-specific:
         case InitializationError:
