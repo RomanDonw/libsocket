@@ -75,7 +75,9 @@ SocketError socket_getlasterror(void)
         case SOCKERR_INVDESC:
             return InvalidDescriptor;
 
-        case SOCKERR_AGAIN:
+	#if SOCKERR_AGAIN != SOCKERR_WOULDBLOCK
+		case SOCKERR_AGAIN:
+	#endif
         case SOCKERR_WOULDBLOCK:
             return TemporaryUnavailable;
 
