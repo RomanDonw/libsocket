@@ -12,8 +12,6 @@
     #include <arpa/inet.h>
 #endif
 
-#define IPV4ADDR_INIT(addr) { .s_addr = SOCKET_HTONL(addr) }
-
 const IPv4Address IPV4ADDR_ANY = IPV4ADDR_INIT(INADDR_ANY);
 const IPv4Address IPV4ADDR_LOOPBACK = IPV4ADDR_INIT(INADDR_LOOPBACK);
 const IPv4Address IPV4ADDR_BROADCAST = IPV4ADDR_INIT(INADDR_BROADCAST);

@@ -70,8 +70,8 @@
 
 #endif
 
-#define SOCKET_HTONS(x) ((uint16_t)x >> 8) | ((uint16_t)x << 8)
-#define SOCKET_HTONL(x) (((uint32_t)x >> 24) | ((uint32_t)x << 24) | SOCKET_HTONS((uint16_t)((x >> 8) & 0xFFFF)))
+#define SOCKET_HTONS(x) (((uint16_t)(x) & 0xFF00) >> 8) | (((uint16_t)(x) & 0x00FF) << 8)
+#define SOCKET_HTONL(x) (SOCKET_HTONS((x & 0x00FFFF00) >> 8) | ((uint32_t)(x) >> 24) | ((uint32_t)(x) << 24))
 
 #define LIBSOCKET_ABI __cdecl
 
@@ -174,6 +174,9 @@ typedef void IPAddressInterface;
 
 #define IPV4ADDRSTRSIZE INET_ADDRSTRLEN
 #define IPV6ADDRSTRSIZE INET6_ADDRSTRLEN
+
+#define IPV4ADDR_INIT(addr) { .s_addr = SOCKET_HTONL(addr) }
+#define IPV4ADDR_PACK(a, b, c, d) ((((uint32_t)a & 0xFF) << 24) | (((uint32_t)b & 0xFF) << 16) | (((uint32_t)c & 0xFF) << 8) | ((uint32_t)d & 0xFF))
 
 LIBSOCKET_API extern const IPv4Address IPV4ADDR_ANY;
 LIBSOCKET_API extern const IPv4Address IPV4ADDR_LOOPBACK;
