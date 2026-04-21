@@ -4,13 +4,22 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "../init.h"
-#include "../err.h"
+#include "init.h"
+#include "err.h"
 
 #ifndef OS_WINDOWS
     #include <unistd.h>
     #include <arpa/inet.h>
 #endif
+
+#define IPV4ADDR_INIT(addr) { .s_addr = SOCKET_HTONL(addr) }
+
+const IPv4Address IPV4ADDR_ANY = IPV4ADDR_INIT(INADDR_ANY);
+const IPv4Address IPV4ADDR_LOOPBACK = IPV4ADDR_INIT(INADDR_LOOPBACK);
+const IPv4Address IPV4ADDR_BROADCAST = IPV4ADDR_INIT(INADDR_BROADCAST);
+
+const IPv6Address IPV6ADDR_ANY = IN6ADDR_ANY_INIT;
+const IPv6Address IPV6ADDR_LOOPBACK = IN6ADDR_LOOPBACK_INIT;
 
 struct Socket
 {
@@ -129,7 +138,7 @@ bool socket_addrtostr(const IPAddressInterface *addr, SocketAddressFamily af, ch
 
     bool res = inet_ntop(af, addr, straddr, size);
     #ifdef OS_WINDOWS
-        if (!res && socket_getlasterror() == ERROR_INVALID_PARAMETER) SETLASTERROR(SOCKERR_NOSPC);
+        if (!res && GETLASTERROR() == SOCKERR_INVAL) SETLASTERROR(SOCKERR_NOSPC);
     #endif
     return res;
 }

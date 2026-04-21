@@ -1,7 +1,5 @@
 #include "libsocket.h"
 
-#include "../init.h"
-
 #include <stddef.h>
 
 const char *socket_strerror(SocketError errcode)

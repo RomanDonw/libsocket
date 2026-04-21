@@ -7,6 +7,7 @@
 #endif
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #if defined(_WIN32) || defined(WIN32) || defined(_WIN64)
     #define OS_WINDOWS
@@ -68,6 +69,9 @@
     } typedef SocketShutdownMode;
 
 #endif
+
+#define SOCKET_HTONS(x) ((uint16_t)x >> 8) | ((uint16_t)x << 8)
+#define SOCKET_HTONL(x) (((uint32_t)x >> 24) | ((uint32_t)x << 24) & HTONS((uint16_t)((x >> 8) | 0xFFFF)))
 
 #define LIBSOCKET_ABI __cdecl
 
@@ -166,21 +170,17 @@ typedef SocketAddressInterface SocketAddress;
 
 typedef struct in_addr IPv4Address;
 typedef struct in6_addr IPv6Address;
+typedef void IPAddressInterface;
 
 #define IPV4ADDRSTRSIZE INET_ADDRSTRLEN
-#define IPV4ADDR_ANY { .s_addr = htonl(INADDR_ANY) }
-#define IPV4ADDR_LOOPBACK { .s_addr = htonl(INADDR_LOOPBACK) }
-#define IPV4ADDR_BROADCAST { .s_addr = htonl(INADDR_BROADCAST) }
-
 #define IPV6ADDRSTRSIZE INET6_ADDRSTRLEN
-#define IPV6ADDR_ANY IN6ADDR_ANY_INIT
-#define IPV6ADDR_LOOPBACK IN6ADDR_LOOPBACK_INIT
 
-union
-{
-    IPv4Address ipv4;
-    IPv6Address ipv6;
-} typedef IPAddressInterface;
+LIBSOCKET_API extern const IPv4Address IPV4ADDR_ANY;
+LIBSOCKET_API extern const IPv4Address IPV4ADDR_LOOPBACK;
+LIBSOCKET_API extern const IPv4Address IPV4ADDR_BROADCAST;
+
+LIBSOCKET_API extern const IPv6Address IPV6ADDR_ANY;
+LIBSOCKET_API extern const IPv6Address IPV6ADDR_LOOPBACK;
 
 LIBSOCKET_API SocketError LIBSOCKET_ABI socket_getlasterror(void);
 LIBSOCKET_API const char * LIBSOCKET_ABI socket_strerror(SocketError errcode);

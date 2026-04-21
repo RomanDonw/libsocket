@@ -8,6 +8,7 @@
 #define CUSTOMERR(index) (CUSTOMERR_STARTOFFSET + (CUSTOMERR_STEP) * index)
 
 #ifdef OS_WINDOWS
+    #define GETLASTERROR() (WSAGetLastError())
     #define SETLASTERROR(x) (WSASetLastError(x))
 
     #define SOCKERR_NOMEM WSA_NOT_ENOUGH_MEMORY
@@ -41,6 +42,7 @@
 #else
     #include <errno.h>
 
+    #define GETLASTERROR() (errno)
     #define SETLASTERROR(x) (errno = x)
 
     #define SOCKERR_NOMEM ENOMEM

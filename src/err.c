@@ -1,19 +1,13 @@
 #include "libsocket.h"
-#include "../err.h"
+#include "err.h"
 
-#include "../init.h"
+#include "init.h"
 
 SocketError socket_getlasterror(void)
 {
     ENSURE_INIT;
 
-    #ifdef OS_WINDOWS
-        int err = WSAGetLastError();
-    #else
-        int err = errno;
-    #endif
-
-    switch (err)
+    switch (GETLASTERROR())
     {
         case SOCKERR_NOMEM:
             return MemoryAllocationFailed;
