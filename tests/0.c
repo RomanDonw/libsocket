@@ -38,7 +38,7 @@ int main(void)
     setsocksendbuffsize(s, 4096);
     printf("New send buffer size: %i\n", getsocksendbuffsize(s));
 
-    IPv4Address localhost = IPV4ADDRESS_LOOPBACK;
+    IPv4Address localhost = IPV4ADDR_LOOPBACK;
     SocketAddress saddr;
     socket_fillsockaddr(&saddr, IPv4, (IPAddressInterface *)&localhost, 8000);
     if (!socket_connect(s, &saddr)) handleerror("socket_connect");

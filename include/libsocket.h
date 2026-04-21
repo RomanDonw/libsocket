@@ -166,12 +166,14 @@ typedef SocketAddressInterface SocketAddress;
 typedef struct in_addr IPv4Address;
 typedef struct in6_addr IPv6Address;
 
-#define IPV4ADDRESS_ANY { .s_addr = htonl(INADDR_ANY) }
-#define IPV4ADDRESS_LOOPBACK { .s_addr = htonl(INADDR_LOOPBACK) }
-#define IPV4ADDRESS_BROADCAST { .s_addr = htonl(INADDR_BROADCAST) }
+#define IPV4ADDRSTRSIZE INET_ADDRSTRLEN
+#define IPV4ADDR_ANY { .s_addr = htonl(INADDR_ANY) }
+#define IPV4ADDR_LOOPBACK { .s_addr = htonl(INADDR_LOOPBACK) }
+#define IPV4ADDR_BROADCAST { .s_addr = htonl(INADDR_BROADCAST) }
 
-#define IPV6ADDRESS_ANY IN6ADDR_ANY_INIT
-#define IPV6ADDRESS_LOOPBACK IN6ADDR_LOOPBACK_INIT
+#define IPV6ADDRSTRSIZE INET6_ADDRSTRLEN
+#define IPV6ADDR_ANY IN6ADDR_ANY_INIT
+#define IPV6ADDR_LOOPBACK IN6ADDR_LOOPBACK_INIT
 
 union
 {
