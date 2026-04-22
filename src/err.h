@@ -7,7 +7,7 @@
 #define CUSTOMERR_STEP -1
 #define CUSTOMERR(index) (CUSTOMERR_STARTOFFSET + (CUSTOMERR_STEP) * index)
 
-#ifdef OS_WINDOWS
+#ifdef LIBSOCKET_OS_WINDOWS
     #define GETLASTERROR() (WSAGetLastError())
     #define SETLASTERROR(x) (WSASetLastError(x))
 

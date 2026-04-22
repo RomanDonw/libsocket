@@ -10,10 +10,10 @@
 #include <stdint.h>
 
 #if defined(_WIN32) || defined(WIN32) || defined(_WIN64)
-    #define OS_WINDOWS
+    #define LIBSOCKET_OS_WINDOWS
 #endif
 
-#ifdef OS_WINDOWS
+#ifdef LIBSOCKET_OS_WINDOWS
     // Windows environment.
 
     #include <winsock2.h>

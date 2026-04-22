@@ -81,7 +81,7 @@ SocketError socket_getlasterror(void)
         case SOCKERR_WOULDBLOCK:
             return TemporaryUnavailable;
 
-        #ifdef OS_WINDOWS
+        #ifdef LIBSOCKET_OS_WINDOWS
             case WSANOTINITIALISED:
                 return InitializationError;
         #endif

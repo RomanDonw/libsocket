@@ -7,7 +7,7 @@
 #include "init.h"
 #include "err.h"
 
-#ifndef OS_WINDOWS
+#ifndef LIBSOCKET_OS_WINDOWS
     #include <unistd.h>
     #include <arpa/inet.h>
 #endif
@@ -54,7 +54,7 @@ bool socket_close(Socket *socket)
 {
     ENSURE_INIT;
 
-    #ifdef OS_WINDOWS
+    #ifdef LIBSOCKET_OS_WINDOWS
         if (closesocket(socket->desc)) return false;
     #else
         if (close(socket->desc)) return false;
@@ -102,7 +102,7 @@ bool socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value)
 {
     ENSURE_INIT;
 
-    #ifdef OS_WINDOWS
+    #ifdef LIBSOCKET_OS_WINDOWS
         return !ioctlsocket(socket->desc, option, value);
     #else
         return !ioctl(socket->desc, option, value);
@@ -135,7 +135,7 @@ bool socket_addrtostr(const IPAddressInterface *addr, SocketAddressFamily af, ch
     ENSURE_INIT;
 
     bool res = inet_ntop(af, addr, straddr, size);
-    #ifdef OS_WINDOWS
+    #ifdef LIBSOCKET_OS_WINDOWS
         if (!res && GETLASTERROR() == SOCKERR_INVAL) SETLASTERROR(SOCKERR_NOSPC);
     #endif
     return res;

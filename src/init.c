@@ -22,7 +22,7 @@ static void LIBSOCKET_INITATTR libsocket_WSAInit(void)
     if (inited) return;
 
     {
-        #ifdef OS_WINDOWS
+        #ifdef LIBSOCKET_OS_WINDOWS
             const WORD version = MAKEWORD(2, 2);
 
             WSADATA data;
@@ -51,7 +51,7 @@ static void LIBSOCKET_CLUPATTR libsocket_WSACleanup(void)
     if (!inited) return;
 
     {
-        #ifdef OS_WINDOWS
+        #ifdef LIBSOCKET_OS_WINDOWS
             WSACleanup();
         #endif
     }

@@ -5,7 +5,7 @@
 #include "libsocket.h"
 #include "util.h"
 
-#ifdef OS_WINDOWS
+#ifdef LIBSOCKET_OS_WINDOWS
     #include <windows.h>
     #define MILLIS(x) Sleep(x);
 #else
