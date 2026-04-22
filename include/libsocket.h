@@ -191,6 +191,7 @@ LIBSOCKET_API const char * LIBSOCKET_ABI socket_strerror(SocketError errcode);
 LIBSOCKET_API bool LIBSOCKET_ABI socket_parseaddr(IPAddressInterface *addr, SocketAddressFamily af, const char *straddr);
 LIBSOCKET_API bool LIBSOCKET_ABI socket_addrtostr(const IPAddressInterface *addr, SocketAddressFamily af, char *straddr, socklen_t size);
 
+LIBSOCKET_API SocketAddressFamily LIBSOCKET_ABI socket_getsockaddraf(const SocketAddressInterface *sockaddr);
 LIBSOCKET_API bool LIBSOCKET_ABI socket_packsockaddr(SocketAddressInterface *sockaddr, SocketAddressFamily af, const IPAddressInterface *addr, unsigned short port);
 LIBSOCKET_API bool LIBSOCKET_ABI socket_unpacksockaddr(const SocketAddressInterface *sockaddr, SocketAddressFamily af, IPAddressInterface *addr, unsigned short *port);
 

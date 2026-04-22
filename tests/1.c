@@ -18,6 +18,8 @@ int main(void)
 
     printf("Socket descriptor: %i\n", socket_gethandle(s));
 
+    puts("");
+
     {
         SocketAddress saddr;
         IPv4Address addr = IPV4ADDR_ANY;
@@ -38,6 +40,22 @@ int main(void)
         if (!socket_unpacksockaddr(&saddr, IPv4, &addr, &port)) handleerror("socket_unpacksockaddr");
         if (!socket_addrtostr(&addr, IPv4, addrstr, IPV4ADDRSTRSIZE)) handleerror("socket_addrtostr");
         printf("Binded to address %s:%u.\n", addrstr, port);
+
+        switch (socket_getsockaddraf(&saddr))
+        {
+            case IPv4:
+                puts("Socket has IPv4 address family.");
+                break;
+
+            case IPv6:
+                puts("Socket has IPv6 address family.");
+                break;
+
+            default:
+                puts("!!! UNKNOWN SOCKET ADDRESS FAMILY !!!");
+        }
+
+        puts("");
     }
 
     if (!socket_close(s)) handleerror("socket_close");
@@ -45,13 +63,15 @@ int main(void)
     printf("htons: before(0x%x) -> after(0x%x)\n", 0x1234, SOCKET_HTONS(0x1234));
     printf("htonl: before(0x%x) -> after(0x%x)\n", 0x12345678, SOCKET_HTONL(0x12345678));
 
+    puts("");
+
     {
-        IPv4Address addr = IPV4ADDR_INIT(IPV4ADDR_PACK(4, 3, 2, 1));
+        IPv4Address addr = IPV4ADDR_INIT(IPV4ADDR_PACK(123, 213, 45, 67));
 
         printipv4(IPV4ADDR_ANY, "IPv4 any");
         printipv4(IPV4ADDR_LOOPBACK, "IPv4 loopback");
         printipv4(IPV4ADDR_BROADCAST, "IPv4 broadcast");
-        printipv4(addr, "Custom (must be 123.456.789.952)");
+        printipv4(addr, "Custom (must be 123.213.45.67)");
     }
 
     return 0;
