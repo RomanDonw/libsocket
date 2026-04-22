@@ -1,6 +1,15 @@
 # Universal cross-platform C99/C++ sockets library.
 
+## Description
+
+### Basic
 This library provides universal cross-platform network sockets implementation. Supports Windows (recommended MinGW UCRT64 env., MSVC also supported), and any other OS that provides POSIX socket implementation. Also this library supports both static & dynamic linking and building (if set CMake `BUILD_SHARED_LIBS` to `ON`).
+
+### Supported platforms
+Note, that __**now supported only little-endian CPU arch.-es**__, because host to network byte order convertion macroses hardcoded in header(-s) only for little-endian CPU arch.-es.
+
+- **Windows** (fully x86-64, theoretically x86-32 (IA-32), "ARM64", "ARM32") with **WinSock 2.2 support**.
+- any **POSIX-compatible OS**, such as Linux (inclues Android; library tested in Termux), BSD-s and other **(arch.-es same as for Windows)**.
 
 ## Building the library
 
