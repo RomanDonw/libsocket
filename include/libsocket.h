@@ -71,7 +71,7 @@
 #endif
 
 #define SOCKET_HTONS(x) (((uint16_t)(x) & 0xFF00) >> 8) | (((uint16_t)(x) & 0x00FF) << 8)
-#define SOCKET_HTONL(x) (SOCKET_HTONS((x & 0x00FFFF00) >> 8) | ((uint32_t)(x) >> 24) | ((uint32_t)(x) << 24))
+#define SOCKET_HTONL(x) ((((uint32_t)(x) & 0xFF000000) >> 24) | (((uint32_t)(x) & 0x000000FF) << 24) | (((uint32_t)(x) & 0x00FF0000) >> 8) | (((uint32_t)(x) & 0x0000FF00) << 8))
 
 #define LIBSOCKET_ABI __cdecl
 
