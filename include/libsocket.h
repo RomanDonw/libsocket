@@ -38,8 +38,8 @@
     #endif
 
     typedef SSIZE_T ssize_t;
-
     typedef SOCKET SOCKETDESCRIPTOR;
+    typedef int socksize_t;
 
     enum
     {
@@ -60,6 +60,7 @@
 
     typedef int SOCKETDESCRIPTOR;
     #define INVALID_SOCKET -1
+    typedef size_t socksize_t;
 
     enum
     {
@@ -72,6 +73,9 @@
 
 #define SOCKET_HTONS(x) (((uint16_t)(x) & 0xFF00) >> 8) | (((uint16_t)(x) & 0x00FF) << 8)
 #define SOCKET_HTONL(x) ((((uint32_t)(x) & 0xFF000000) >> 24) | (((uint32_t)(x) & 0x000000FF) << 24) | (((uint32_t)(x) & 0x00FF0000) >> 8) | (((uint32_t)(x) & 0x0000FF00) << 8))
+
+#define SOCKET_NTOHS(x) SOCKET_HTONS(x)
+#define SOCKET_NTOHL(x) SOCKET_HTONL(x)
 
 #define LIBSOCKET_ABI __cdecl
 
@@ -123,14 +127,10 @@ enum
 
 enum
 {
-    // Internal (generated only by libsocket).
     InternalUnknownError,
     ParsingAddressFailed,
 
-    // External with internal usage:
     MemoryAllocationFailed, // ENOMEM
-
-    // "Pure-external" (cross-platform).
     Interrupted, // EINTR
     AccessDenied, // EACCES
     Fault, // EFAULT
@@ -190,7 +190,9 @@ LIBSOCKET_API const char * LIBSOCKET_ABI socket_strerror(SocketError errcode);
 
 LIBSOCKET_API bool LIBSOCKET_ABI socket_parseaddr(IPAddressInterface *addr, SocketAddressFamily af, const char *straddr);
 LIBSOCKET_API bool LIBSOCKET_ABI socket_addrtostr(const IPAddressInterface *addr, SocketAddressFamily af, char *straddr, socklen_t size);
-LIBSOCKET_API bool LIBSOCKET_ABI socket_fillsockaddr(SocketAddressInterface *sockaddr, SocketAddressFamily af, const IPAddressInterface *addr, unsigned short port);
+
+LIBSOCKET_API bool LIBSOCKET_ABI socket_packsockaddr(SocketAddressInterface *sockaddr, SocketAddressFamily af, const IPAddressInterface *addr, unsigned short port);
+LIBSOCKET_API bool LIBSOCKET_ABI socket_unpacksockaddr(const SocketAddressInterface *sockaddr, SocketAddressFamily af, IPAddressInterface *addr, unsigned short *port);
 
 LIBSOCKET_API Socket * LIBSOCKET_ABI socket_open(SocketAddressFamily af, SocketType type, SocketProtocol protocol);
 LIBSOCKET_API bool LIBSOCKET_ABI socket_close(Socket *socket);
@@ -201,18 +203,21 @@ LIBSOCKET_API bool LIBSOCKET_ABI socket_bind(const Socket *socket, const SocketA
 LIBSOCKET_API bool LIBSOCKET_ABI socket_listen(const Socket *socket, int backlog);
 LIBSOCKET_API Socket * LIBSOCKET_ABI socket_accept(const Socket *socket);
 
-LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_recv(const Socket *socket, void *buffer, size_t len, int flags);
-LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_send(const Socket *socket, const void *data, size_t len);
+LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_recv(const Socket *socket, void *buffer, socksize_t len, int flags);
+LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_send(const Socket *socket, const void *data, socksize_t len);
 
 LIBSOCKET_API bool LIBSOCKET_ABI socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value);
 LIBSOCKET_API bool LIBSOCKET_ABI socket_shutdown(const Socket *socket, SocketShutdownMode mode);
+
+LIBSOCKET_API bool LIBSOCKET_ABI socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, void *optval, socklen_t *optlen);
+LIBSOCKET_API bool LIBSOCKET_ABI socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, const void *optval, socklen_t optlen);
 
 LIBSOCKET_API SocketAddressFamily LIBSOCKET_ABI socket_getaf(const Socket *socket);
 LIBSOCKET_API SocketType LIBSOCKET_ABI socket_gettype(const Socket *socket);
 LIBSOCKET_API SocketProtocol LIBSOCKET_ABI socket_getprotocol(const Socket *socket);
 
-LIBSOCKET_API bool LIBSOCKET_ABI socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, void *optval, socklen_t *optlen);
-LIBSOCKET_API bool LIBSOCKET_ABI socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, const void *optval, socklen_t optlen);
+LIBSOCKET_API bool LIBSOCKET_ABI socket_getremoteaddr(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size);
+LIBSOCKET_API bool LIBSOCKET_ABI socket_getlocaladdr(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size);
 
 #if defined(LIBSOCKET_ALLOWUNSAFEACCESS) || defined(LIBSOCKET_EXPORT)
     LIBSOCKET_API SOCKETDESCRIPTOR LIBSOCKET_ABI socket_gethandle(const Socket *socket);

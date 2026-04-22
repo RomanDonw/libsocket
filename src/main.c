@@ -95,8 +95,8 @@ Socket *socket_accept(const Socket *socket)
     return ret;
 }
 
-ssize_t socket_recv(const Socket *socket, void *buffer, size_t len, int flags) { ENSURE_INIT; return recv(socket->desc, buffer, len, flags); }
-ssize_t socket_send(const Socket *socket, const void *data, size_t len) { ENSURE_INIT; return send(socket->desc, data, len, 0); }
+ssize_t socket_recv(const Socket *socket, void *buffer, socksize_t len, int flags) { ENSURE_INIT; return recv(socket->desc, buffer, len, flags); }
+ssize_t socket_send(const Socket *socket, const void *data, socksize_t len) { ENSURE_INIT; return send(socket->desc, data, len, 0); }
 
 bool socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value)
 {
@@ -141,7 +141,7 @@ bool socket_addrtostr(const IPAddressInterface *addr, SocketAddressFamily af, ch
     return res;
 }
 
-LIBSOCKET_API bool LIBSOCKET_ABI socket_fillsockaddr(SocketAddressInterface *sockaddr, SocketAddressFamily af, const IPAddressInterface *addr, unsigned short port)
+LIBSOCKET_API bool LIBSOCKET_ABI socket_packsockaddr(SocketAddressInterface *sockaddr, SocketAddressFamily af, const IPAddressInterface *addr, unsigned short port)
 {
     ENSURE_INIT;
 
@@ -153,13 +153,13 @@ LIBSOCKET_API bool LIBSOCKET_ABI socket_fillsockaddr(SocketAddressInterface *soc
         case IPv4:;
             SocketIPv4Address *sa4 = (SocketIPv4Address *)sockaddr;
             sa4->sin_addr = *((IPv4Address *)addr);
-            sa4->sin_port = htons(port);
+            sa4->sin_port = SOCKET_HTONS(port);
             break;
 
         case IPv6:;
             SocketIPv6Address *sa6 = (SocketIPv6Address *)sockaddr;
             sa6->sin6_addr = *((IPv6Address *)addr);
-            sa6->sin6_port = htons(port);
+            sa6->sin6_port = SOCKET_HTONS(port);
             break;
 
         default:
@@ -169,5 +169,37 @@ LIBSOCKET_API bool LIBSOCKET_ABI socket_fillsockaddr(SocketAddressInterface *soc
 
     return true;
 }
+
+LIBSOCKET_API bool LIBSOCKET_ABI socket_unpacksockaddr(const SocketAddressInterface *sockaddr, SocketAddressFamily af, IPAddressInterface *addr, unsigned short *port)
+{
+    if (sockaddr->ss_family != af) { SETLASTERROR(SOCKERR_INVAL); return false; }
+
+    switch (af)
+    {
+        case IPv4:;
+            SocketIPv4Address *sa4 = (SocketIPv4Address *)sockaddr;
+            *((IPv4Address *)addr) = sa4->sin_addr;
+            *port = SOCKET_NTOHS(sa4->sin_port);
+            break;
+
+        case IPv6:;
+            SocketIPv6Address *sa6 = (SocketIPv6Address *)sockaddr;
+            *((IPv6Address *)addr) = sa6->sin6_addr;
+            *port = SOCKET_NTOHS(sa6->sin6_port);
+            break;
+
+        default:
+            SETLASTERROR(SOCKERR_AFNOSUPPORT);
+            return false;
+    }
+
+    return true;
+}
+
+bool socket_getremoteaddr(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size)
+{ return !getpeername(socket->desc, (struct sockaddr *)sockaddr, size); }
+
+bool socket_getlocaladdr(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size)
+{ return !getsockname(socket->desc, (struct sockaddr *)sockaddr, size); }
 
 SOCKETDESCRIPTOR socket_gethandle(const Socket *socket) { ENSURE_INIT; return socket->desc; }

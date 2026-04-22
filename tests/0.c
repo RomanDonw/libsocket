@@ -40,7 +40,7 @@ int main(void)
 
     IPv4Address localhost = IPV4ADDR_LOOPBACK;
     SocketAddress saddr;
-    socket_fillsockaddr(&saddr, IPv4, &localhost, 8000);
+    if (!socket_packsockaddr(&saddr, IPv4, &localhost, 8000)) handleerror("socket_packsockaddr");
     if (!socket_connect(s, &saddr)) handleerror("socket_connect");
 
     const char *request = "GET / HTTP/1.0\r\n\r\n";
