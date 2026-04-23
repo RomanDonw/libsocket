@@ -66,6 +66,7 @@ SocketError socket_getlasterror(void)
         case SOCKERR_NOTCONN:
             return NotConnected;
 
+        case SOCKERR_NOTSOCK:
         case SOCKERR_INVDESC:
             return InvalidDescriptor;
 
