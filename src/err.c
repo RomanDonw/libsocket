@@ -76,6 +76,9 @@ SocketError socket_getlasterror(void)
         case SOCKERR_NOSPC:
             return NoSpaceLeft;
 
+        case SOCKERR_NOPROTOOPT:
+            return UnsupportedOption;
+
 	    #if SOCKERR_AGAIN != SOCKERR_WOULDBLOCK
 		    case SOCKERR_AGAIN:
 	    #endif
@@ -87,6 +90,7 @@ SocketError socket_getlasterror(void)
                 return InitializationError;
         #endif
 
+        case SOCKERR_INTERNALERR:
         default:
             return InternalUnknownError;
     }

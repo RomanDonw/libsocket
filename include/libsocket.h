@@ -119,6 +119,7 @@ enum
     Socket_InternalError = SO_ERROR, // int, readonly.
     Socket_AllowReuseAddress = SO_REUSEADDR, // int (bool), readable/writable.
     Socket_Broadcast = SO_BROADCAST, // int (bool), readable/writable.
+    Socket_Linger = SO_LINGER, // struct SocketLingerOptions, readable/writable.
 
     // TCPLevel
     TCP_DisableDelay = TCP_NODELAY, // int (bool), readable/writable.
@@ -152,10 +153,17 @@ enum
     NotConnected, // ENOTCONN
     InvalidDescriptor, // EBADF
     NoSpaceLeft, // ENOSPC
+    UnsupportedOption, // ENOPROTOOPT
 
     // Windows-specific.
     InitializationError // WSANOTINITIALISED
 } typedef SocketError;
+
+struct
+{
+    bool enable;
+    unsigned short linger; // in seconds.
+} typedef SocketLingerOptions;
 
 #define RECV_NOFLAGS 0
 #define RECV_FLAG_PEEK MSG_PEEK

@@ -15,6 +15,7 @@ int main(void)
 {
     Socket *s = socket_open(IPv4, Stream, TCP);
     if (!s) handleerror("socket_open");
+    puts(" === === [socket opened] === ===\n");
 
     printf("Socket descriptor: %i\n", socket_gethandle(s));
 
@@ -58,7 +59,23 @@ int main(void)
         puts("");
     }
 
+    SocketLingerOptions ling;
+    ling.enable = true;
+    ling.linger = 5;
+    if (!socket_setopt(s, SocketLevel, Socket_Linger, &ling, sizeof(ling))) handleerror("socket_setopt");
+
+    ling.enable = false;
+    ling.linger = 666;
+
+    socklen_t lingsz = sizeof(SocketLingerOptions);
+    if (!socket_getopt(s, SocketLevel, Socket_Linger, &ling, &lingsz)) handleerror("socket_getopt");
+    printf("sizeof(SocketLingerOptions) = %llu    |    lingsz from socket_getopt = %llu\n", sizeof(ling), lingsz);
+    if (lingsz != sizeof(ling)) { puts("lingsz != sizeof(ling). TEST NOT PASSED. lingsz must be equal to sizeof(ling)! Testing aborted."); abort(); }
+
+    printf("ling.enable = %s\nling.linger = %u seconds.\n", ling.enable ? "true" : "false", ling.linger);
+
     if (!socket_close(s)) handleerror("socket_close");
+    puts(" === === [socket closed] === ===\n");
 
     printf("htons: before(0x%x) -> after(0x%x)\n", 0x1234, SOCKET_HTONS(0x1234));
     printf("htonl: before(0x%x) -> after(0x%x)\n", 0x12345678, SOCKET_HTONL(0x12345678));

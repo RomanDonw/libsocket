@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 #include "init.h"
 #include "err.h"
@@ -31,8 +32,8 @@ Socket *socket_open(SocketAddressFamily af, SocketType type, SocketProtocol prot
 {
     ENSURE_INIT;
 
-    SOCKETDESCRIPTOR desc;
-    if ((desc = socket(af, type, protocol)) == INVALID_SOCKET) return NULL;
+    SOCKETDESCRIPTOR desc = socket(af, type, protocol);
+    if (desc == INVALID_SOCKET) return NULL;
 
     Socket *ret = malloc(sizeof(Socket));
     if (!ret)
@@ -76,8 +77,8 @@ Socket *socket_accept(const Socket *socket)
 {
     ENSURE_INIT;
 
-    SOCKETDESCRIPTOR desc;
-    if ((desc = accept(socket->desc, NULL, NULL)) == INVALID_SOCKET) return NULL;
+    SOCKETDESCRIPTOR desc = accept(socket->desc, NULL, NULL);
+    if (desc == INVALID_SOCKET) return NULL;
 
     Socket *ret = malloc(sizeof(Socket));
     if (!ret)
@@ -115,10 +116,53 @@ SocketType socket_gettype(const Socket *socket) { ENSURE_INIT; return socket->ty
 SocketProtocol socket_getprotocol(const Socket *socket) { ENSURE_INIT; return socket->protocol; }
 
 bool socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, void *optval, socklen_t *optlen)
-{ ENSURE_INIT; return !getsockopt(socket->desc, level, optname, optval, optlen); }
+{
+    ENSURE_INIT;
+
+    switch (optname)
+    {
+        case Socket_Linger:;
+            if (level != SocketLevel) { SETLASTERROR(SOCKERR_NOPROTOOPT); return false; }
+            if (!optval) { SETLASTERROR(SOCKERR_FAULT); return false; }
+
+            struct linger ling;
+            socklen_t lingsz = sizeof(ling);
+            if (getsockopt(socket->desc, SocketLevel, Socket_Linger, (void *)&ling, &lingsz)) return false;
+            if (lingsz > sizeof(ling)) { SETLASTERROR(SOCKERR_INTERNALERR); return false; }
+
+            SocketLingerOptions lingopts;
+            lingopts.enable = ling.l_onoff;
+            lingopts.linger = (ling.l_linger > USHRT_MAX) ? USHRT_MAX : ling.l_linger;
+
+            if (*optlen > 0) memcpy(optval, &lingopts, (*optlen > sizeof(SocketLingerOptions)) ? sizeof(SocketLingerOptions) : *optlen);
+            *optlen = sizeof(SocketLingerOptions);
+            return true;
+    }
+
+    return !getsockopt(socket->desc, level, optname, optval, optlen);
+}
 
 bool socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, const void *optval, socklen_t optlen)
-{ ENSURE_INIT; return !setsockopt(socket->desc, level, optname, optval, optlen); }
+{
+    ENSURE_INIT;
+
+    switch (optname)
+    {
+        case Socket_Linger:;
+            if (level != SocketLevel) { SETLASTERROR(SOCKERR_NOPROTOOPT); return false; }
+            if (!optval) { SETLASTERROR(SOCKERR_FAULT); return false; }
+            if (optlen < sizeof(SocketLingerOptions)) { SETLASTERROR(SOCKERR_INVAL); return false; }
+
+            const SocketLingerOptions *lingopts = optval;
+
+            struct linger ling;
+            ling.l_onoff = lingopts->enable;
+            ling.l_linger = lingopts->linger;
+            return !setsockopt(socket->desc, SocketLevel, Socket_Linger, (char *)&ling, sizeof(ling));
+    }
+
+    return !setsockopt(socket->desc, level, optname, optval, optlen);
+}
 
 bool socket_getpeername(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size)
 { ENSURE_INIT; return !getpeername(socket->desc, (struct sockaddr *)sockaddr, size); }

@@ -78,6 +78,9 @@ const char *socket_strerror(SocketError errcode)
         case NoSpaceLeft:
             return "no space left";
 
+        case UnsupportedOption:
+            return "unsupported option name at specified option level";
+
         // Windows-specific:
         case InitializationError:
             return "WinSock not initialized";
