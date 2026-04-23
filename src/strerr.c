@@ -78,8 +78,8 @@ const char *socket_strerror(SocketError errcode)
         case NoSpaceLeft:
             return "no space left";
 
-        case UnsupportedOption:
-            return "unsupported option name at specified option level";
+        case ProtocolOptionUnsupported:
+            return "protocol option unsupported";
 
         // Windows-specific:
         case InitializationError:

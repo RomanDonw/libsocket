@@ -77,7 +77,7 @@ SocketError socket_getlasterror(void)
             return NoSpaceLeft;
 
         case SOCKERR_NOPROTOOPT:
-            return UnsupportedOption;
+            return ProtocolOptionUnsupported;
 
 	    #if SOCKERR_AGAIN != SOCKERR_WOULDBLOCK
 		    case SOCKERR_AGAIN:

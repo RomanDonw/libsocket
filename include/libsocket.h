@@ -153,7 +153,7 @@ enum
     NotConnected, // ENOTCONN
     InvalidDescriptor, // EBADF
     NoSpaceLeft, // ENOSPC
-    UnsupportedOption, // ENOPROTOOPT
+    ProtocolOptionUnsupported, // ENOPROTOOPT
 
     // Windows-specific.
     InitializationError // WSANOTINITIALISED
