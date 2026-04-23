@@ -24,13 +24,13 @@ bool socket_packsockaddr(SocketAddressInterface *sockaddr, SocketAddressFamily a
     switch (af)
     {
         case IPv4:;
-            SocketIPv4Address *sa4 = (SocketIPv4Address *)sockaddr;
+            SocketIPv4Address *sa4 = (void *)sockaddr;
             sa4->sin_addr = *((IPv4Address *)addr);
             sa4->sin_port = SOCKET_HTONS(port);
             break;
 
         case IPv6:;
-            SocketIPv6Address *sa6 = (SocketIPv6Address *)sockaddr;
+            SocketIPv6Address *sa6 = (void *)sockaddr;
             sa6->sin6_addr = *((IPv6Address *)addr);
             sa6->sin6_port = SOCKET_HTONS(port);
             break;
@@ -52,13 +52,13 @@ bool socket_unpacksockaddr(const SocketAddressInterface *sockaddr, SocketAddress
     switch (af)
     {
         case IPv4:;
-            SocketIPv4Address *sa4 = (SocketIPv4Address *)sockaddr;
+            const SocketIPv4Address *sa4 = (const void *)sockaddr;
             *((IPv4Address *)addr) = sa4->sin_addr;
             *port = SOCKET_NTOHS(sa4->sin_port);
             break;
 
         case IPv6:;
-            SocketIPv6Address *sa6 = (SocketIPv6Address *)sockaddr;
+            const SocketIPv6Address *sa6 = (const void *)sockaddr;
             *((IPv6Address *)addr) = sa6->sin6_addr;
             *port = SOCKET_NTOHS(sa6->sin6_port);
             break;

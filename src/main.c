@@ -122,7 +122,7 @@ bool socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionNa
     switch (optname)
     {
         case Socket_Linger:;
-            if (level != SocketLevel) { SETLASTERROR(SOCKERR_NOPROTOOPT); return false; }
+            // this can do getsockopt -> if (level != SocketLevel) { SETLASTERROR(SOCKERR_NOPROTOOPT); return false; }
             if (!optval) { SETLASTERROR(SOCKERR_FAULT); return false; }
 
             struct linger ling;
@@ -134,8 +134,43 @@ bool socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionNa
             lingopts.enable = ling.l_onoff;
             lingopts.linger = (ling.l_linger > USHRT_MAX) ? USHRT_MAX : ling.l_linger;
 
-            if (*optlen > 0) memcpy(optval, &lingopts, (*optlen > sizeof(SocketLingerOptions)) ? sizeof(SocketLingerOptions) : *optlen);
-            *optlen = sizeof(SocketLingerOptions);
+            if (*optlen > 0) memcpy(optval, &lingopts, (*optlen > sizeof(lingopts)) ? sizeof(lingopts) : *optlen);
+            *optlen = sizeof(lingopts);
+            return true;
+
+        case Socket_RecvTimeout:;
+        case Socket_SendTimeout:;
+            // this can do getsockopt -> if (level != SocketLevel) { SETLASTERROR(SOCKERR_NOPROTOOPT); return false; }
+            if (!optval) { SETLASTERROR(SOCKERR_FAULT); return false; }
+
+            uint32_t millis;
+            #ifdef LIBSOCKET_OS_WINDOWS
+                socklen_t millissz = sizeof(millis);
+                if (getsockopt(socket->desc, level, optname, (void *)&millis, &millissz)) return false;
+                if (millissz > sizeof(millis)) { SETLASTERROR(SOCKERR_INTERNALERR); return false; }
+            #else
+                struct timeval tv;
+                socklen_t tvsz = sizeof(tv);
+                if (getsockopt(socket->desc, level, optname, (void *)&tv, &tvsz)) return false;
+                if (tvsz > sizeof(tv)) { SETLASTERROR(SOCKERR_INTERNALERR); return false; }
+
+                uint64_t usecs;
+                
+                // check seconds on possible overflow when it will be converted to microseconds & set usecs variable.
+                if (tv.tv_sec > UINT64_MAX / 1000000) usecs = UINT64_MAX;
+                else usecs = tv.tv_sec * 1000000;
+
+                // check microseconds on possible overflow before adding & clamp usecs value on overflow.
+                if (UINT64_MAX - usecs < tv.tv_usec) usecs = UINT64_MAX;
+                else usecs += tv.tv_usec;
+
+                usecs /= 1000;
+                if (usecs > UINT32_MAX) usecs = UINT32_MAX;
+                millis = (uint32_t)usecs;
+            #endif
+
+            if (*optlen > 0) memcpy(optval, &millis, (*optlen > sizeof(millis)) ? sizeof(millis) : *optlen);
+            *optlen = sizeof(millis);
             return true;
     }
 
@@ -149,7 +184,7 @@ bool socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionNa
     switch (optname)
     {
         case Socket_Linger:;
-            if (level != SocketLevel) { SETLASTERROR(SOCKERR_NOPROTOOPT); return false; }
+            // this can do setsockopt -> if (level != SocketLevel) { SETLASTERROR(SOCKERR_NOPROTOOPT); return false; }
             if (!optval) { SETLASTERROR(SOCKERR_FAULT); return false; }
             if (optlen < sizeof(SocketLingerOptions)) { SETLASTERROR(SOCKERR_INVAL); return false; }
 
@@ -158,7 +193,29 @@ bool socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionNa
             struct linger ling;
             ling.l_onoff = lingopts->enable;
             ling.l_linger = lingopts->linger;
-            return !setsockopt(socket->desc, SocketLevel, Socket_Linger, (char *)&ling, sizeof(ling));
+            return !setsockopt(socket->desc, level, Socket_Linger, (void *)&ling, sizeof(ling));
+
+        case Socket_RecvTimeout:;
+        case Socket_SendTimeout:;
+            // this can do setsockopt -> if (level != SocketLevel) { SETLASTERROR(SOCKERR_NOPROTOOPT); return false; }
+            if (!optval) { SETLASTERROR(SOCKERR_FAULT); return false; }
+            if (optlen < sizeof(uint32_t)) { SETLASTERROR(SOCKERR_INVAL); return false; }
+
+            #ifdef LIBSOCKET_OS_WINDOWS
+                const void *data = optval;
+                const socklen_t size = sizeof(uint32_t);
+            #else
+                uint32_t millis = *(const uint32_t *)optval;
+
+                struct timeval tv;
+                tv.tv_sec = millis / 1000;
+                tv.tv_usec = (millis % 1000) * 1000;
+
+                const void *data = &tv;
+                const socklen_t size = sizeof(tv);
+            #endif
+
+            return !setsockopt(socket->desc, level, optname, data, size);
     }
 
     return !setsockopt(socket->desc, level, optname, optval, optlen);

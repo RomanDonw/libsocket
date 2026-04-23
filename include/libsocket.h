@@ -112,7 +112,7 @@ enum
 enum
 {
     // SocketLevel
-    Socket_RevcBufferSize = SO_RCVBUF, // int, readable/writable.
+    Socket_RecvBufferSize = SO_RCVBUF, // int, readable/writable.
     Socket_SendBufferSize = SO_SNDBUF, // int, readable/writable.
     Socket_KeepAliveConnection = SO_KEEPALIVE, // int (bool), readable/writable.
     Socket_AcceptConnections = SO_ACCEPTCONN, // int (bool), readonly.
@@ -120,6 +120,8 @@ enum
     Socket_AllowReuseAddress = SO_REUSEADDR, // int (bool), readable/writable.
     Socket_Broadcast = SO_BROADCAST, // int (bool), readable/writable.
     Socket_Linger = SO_LINGER, // struct SocketLingerOptions, readable/writable.
+    Socket_RecvTimeout = SO_RCVTIMEO, // uint32_t (milliseconds), readable/writable.
+    Socket_SendTimeout = SO_SNDTIMEO, // uint32_t (milliseconds), readable/writable.
 
     // TCPLevel
     TCP_DisableDelay = TCP_NODELAY, // int (bool), readable/writable.
