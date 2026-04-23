@@ -176,7 +176,7 @@ typedef void IPAddressInterface;
 #define IPV6ADDRSTRSIZE INET6_ADDRSTRLEN
 
 #define IPV4ADDR_INIT(addr) { .s_addr = SOCKET_HTONL(addr) }
-#define IPV4ADDR_PACK(a, b, c, d) ((((uint32_t)a & 0xFF) << 24) | (((uint32_t)b & 0xFF) << 16) | (((uint32_t)c & 0xFF) << 8) | ((uint32_t)d & 0xFF))
+#define IPV4ADDR_PACK(a, b, c, d) ((((uint32_t)(a) & 0xFF) << 24) | (((uint32_t)(b) & 0xFF) << 16) | (((uint32_t)(c) & 0xFF) << 8) | ((uint32_t)(d) & 0xFF))
 
 LIBSOCKET_API extern const IPv4Address IPV4ADDR_ANY;
 LIBSOCKET_API extern const IPv4Address IPV4ADDR_LOOPBACK;
@@ -217,8 +217,8 @@ LIBSOCKET_API SocketAddressFamily LIBSOCKET_ABI socket_getaf(const Socket *socke
 LIBSOCKET_API SocketType LIBSOCKET_ABI socket_gettype(const Socket *socket);
 LIBSOCKET_API SocketProtocol LIBSOCKET_ABI socket_getprotocol(const Socket *socket);
 
-LIBSOCKET_API bool LIBSOCKET_ABI socket_getremoteaddr(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size);
-LIBSOCKET_API bool LIBSOCKET_ABI socket_getlocaladdr(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size);
+LIBSOCKET_API bool LIBSOCKET_ABI socket_getpeername(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size);
+LIBSOCKET_API bool LIBSOCKET_ABI socket_getsockname(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size);
 
 #if defined(LIBSOCKET_ALLOWUNSAFEACCESS) || defined(LIBSOCKET_EXPORT)
     LIBSOCKET_API SOCKETDESCRIPTOR LIBSOCKET_ABI socket_gethandle(const Socket *socket);

@@ -120,10 +120,10 @@ bool socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionNa
 bool socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, const void *optval, socklen_t optlen)
 { ENSURE_INIT; return !setsockopt(socket->desc, level, optname, optval, optlen); }
 
-bool socket_getremoteaddr(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size)
+bool socket_getpeername(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size)
 { ENSURE_INIT; return !getpeername(socket->desc, (struct sockaddr *)sockaddr, size); }
 
-bool socket_getlocaladdr(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size)
+bool socket_getsockname(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size)
 { ENSURE_INIT; return !getsockname(socket->desc, (struct sockaddr *)sockaddr, size); }
 
 SOCKETDESCRIPTOR socket_gethandle(const Socket *socket) { ENSURE_INIT; return socket->desc; }
