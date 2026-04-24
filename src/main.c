@@ -73,11 +73,11 @@ bool socket_connect(const Socket *socket, const SocketAddressInterface *sockaddr
 bool socket_bind(const Socket *socket, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen)
 { ENSURE_INIT; return !bind(socket->desc, (struct sockaddr *)sockaddr, sockaddrlen); }
 
-Socket *socket_accept(const Socket *socket)
+Socket *socket_accept(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen)
 {
     ENSURE_INIT;
 
-    SOCKETDESCRIPTOR desc = accept(socket->desc, NULL, NULL);
+    SOCKETDESCRIPTOR desc = accept(socket->desc, sockaddr, sockaddrlen);
     if (desc == INVALID_SOCKET) return NULL;
 
     Socket *ret = malloc(sizeof(Socket));

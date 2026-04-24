@@ -216,10 +216,12 @@ LIBSOCKET_API bool LIBSOCKET_ABI socket_connect(const Socket *socket, const Sock
 LIBSOCKET_API bool LIBSOCKET_ABI socket_bind(const Socket *socket, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen);
 
 LIBSOCKET_API bool LIBSOCKET_ABI socket_listen(const Socket *socket, int backlog);
-LIBSOCKET_API Socket * LIBSOCKET_ABI socket_accept(const Socket *socket);
+// [socket_accept]: sockaddr & sockaddrlen can be NULL. see <sys/socket.h> accept function documentation for more info.
+LIBSOCKET_API Socket * LIBSOCKET_ABI socket_accept(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen);
 
 LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_recv(const Socket *socket, void *buffer, socksize_t len, int flags);
-LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_recvfrom(const Socket *socket, void *buffer, socksize_t len, int flags, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen); // sockaddr can be NULL.
+// [socket_recvfrom]: sockaddr & sockaddrlen can be NULL. see <sys/socket.h> recvfrom function documentation for more info.
+LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_recvfrom(const Socket *socket, void *buffer, socksize_t len, int flags, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen);
 LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_send(const Socket *socket, const void *data, socksize_t len, int flags);
 LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_sendto(const Socket *socket, const void *buffer, socksize_t len, int flags, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen);
 
