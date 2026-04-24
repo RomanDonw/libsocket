@@ -67,11 +67,11 @@ bool socket_close(Socket *socket)
 
 bool socket_listen(const Socket *socket, int backlog) { ENSURE_INIT; return !listen(socket->desc, backlog); }
 
-bool socket_connect(const Socket *socket, const SocketAddressInterface *sockaddr)
-{ ENSURE_INIT; return !connect(socket->desc, (struct sockaddr *)sockaddr, sizeof(SocketAddressInterface)); }
+bool socket_connect(const Socket *socket, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen)
+{ ENSURE_INIT; return !connect(socket->desc, (struct sockaddr *)sockaddr, sockaddrlen); }
 
-bool socket_bind(const Socket *socket, const SocketAddressInterface *sockaddr)
-{ ENSURE_INIT; return !bind(socket->desc, (struct sockaddr *)sockaddr, sizeof(SocketAddressInterface)); }
+bool socket_bind(const Socket *socket, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen)
+{ ENSURE_INIT; return !bind(socket->desc, (struct sockaddr *)sockaddr, sockaddrlen); }
 
 Socket *socket_accept(const Socket *socket)
 {

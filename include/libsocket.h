@@ -179,8 +179,8 @@ typedef struct Socket Socket;
 
 typedef struct sockaddr_in SocketIPv4Address;
 typedef struct sockaddr_in6 SocketIPv6Address;
-typedef struct sockaddr_storage SocketAddressInterface;
-typedef SocketAddressInterface SocketAddress;
+typedef struct sockaddr_storage SocketAddressStorage;
+typedef void SocketAddressInterface;
 
 typedef struct in_addr IPv4Address;
 typedef struct in6_addr IPv6Address;
@@ -212,8 +212,8 @@ LIBSOCKET_API bool LIBSOCKET_ABI socket_unpacksockaddr(const SocketAddressInterf
 LIBSOCKET_API Socket * LIBSOCKET_ABI socket_open(SocketAddressFamily af, SocketType type, SocketProtocol protocol);
 LIBSOCKET_API bool LIBSOCKET_ABI socket_close(Socket *socket);
 
-LIBSOCKET_API bool LIBSOCKET_ABI socket_connect(const Socket *socket, const SocketAddressInterface *sockaddr);
-LIBSOCKET_API bool LIBSOCKET_ABI socket_bind(const Socket *socket, const SocketAddressInterface *sockaddr);
+LIBSOCKET_API bool LIBSOCKET_ABI socket_connect(const Socket *socket, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen);
+LIBSOCKET_API bool LIBSOCKET_ABI socket_bind(const Socket *socket, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen);
 
 LIBSOCKET_API bool LIBSOCKET_ABI socket_listen(const Socket *socket, int backlog);
 LIBSOCKET_API Socket * LIBSOCKET_ABI socket_accept(const Socket *socket);

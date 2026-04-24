@@ -22,7 +22,7 @@ int main(void)
     puts("");
 
     {
-        SocketAddress saddr;
+        SocketIPv4Address saddr;
         IPv4Address addr = IPV4ADDR_ANY;
         unsigned short port = 12345;
         char addrstr[IPV4ADDRSTRSIZE];
@@ -31,7 +31,7 @@ int main(void)
         if (!socket_addrtostr(&addr, IPv4, addrstr, IPV4ADDRSTRSIZE)) handleerror("socket_addrtostr");
         printf("Binding to address %s:%u...\n", addrstr, port);
         if (!socket_packsockaddr(&saddr, IPv4, &addr, port)) handleerror("socket_packsockaddr");
-        if (!socket_bind(s, &saddr)) handleerror("socket_bind");
+        if (!socket_bind(s, &saddr, sizeof(saddr))) handleerror("socket_bind");
 
         // fill address & port variables with garbage.
         addr = IPV4ADDR_BROADCAST;
