@@ -172,9 +172,10 @@ bool socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionNa
             if (*optlen > 0) memcpy(optval, &millis, (*optlen > sizeof(millis)) ? sizeof(millis) : *optlen);
             *optlen = sizeof(millis);
             return true;
-    }
 
-    return !getsockopt(socket->desc, level, optname, optval, optlen);
+        default:
+            return !getsockopt(socket->desc, level, optname, optval, optlen);
+    }
 }
 
 bool socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, const void *optval, socklen_t optlen)
@@ -216,9 +217,10 @@ bool socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionNa
             #endif
 
             return !setsockopt(socket->desc, level, optname, data, size);
-    }
 
-    return !setsockopt(socket->desc, level, optname, optval, optlen);
+        default:
+            return !setsockopt(socket->desc, level, optname, optval, optlen);
+    }
 }
 
 bool socket_getpeername(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size)
