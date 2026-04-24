@@ -100,10 +100,10 @@ ssize_t socket_recv(const Socket *socket, void *buffer, socksize_t len, int flag
 ssize_t socket_recvfrom(const Socket *socket, void *buffer, socksize_t len, int flags, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen)
 { ENSURE_INIT; return recvfrom(socket->desc, buffer, len, flags, (struct sockaddr *)sockaddr, sockaddrlen); }
 
+ssize_t socket_send(const Socket *socket, const void *data, socksize_t len, int flags) { ENSURE_INIT; return send(socket->desc, data, len, flags); }
+
 ssize_t socket_sendto(const Socket *socket, const void *buffer, socksize_t len, int flags, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen)
 { ENSURE_INIT; return sendto(socket->desc, buffer, len, flags, (const struct sockaddr *)sockaddr, sockaddrlen); }
-
-ssize_t socket_send(const Socket *socket, const void *data, socksize_t len, int flags) { ENSURE_INIT; return send(socket->desc, data, len, flags); }
 
 bool socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value)
 {
@@ -118,9 +118,9 @@ bool socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value)
 
 bool socket_shutdown(const Socket *socket, SocketShutdownMode mode) { ENSURE_INIT; return !shutdown(socket->desc, mode); }
 
-SocketAddressFamily socket_getaf(const Socket *socket) { ENSURE_INIT; return socket->af; }
-SocketType socket_gettype(const Socket *socket) { ENSURE_INIT; return socket->type; }
-SocketProtocol socket_getprotocol(const Socket *socket) { ENSURE_INIT; return socket->protocol; }
+SocketAddressFamily socket_getaf(const Socket *socket) { return socket->af; }
+SocketType socket_gettype(const Socket *socket) { return socket->type; }
+SocketProtocol socket_getprotocol(const Socket *socket) { return socket->protocol; }
 
 bool socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, void *optval, socklen_t *optlen)
 {
@@ -236,4 +236,4 @@ bool socket_getpeername(const Socket *socket, SocketAddressInterface *sockaddr, 
 bool socket_getsockname(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size)
 { ENSURE_INIT; return !getsockname(socket->desc, (struct sockaddr *)sockaddr, size); }
 
-SOCKETDESCRIPTOR socket_gethandle(const Socket *socket) { ENSURE_INIT; return socket->desc; }
+SOCKETDESCRIPTOR socket_gethandle(const Socket *socket) { return socket->desc; }

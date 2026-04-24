@@ -11,8 +11,7 @@
     #include <arpa/inet.h>
 #endif
 
-SocketAddressFamily socket_getsockaddraf(const SocketAddressInterface *sockaddr)
-{ return sockaddr->ss_family; }
+SocketAddressFamily socket_getsockaddraf(const SocketAddressInterface *sockaddr) { return sockaddr->ss_family; }
 
 bool socket_packsockaddr(SocketAddressInterface *sockaddr, SocketAddressFamily af, const IPAddressInterface *addr, unsigned short port)
 {

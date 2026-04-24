@@ -87,8 +87,8 @@ enum
 
 enum
 {
-    Stream = SOCK_STREAM/*,
-    Datagram = SOCK_DGRAM*/
+    Stream = SOCK_STREAM,
+    Datagram = SOCK_DGRAM
 } typedef SocketType;
 
 enum
