@@ -96,6 +96,13 @@ Socket *socket_accept(const Socket *socket)
 }
 
 ssize_t socket_recv(const Socket *socket, void *buffer, socksize_t len, int flags) { ENSURE_INIT; return recv(socket->desc, buffer, len, flags); }
+
+ssize_t socket_recvfrom(const Socket *socket, void *buffer, socksize_t len, int flags, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen)
+{ ENSURE_INIT; return recvfrom(socket->desc, buffer, len, flags, (struct sockaddr *)sockaddr, sockaddrlen); }
+
+ssize_t socket_sendto(const Socket *socket, const void *buffer, socksize_t len, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen)
+{ ENSURE_INIT; return sendto(socket->desc, buffer, len, 0, (const struct sockaddr *)sockaddr, sockaddrlen); }
+
 ssize_t socket_send(const Socket *socket, const void *data, socksize_t len) { ENSURE_INIT; return send(socket->desc, data, len, 0); }
 
 bool socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value)

@@ -93,8 +93,8 @@ enum
 
 enum
 {
-    TCP = IPPROTO_TCP/*,
-    UDP = IPPROTO_UDP*/
+    TCP = IPPROTO_TCP,
+    UDP = IPPROTO_UDP
 } typedef SocketProtocol;
 
 enum
@@ -215,7 +215,9 @@ LIBSOCKET_API bool LIBSOCKET_ABI socket_listen(const Socket *socket, int backlog
 LIBSOCKET_API Socket * LIBSOCKET_ABI socket_accept(const Socket *socket);
 
 LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_recv(const Socket *socket, void *buffer, socksize_t len, int flags);
+LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_recvfrom(const Socket *socket, void *buffer, socksize_t len, int flags, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen); // sockaddr can be NULL.
 LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_send(const Socket *socket, const void *data, socksize_t len);
+LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_sendto(const Socket *socket, const void *buffer, socksize_t len, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen);
 
 LIBSOCKET_API bool LIBSOCKET_ABI socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value);
 LIBSOCKET_API bool LIBSOCKET_ABI socket_shutdown(const Socket *socket, SocketShutdownMode mode);
