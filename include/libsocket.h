@@ -170,6 +170,10 @@ struct
 #define RECV_NOFLAGS 0
 #define RECV_FLAG_PEEK MSG_PEEK
 #define RECV_FLAG_WAITALL MSG_WAITALL
+#define RECV_FLAG_TRUNC MSG_TRUNC
+
+#define SEND_NOFLAGS 0
+#define SEND_FLAG_DONTROUTE MSG_DONTROUTE
 
 typedef struct Socket Socket;
 
@@ -216,8 +220,8 @@ LIBSOCKET_API Socket * LIBSOCKET_ABI socket_accept(const Socket *socket);
 
 LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_recv(const Socket *socket, void *buffer, socksize_t len, int flags);
 LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_recvfrom(const Socket *socket, void *buffer, socksize_t len, int flags, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen); // sockaddr can be NULL.
-LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_send(const Socket *socket, const void *data, socksize_t len);
-LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_sendto(const Socket *socket, const void *buffer, socksize_t len, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen);
+LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_send(const Socket *socket, const void *data, socksize_t len, int flags);
+LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_sendto(const Socket *socket, const void *buffer, socksize_t len, int flags, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen);
 
 LIBSOCKET_API bool LIBSOCKET_ABI socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value);
 LIBSOCKET_API bool LIBSOCKET_ABI socket_shutdown(const Socket *socket, SocketShutdownMode mode);

@@ -44,7 +44,7 @@ int main(void)
     if (!socket_connect(s, &saddr)) handleerror("socket_connect");
 
     const char *request = "GET / HTTP/1.0\r\n\r\n";
-    if (!socket_send(s, request, strlen(request))) handleerror("socket_send");
+    if (!socket_send(s, request, strlen(request), SEND_NOFLAGS)) handleerror("socket_send");
 
     MILLIS(100);
 
