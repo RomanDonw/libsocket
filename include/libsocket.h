@@ -99,8 +99,8 @@ enum
 
 enum
 {
-    NonBlockingIO = FIONBIO,
-    AvailableDataToRead = FIONREAD
+    NonBlockingIO, // bool, writeonly.
+    AvailableDataToRead // uint32_t, readonly.
 } typedef SocketIOCTLOption;
 
 enum

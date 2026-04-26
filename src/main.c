@@ -105,15 +105,48 @@ ssize_t socket_send(const Socket *socket, const void *data, socksize_t len, int 
 ssize_t socket_sendto(const Socket *socket, const void *buffer, socksize_t len, int flags, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen)
 { ENSURE_INIT; return sendto(socket->desc, buffer, len, flags, (const struct sockaddr *)sockaddr, sockaddrlen); }
 
+#ifdef LIBSOCKET_OS_WINDOWS
+    #define IOCTLSOCKET(desc, option, value_ptr) (ioctlsocket(desc, option, value_ptr))
+#else
+    #define IOCTLSOCKET(desc, option, value_ptr) (ioctl(desc, option, value_ptr))
+#endif
+
 bool socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value)
 {
     ENSURE_INIT;
 
-    #ifdef LIBSOCKET_OS_WINDOWS
-        return !ioctlsocket(socket->desc, option, value);
-    #else
-        return !ioctl(socket->desc, option, value);
-    #endif
+    switch (option)
+    {
+        case NonBlockingIO:
+        {
+            #ifdef LIBSOCKET_OS_WINDOWS
+                unsigned long val = *(bool *)value;
+            #else
+                int val = *(bool *)value;
+            #endif
+            return !IOCTLSOCKET(socket->desc, FIONBIO, &val);
+        }
+
+        case AvailableDataToRead:
+        {
+            #ifdef LIBSOCKET_OS_WINDOWS
+                unsigned long val;
+            #else
+                int val;
+            #endif
+            if (IOCTLSOCKET(socket->desc, FIONREAD, &val)) return false;
+            *(uint32_t *)value = val;
+            return true;
+        }
+
+        /*
+        default:
+            return !IOCTLSOCKET(socket->desc, option, value);
+        */
+        default:
+            SETLASTERROR(SOCKERR_INVAL);
+            return false;
+    }
 }
 
 bool socket_shutdown(const Socket *socket, SocketShutdownMode mode) { ENSURE_INIT; return !shutdown(socket->desc, mode); }
