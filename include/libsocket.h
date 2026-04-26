@@ -37,6 +37,8 @@
         #endif
     #endif
 
+    #define LIBSOCKET_ABI __cdecl
+
     typedef SSIZE_T ssize_t;
     typedef SOCKET SOCKETDESCRIPTOR;
     typedef int socksize_t;
@@ -57,6 +59,7 @@
     #include <netinet/tcp.h>
 
     #define LIBSOCKET_API __attribute__((visibility("default")))
+    #define LIBSOCKET_ABI
 
     typedef int SOCKETDESCRIPTOR;
     #define INVALID_SOCKET -1
@@ -76,8 +79,6 @@
 
 #define SOCKET_NTOHS(x) SOCKET_HTONS(x)
 #define SOCKET_NTOHL(x) SOCKET_HTONL(x)
-
-#define LIBSOCKET_ABI __cdecl
 
 enum
 {

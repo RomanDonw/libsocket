@@ -1,11 +1,11 @@
 #include "libsocket.h"
 #include "init.h"
 
-volatile void *___ = NULL;
-
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+volatile void *___ = NULL;
 
 #ifdef _MSC_VER
     #define LIBSOCKET_INITATTR
@@ -21,27 +21,25 @@ static void LIBSOCKET_INITATTR libsocket_WSAInit(void)
 {
     if (inited) return;
 
-    {
-        #ifdef LIBSOCKET_OS_WINDOWS
-            const WORD version = MAKEWORD(2, 2);
+    #ifdef LIBSOCKET_OS_WINDOWS
+        const WORD version = MAKEWORD(2, 2);
 
-            WSADATA data;
-            int err = WSAStartup(version, &data);
-            if (err)
-            {
-                fprintf(stderr, "[libsocket]: WSAStartup error %i. Application aborted.\n", err);
-                abort();
-            }
+        WSADATA data;
+        int err = WSAStartup(version, &data);
+        if (err)
+        {
+            fprintf(stderr, "[libsocket]: WSAStartup error %i. Application aborted.\n", err);
+            abort();
+        }
 
-            if (data.wVersion != version)
-            {
-                fprintf(stderr, "[libsocket]: responced WinSock version (high.low: %u.%u) doesn't match requested version (high.low: %u.%u). Application aborted.\n", HIBYTE(data.wVersion), LOBYTE(data.wVersion), HIBYTE(version), LOBYTE(version));
+        if (data.wVersion != version)
+        {
+            fprintf(stderr, "[libsocket]: responced WinSock version (high.low: %u.%u) doesn't match requested version (high.low: %u.%u). Application aborted.\n", HIBYTE(data.wVersion), LOBYTE(data.wVersion), HIBYTE(version), LOBYTE(version));
 
-                WSACleanup();
-                abort();
-            }
-        #endif
-    }
+            WSACleanup();
+            abort();
+        }
+    #endif
 
     inited = true;
 }
@@ -50,17 +48,15 @@ static void LIBSOCKET_CLUPATTR libsocket_WSACleanup(void)
 {
     if (!inited) return;
 
-    {
-        #ifdef LIBSOCKET_OS_WINDOWS
-            WSACleanup();
-        #endif
-    }
+    #ifdef LIBSOCKET_OS_WINDOWS
+        WSACleanup();
+    #endif
 
     inited = false;
 }
 
 #ifdef _MSC_VER
-    static void libsocket_MSVCinit()
+    static void libsocket_MSVCinit(void)
     {
         libsocket_WSAInit();
         if (atexit(libsocket_WSACleanup))
