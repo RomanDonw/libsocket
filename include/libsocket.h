@@ -167,13 +167,13 @@ struct
     unsigned short linger; // in seconds.
 } typedef SocketLingerOptions;
 
-#define RECV_NOFLAGS 0
-#define RECV_FLAG_PEEK MSG_PEEK
-#define RECV_FLAG_WAITALL MSG_WAITALL
-#define RECV_FLAG_TRUNC MSG_TRUNC
+#define SOCKET_RECV_NOFLAGS 0
+#define SOCKET_RECV_FLAG_PEEK MSG_PEEK
+#define SOCKET_RECV_FLAG_WAITALL MSG_WAITALL
+#define SOCKET_RECV_FLAG_TRUNC MSG_TRUNC
 
-#define SEND_NOFLAGS 0
-#define SEND_FLAG_DONTROUTE MSG_DONTROUTE
+#define SOCKET_SEND_NOFLAGS 0
+#define SOCKET_SEND_FLAG_DONTROUTE MSG_DONTROUTE
 
 typedef struct Socket Socket;
 

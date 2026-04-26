@@ -44,7 +44,7 @@ int main(void)
     if (!socket_connect(s, &saddr, sizeof(saddr))) handleerror("socket_connect");
 
     const char *request = "GET / HTTP/1.0\r\n\r\n";
-    if (!socket_send(s, request, strlen(request), SEND_NOFLAGS)) handleerror("socket_send");
+    if (!socket_send(s, request, strlen(request), SOCKET_SEND_NOFLAGS)) handleerror("socket_send");
 
     MILLIS(100);
 
@@ -56,7 +56,7 @@ int main(void)
     #define BUFFER_SIZE 512
     char buffer[BUFFER_SIZE];;
     ssize_t readbytes;
-    while ((readbytes = socket_recv(s, buffer, BUFFER_SIZE, RECV_NOFLAGS)) > 0)
+    while ((readbytes = socket_recv(s, buffer, BUFFER_SIZE, SOCKET_RECV_NOFLAGS)) > 0)
     {
         for (size_t i = 0; i < readbytes; i++) putchar(buffer[i]);
     }
