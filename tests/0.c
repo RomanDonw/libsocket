@@ -41,7 +41,7 @@ int main(void)
 
     waitms(100);
 
-    unsigned long avail;
+    uint32_t avail;
     if (!socket_ioctl(s, AvailableDataToRead, &avail)) handleerror("socket_ioctl");
     printf("Available bytes: %lu\n", avail);
 
