@@ -39,7 +39,7 @@ int main(void)
     const char *request = "GET / HTTP/1.0\r\n\r\n";
     if (!socket_send(s, request, strlen(request), SOCKET_SEND_NOFLAGS)) handleerror("socket_send");
 
-    MILLIS(100);
+    waitms(100);
 
     unsigned long avail;
     if (!socket_ioctl(s, AvailableDataToRead, &avail)) handleerror("socket_ioctl");

@@ -1,5 +1,7 @@
-add_executable(test0 "tests/0.c")
-target_link_libraries(test0 PRIVATE socket)
+macro(test name sources)
+    add_executable(${name} ${sources} "tests/util.c")
+    target_link_libraries(${name} PRIVATE socket)
+endmacro()
 
-add_executable(test1 "tests/1.c")
-target_link_libraries(test1 PRIVATE socket)
+test(test0 "tests/0.c")
+test(test1 "tests/1.c")
