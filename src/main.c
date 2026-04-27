@@ -12,6 +12,7 @@
     #include <unistd.h>
     #include <arpa/inet.h>
     #include <sys/time.h>
+    #include <sys/ioctl.h>
 #endif
 
 const IPv4Address IPV4ADDR_ANY = IPV4ADDR_INIT(INADDR_ANY);
