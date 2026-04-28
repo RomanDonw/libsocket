@@ -81,6 +81,15 @@ const char *socket_strerror(SocketError errcode)
         case ProtocolOptionUnsupported:
             return "protocol option unsupported";
 
+        case OperationNotSupported:
+            return "operation not supported";
+
+        case SystemBufferOverflowed:
+            return "system buffer overflowed";
+
+        case ConnectionAborted:
+            return "connection aborted";
+
         // Windows-specific:
         case InitializationError:
             return "WinSock not initialized";

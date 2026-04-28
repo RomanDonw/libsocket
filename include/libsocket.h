@@ -151,11 +151,14 @@ enum
     NetworkReset, // ENETRESET
     ConnectionReset, // ECONNRESET
     ConnectionRefused, // ECONNREFUSED
+    ConnectionAborted, // ECONNABORTED
     ConnectionTimedOut, // ETIMEDOUT
     NotConnected, // ENOTCONN
     InvalidDescriptor, // EBADF
     NoSpaceLeft, // ENOSPC
     ProtocolOptionUnsupported, // ENOPROTOOPT
+    OperationNotSupported, // EOPNOTSUPP
+    SystemBufferOverflowed, // ENOBUFS
 
     // Windows-specific.
     InitializationError // WSANOTINITIALISED

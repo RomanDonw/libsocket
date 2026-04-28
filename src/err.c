@@ -85,6 +85,15 @@ SocketError socket_getlasterror(void)
         case SOCKERR_WOULDBLOCK:
             return TemporaryUnavailable;
 
+        case SOCKERR_OPNOTSUPP:
+            return OperationNotSupported;
+
+        case SOCKERR_NOBUFFS:
+            return SystemBufferOverflowed;
+
+        case SOCKERR_CONNABORTED:
+            return ConnectionAborted;
+
         #ifdef LIBSOCKET_OS_WINDOWS
             case WSANOTINITIALISED:
                 return InitializationError;
