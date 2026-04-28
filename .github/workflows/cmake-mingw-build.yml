@@ -1,4 +1,4 @@
-name: CMake MinGW UCRT64 Build
+name: Windows x86-64 MSYS2 MinGW UCRT64
 on: [push, pull_request]
 
 jobs:
@@ -23,8 +23,11 @@ jobs:
         run: |
           mkdir build
           cd build
+
+          cmake -S .. -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=ON
+          mingw32-make
           
-          cmake -S .. -G "MinGW Makefiles"
+          cmake -S .. -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=OFF
           mingw32-make
 
           cd ..
@@ -34,12 +37,14 @@ jobs:
 
           mkdir bin
           mv build/*.exe bin/
+          mv build/*.dll bin/
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: win
+          name: win64-mingw-ucrt64
           path: |
             bin/*.exe
+            bin/*.dll
             lib/*.a
             include/*.h
