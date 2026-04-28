@@ -30,14 +30,16 @@ jobs:
           cmake -S .. -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=OFF
           mingw32-make
 
-          cd ..
+          rm *.dll.a
 
-          mkdir lib
-          mv build/*.a lib/
+          cd ..
 
           mkdir bin
           mv build/*.exe bin/
           mv build/*.dll bin/
+
+          mkdir lib
+          mv build/*.a lib/
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
