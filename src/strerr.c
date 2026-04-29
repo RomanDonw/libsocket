@@ -51,6 +51,9 @@ const char *socket_strerror(SocketError errcode)
         case AddressInUse:
             return "address already in use";
 
+        case AddressNotAvailable:
+            return "address not available";
+
         case NetworkUnreachable:
             return "network unreachable";
 
@@ -89,6 +92,18 @@ const char *socket_strerror(SocketError errcode)
 
         case ConnectionAborted:
             return "connection aborted";
+
+        case CannotTranslateName:
+            return "cannot translate name";
+
+        case DestinationAddressRequired:
+            return "destination address required";
+
+        case AlreadyConnected:
+            return "already connected";
+
+        case NameTooLong:
+            return "name too long";
 
         // Windows-specific:
         case InitializationError:

@@ -45,6 +45,9 @@ SocketError socket_getlasterror(void)
         case SOCKERR_ADDRINUSE:
             return AddressInUse;
 
+        case SOCKERR_ADDRNOTAVAIL:
+            return AddressNotAvailable;
+
         case SOCKERR_NETUNREACH:
             return NetworkUnreachable;
         
@@ -93,6 +96,18 @@ SocketError socket_getlasterror(void)
 
         case SOCKERR_CONNABORTED:
             return ConnectionAborted;
+
+        case SOCKERR_LOOP:
+            return CannotTranslateName;
+
+        case SOCKERR_DESTADDRREQ:
+            return DestinationAddressRequired;
+
+        case SOCKERR_ISCONN:
+            return AlreadyConnected;
+
+        case SOCKERR_NAMETOOLONG:
+            return NameTooLong;
 
         #ifdef LIBSOCKET_OS_WINDOWS
             case WSANOTINITIALISED:

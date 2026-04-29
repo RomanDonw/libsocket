@@ -146,6 +146,7 @@ enum
     UnsupportedProtocol, // EPROTONOSUPPORT
     UnsupportedSocketType, // ESOCKTNOSUPPORT
     AddressInUse, // EADDRINUSE
+    AddressNotAvailable, // EADDRNOTAVAIL
     NetworkUnreachable, // ENETUNREACH
     NetworkDown, // ENETDOWN
     NetworkReset, // ENETRESET
@@ -154,11 +155,15 @@ enum
     ConnectionAborted, // ECONNABORTED
     ConnectionTimedOut, // ETIMEDOUT
     NotConnected, // ENOTCONN
+    AlreadyConnected, // EISCONN
     InvalidDescriptor, // EBADF
     NoSpaceLeft, // ENOSPC
     ProtocolOptionUnsupported, // ENOPROTOOPT
     OperationNotSupported, // EOPNOTSUPP
     SystemBufferOverflowed, // ENOBUFS
+    CannotTranslateName, // ELOOP
+    DestinationAddressRequired, // EDESTADDRREQ
+    NameTooLong, // ENAMETOOLONG
 
     // Windows-specific.
     InitializationError // WSANOTINITIALISED
