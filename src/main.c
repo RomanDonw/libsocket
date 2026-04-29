@@ -13,6 +13,7 @@
     #include <arpa/inet.h>
     #include <sys/time.h>
     #include <sys/ioctl.h>
+    #include <fcntl.h>
 #endif
 
 const IPv4Address IPV4ADDR_ANY = IPV4ADDR_INIT(INADDR_ANY);
@@ -124,10 +125,16 @@ bool socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value)
         {
             #ifdef LIBSOCKET_OS_WINDOWS
                 unsigned long val = *(bool *)value;
+                return !IOCTLSOCKET(socket->desc, FIONBIO, &val);
             #else
-                int val = *(bool *)value;
+                int flags = fctl(socket->desc, F_GETFL, 0);
+                if (flags < 0) return false;
+
+                if (*(bool *)val && fctl(socket->desc, F_SETFL, flags | O_NONBLOCK) < 0) return false;
+                else if (!(*(bool *)val) && fctl(socket->desc, F_SETFL, flags & (~O_NONBLOCK)) < 0) return false;
+                
+                return true;
             #endif
-            return !IOCTLSOCKET(socket->desc, FIONBIO, &val);
         }
 
         case AvailableDataToRead:
