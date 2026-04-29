@@ -127,12 +127,12 @@ bool socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value)
                 unsigned long val = *(bool *)value;
                 return !IOCTLSOCKET(socket->desc, FIONBIO, &val);
             #else
-                int flags = fctl(socket->desc, F_GETFL, 0);
+                int flags = fcntl(socket->desc, F_GETFL, 0);
                 if (flags < 0) return false;
 
-                if (*(bool *)val && fctl(socket->desc, F_SETFL, flags | O_NONBLOCK) < 0) return false;
-                else if (!(*(bool *)val) && fctl(socket->desc, F_SETFL, flags & (~O_NONBLOCK)) < 0) return false;
-                
+                if (*(bool *)value && fcntl(socket->desc, F_SETFL, flags | O_NONBLOCK) < 0) return false;
+                else if (!(*(bool *)value) && fcntl(socket->desc, F_SETFL, flags & (~O_NONBLOCK)) < 0) return false;
+
                 return true;
             #endif
         }
@@ -149,10 +149,6 @@ bool socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value)
             return true;
         }
 
-        /*
-        default:
-            return !IOCTLSOCKET(socket->desc, option, value);
-        */
         default:
             SETLASTERROR(SOCKERR_INVAL);
             return false;
