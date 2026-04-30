@@ -58,9 +58,4 @@ This will fully automatily setup __libsocket__ for your project. By default CMak
 
 ## Tests
 
-Tests are available in `/tests/` folder in the root of repo. You can also use they as examples.
-
-### All tests short description:
-
-- Test 0 (0.c): HTTP 1.0 GET request test.
-- Test 1 (1.c): Unsafe API functions (for ex. `socket_gethandle`) test.
+Tests are available in `/tests/` folder in the root of repo. You can also use they as examples. Also in `/tests/` folder available README.md file with (short) description of every available test.
