@@ -86,7 +86,7 @@ SocketError socket_getlasterror(void)
 		    case SOCKERR_AGAIN:
 	    #endif
         case SOCKERR_WOULDBLOCK:
-            return TemporaryUnavailable;
+            return WouldBlock;
 
         case SOCKERR_OPNOTSUPP:
             return OperationNotSupported;

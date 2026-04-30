@@ -142,7 +142,7 @@ enum
     Fault, // EFAULT
     IncorrectArgumentValue, // EINVAL
     TooManyOpenedSockets, // EMFILE
-    TemporaryUnavailable, // EAGAIN/EWOULDBLOCK
+    WouldBlock, // EAGAIN/EWOULDBLOCK
     OperationInProgress, // EINPROGRESS
     InExecutionProcess, // EALREADY
     UnsupportedAddressFamily, // EAFNOSUPPORT

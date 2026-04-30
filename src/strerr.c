@@ -30,7 +30,7 @@ const char *socket_strerror(SocketError errcode)
         case TooManyOpenedSockets:
             return "too many opened sockets";
 
-        case TemporaryUnavailable:
+        case WouldBlock:
             return "temporary unavailable";
 
         case OperationInProgress:
