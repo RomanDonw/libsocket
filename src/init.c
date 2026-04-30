@@ -22,7 +22,7 @@ static void LIBSOCKET_INITATTR libsocket_WSAInit(void)
     if (inited) return;
 
     #ifdef LIBSOCKET_OS_WINDOWS
-        const WORD version = MAKEWORD(2, 2);
+        const WORD version = MAKEWORD(LIBSOCKET_WINSOCK_VERSION_LOW, LIBSOCKET_WINSOCK_VERSION_HIGH);
 
         WSADATA data;
         int err = WSAStartup(version, &data);

@@ -39,6 +39,9 @@
 
     #define LIBSOCKET_ABI __cdecl
 
+    #define LIBSOCKET_WINSOCK_VERSION_HIGH 2
+    #define LIBSOCKET_WINSOCK_VERSION_LOW 2
+
     typedef SSIZE_T ssize_t;
     typedef SOCKET SOCKETDESCRIPTOR;
     typedef int socksize_t;
