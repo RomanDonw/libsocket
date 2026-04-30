@@ -44,7 +44,6 @@
 
     typedef SSIZE_T ssize_t;
     typedef SOCKET SOCKETDESCRIPTOR;
-    typedef int socksize_t;
 
     enum
     {
@@ -65,7 +64,6 @@
 
     typedef int SOCKETDESCRIPTOR;
     #define INVALID_SOCKET -1
-    typedef size_t socksize_t;
 
     enum
     {
@@ -230,11 +228,11 @@ LIBSOCKET_API bool LIBSOCKET_ABI socket_listen(const Socket *socket, int backlog
 // [socket_accept]: sockaddr & sockaddrlen can be NULL. see <sys/socket.h> accept function documentation for more info.
 LIBSOCKET_API Socket * LIBSOCKET_ABI socket_accept(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen);
 
-LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_recv(const Socket *socket, void *buffer, socksize_t len, int flags);
+LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_recv(const Socket *socket, void *buffer, size_t len, int flags);
 // [socket_recvfrom]: sockaddr & sockaddrlen can be NULL. see <sys/socket.h> recvfrom function documentation for more info.
-LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_recvfrom(const Socket *socket, void *buffer, socksize_t len, int flags, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen);
-LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_send(const Socket *socket, const void *data, socksize_t len, int flags);
-LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_sendto(const Socket *socket, const void *buffer, socksize_t len, int flags, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen);
+LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_recvfrom(const Socket *socket, void *buffer, size_t len, int flags, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen);
+LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_send(const Socket *socket, const void *data, size_t len, int flags);
+LIBSOCKET_API ssize_t LIBSOCKET_ABI socket_sendto(const Socket *socket, const void *buffer, size_t len, int flags, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen);
 
 LIBSOCKET_API bool LIBSOCKET_ABI socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value);
 LIBSOCKET_API bool LIBSOCKET_ABI socket_shutdown(const Socket *socket, SocketShutdownMode mode);

@@ -7,6 +7,7 @@
 
 #include "init.h"
 #include "err.h"
+#include "util.h"
 
 #ifndef LIBSOCKET_OS_WINDOWS
     #include <unistd.h>
@@ -99,15 +100,17 @@ Socket *socket_accept(const Socket *socket, SocketAddressInterface *sockaddr, so
     return ret;
 }
 
-ssize_t socket_recv(const Socket *socket, void *buffer, socksize_t len, int flags) { ENSURE_INIT; return recv(socket->desc, buffer, len, flags); }
+ssize_t socket_recv(const Socket *socket, void *buffer, size_t len, int flags)
+{ ENSURE_INIT; return recv(socket->desc, buffer, CLAMPSIZET(len), flags); }
 
-ssize_t socket_recvfrom(const Socket *socket, void *buffer, socksize_t len, int flags, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen)
-{ ENSURE_INIT; return recvfrom(socket->desc, buffer, len, flags, (struct sockaddr *)sockaddr, sockaddrlen); }
+ssize_t socket_recvfrom(const Socket *socket, void *buffer, size_t len, int flags, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen)
+{ ENSURE_INIT; return recvfrom(socket->desc, buffer, CLAMPSIZET(len), flags, (struct sockaddr *)sockaddr, sockaddrlen); }
 
-ssize_t socket_send(const Socket *socket, const void *data, socksize_t len, int flags) { ENSURE_INIT; return send(socket->desc, data, len, flags); }
+ssize_t socket_send(const Socket *socket, const void *data, size_t len, int flags)
+{ ENSURE_INIT; return send(socket->desc, data, CLAMPSIZET(len), flags); }
 
-ssize_t socket_sendto(const Socket *socket, const void *buffer, socksize_t len, int flags, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen)
-{ ENSURE_INIT; return sendto(socket->desc, buffer, len, flags, (const struct sockaddr *)sockaddr, sockaddrlen); }
+ssize_t socket_sendto(const Socket *socket, const void *buffer, size_t len, int flags, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen)
+{ ENSURE_INIT; return sendto(socket->desc, buffer, CLAMPSIZET(len), flags, (const struct sockaddr *)sockaddr, sockaddrlen); }
 
 #ifdef LIBSOCKET_OS_WINDOWS
     #define IOCTLSOCKET(desc, option, value_ptr) (ioctlsocket(desc, option, value_ptr))
