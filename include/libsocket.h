@@ -208,6 +208,10 @@ LIBSOCKET_API extern const IPv4Address IPV4ADDR_BROADCAST;
 LIBSOCKET_API extern const IPv6Address IPV6ADDR_ANY;
 LIBSOCKET_API extern const IPv6Address IPV6ADDR_LOOPBACK;
 
+LIBSOCKET_API extern void *(*libsocket_malloc)(size_t);
+LIBSOCKET_API extern void *(*libsocket_realloc)(void *, size_t);
+LIBSOCKET_API extern void (*libsocket_free)(void *);
+
 LIBSOCKET_API SocketError LIBSOCKET_ABI socket_getlasterror(void);
 LIBSOCKET_API const char * LIBSOCKET_ABI socket_strerror(SocketError errcode);
 

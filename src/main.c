@@ -40,7 +40,7 @@ Socket *socket_open(SocketAddressFamily af, SocketType type, SocketProtocol prot
     SOCKETDESCRIPTOR desc = socket(af, type, protocol);
     if (desc == INVALID_SOCKET) return NULL;
 
-    Socket *ret = malloc(sizeof(Socket));
+    Socket *ret = libsocket_malloc(sizeof(Socket));
     if (!ret)
     {
         SETLASTERROR(SOCKERR_NOMEM);
@@ -65,7 +65,7 @@ bool socket_close(Socket *socket)
         if (close(socket->desc)) return false;
     #endif
 
-    free(socket);
+    libsocket_free(socket);
 
     return true;
 }
@@ -85,7 +85,7 @@ Socket *socket_accept(const Socket *socket, SocketAddressInterface *sockaddr, so
     SOCKETDESCRIPTOR desc = accept(socket->desc, sockaddr, sockaddrlen);
     if (desc == INVALID_SOCKET) return NULL;
 
-    Socket *ret = malloc(sizeof(Socket));
+    Socket *ret = libsocket_malloc(sizeof(Socket));
     if (!ret)
     {
         SETLASTERROR(SOCKERR_NOMEM);

@@ -5,8 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-volatile void *___ = NULL;
-
 #ifdef _MSC_VER
     #define LIBSOCKET_INITATTR
     #define LIBSOCKET_CLUPATTR
@@ -15,9 +13,15 @@ volatile void *___ = NULL;
     #define LIBSOCKET_CLUPATTR __attribute__((destructor))
 #endif
 
+volatile void *___ = NULL;
+
+void *(*libsocket_malloc)(size_t) = malloc;
+void *(*libsocket_realloc)(void *, size_t) = realloc;
+void (*libsocket_free)(void *) = free;
+
 bool inited = false;
 
-static void LIBSOCKET_INITATTR libsocket_WSAInit(void)
+static void LIBSOCKET_INITATTR libsocket_init(void)
 {
     if (inited) return;
 
@@ -44,7 +48,7 @@ static void LIBSOCKET_INITATTR libsocket_WSAInit(void)
     inited = true;
 }
 
-static void LIBSOCKET_CLUPATTR libsocket_WSACleanup(void)
+static void LIBSOCKET_CLUPATTR libsocket_cleanup(void)
 {
     if (!inited) return;
 
@@ -58,11 +62,11 @@ static void LIBSOCKET_CLUPATTR libsocket_WSACleanup(void)
 #ifdef _MSC_VER
     static void libsocket_MSVCinit(void)
     {
-        libsocket_WSAInit();
-        if (atexit(libsocket_WSACleanup))
+        libsocket_init();
+        if (atexit(libsocket_cleanup))
         {
             fprintf(stderr, "[libsocket]: error binding library cleanup callback in \"atexit\" C function. Application aborted.\n");
-            libsocket_WSACleanup();
+            libsocket_cleanup();
             abort();
         }
     }
