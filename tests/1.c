@@ -1,9 +1,9 @@
+#define LIBSOCKET_ALLOWUNSAFEACCESS
+
+#include "base.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-
-#define LIBSOCKET_ALLOWUNSAFEACCESS
-#include "libsocket.h"
-#include "util.h"
 
 void printipv4(IPv4Address addr, const char *addrname)
 {
