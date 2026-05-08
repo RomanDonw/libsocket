@@ -24,6 +24,6 @@ void waitms(uint32_t milliseconds)
 
 void handleerror(const char *funcname)
 {
-    printf("%s error: %s. Application aborted.\n", funcname, socket_strerror(socket_getlasterror()));
+    printf("%s error: %s. Application aborted.\n", funcname, socket_strerror(socket_lasterror));
     abort();
 }
