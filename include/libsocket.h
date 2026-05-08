@@ -133,7 +133,7 @@ enum
 {
     Success = 0,
 
-    NotInitialized, // |{| REMOVE THIS COMMENT |}| WSANOTINITIALISED/CUSTOM
+    NotInitialized,
     AlreadyInitialized,
     InternalUnknownError,
     ParsingAddressFailed,
