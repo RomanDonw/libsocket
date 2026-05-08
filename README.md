@@ -5,6 +5,9 @@
 ### Basic
 This library provides universal cross-platform network sockets implementation. Supports Windows (recommended MinGW UCRT64 env., MSVC also supported), and any other OS that provides POSIX socket implementation. Also this library supports both static & dynamic linking and building (if set CMake `BUILD_SHARED_LIBS` to `ON`).
 
+### Thread-safe
+Unfortunately, this **library isn`t yet completely thread-safe**.
+
 ### Supported platforms
 Note, that __**now supported only little-endian CPU arch.-es**__, because host to network byte order convertion macroses hardcoded in header(-s) only for little-endian CPU arch.-es.
 

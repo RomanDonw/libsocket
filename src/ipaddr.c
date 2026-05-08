@@ -14,19 +14,28 @@
 bool socket_parseaddr(IPAddressInterface *addr, SocketAddressFamily af, const char *straddr)
 {
     ENSURE_INIT;
-
     int ret = inet_pton(af, straddr, addr);
-    if (ret == 0) SETLASTERROR(SOCKERR_PARSEADDRFAIL);
-    return ret == 1;
+    if (ret == 0) RETURNWITHERROR(ParsingAddressFailed, false);
+    if (ret == -1) RETURNWITHSYSERR(false);
+    RETURNWITHSUCCESS(true);
 }
 
 bool socket_addrtostr(const IPAddressInterface *addr, SocketAddressFamily af, char *straddr, socklen_t size)
 {
     ENSURE_INIT;
 
-    bool res = inet_ntop(af, addr, straddr, size);
-    #ifdef LIBSOCKET_OS_WINDOWS
-        if (!res && GETLASTERROR() == SOCKERR_INVAL) SETLASTERROR(SOCKERR_NOSPC);
-    #endif
-    return res;
+    if (!inet_ntop(af, addr, straddr, size))
+    {
+        #ifdef LIBSOCKET_OS_WINDOWS
+            int err = GETLASTERROR();
+            if (err == SOCKERR_INVAL) socket_lasterror = NoSpaceLeft;
+            else socket_lasterror = translateerror(err);
+        #else
+            socket_lasterror = translateerror(GETLASTERROR());
+        #endif
+
+        return false;
+    }
+
+    RETURNWITHSUCCESS(true);
 }

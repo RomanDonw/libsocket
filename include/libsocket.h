@@ -131,6 +131,10 @@ enum
 
 enum
 {
+    Success = 0,
+
+    NotInitialized, // |{| REMOVE THIS COMMENT |}| WSANOTINITIALISED/CUSTOM
+    AlreadyInitialized,
     InternalUnknownError,
     ParsingAddressFailed,
 
@@ -165,9 +169,6 @@ enum
     CannotTranslateName, // ELOOP
     DestinationAddressRequired, // EDESTADDRREQ
     NameTooLong, // ENAMETOOLONG
-
-    // Windows-specific.
-    InitializationError // WSANOTINITIALISED
 } typedef SocketError;
 
 struct
@@ -212,7 +213,8 @@ LIBSOCKET_API extern void *(*libsocket_malloc)(size_t);
 LIBSOCKET_API extern void *(*libsocket_realloc)(void *, size_t);
 LIBSOCKET_API extern void (*libsocket_free)(void *);
 
-LIBSOCKET_API SocketError LIBSOCKET_ABI socket_getlasterror(void);
+LIBSOCKET_API extern SocketError socket_lasterror;
+
 LIBSOCKET_API const char * LIBSOCKET_ABI socket_strerror(SocketError errcode);
 
 LIBSOCKET_API bool LIBSOCKET_ABI socket_parseaddr(IPAddressInterface *addr, SocketAddressFamily af, const char *straddr);

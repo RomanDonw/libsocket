@@ -3,19 +3,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "init.h"
-#include "err.h"
-
 #ifndef LIBSOCKET_OS_WINDOWS
     #include <unistd.h>
     #include <arpa/inet.h>
 #endif
 
-SocketAddressFamily socket_getsockaddraf(const SocketAddressInterface *sockaddr) { return ((const struct sockaddr *)sockaddr)->sa_family; }
+#include "err.h"
+
+#define GETSOCKADDRAF(sockaddr_ptr) (((const struct sockaddr *)sockaddr_ptr)->sa_family)
+SocketAddressFamily socket_getsockaddraf(const SocketAddressInterface *sockaddr) { return GETSOCKADDRAF(sockaddr); }
 
 bool socket_packsockaddr(SocketAddressInterface *sockaddr, SocketAddressFamily af, const IPAddressInterface *addr, unsigned short port)
 {
-    ENSURE_INIT;
+    //ENSURE_INIT;
 
     switch (af)
     {
@@ -40,18 +40,18 @@ bool socket_packsockaddr(SocketAddressInterface *sockaddr, SocketAddressFamily a
             break;
 
         default:
-            SETLASTERROR(SOCKERR_AFNOSUPPORT);
-            return false;
+            //SETLASTERROR(SOCKERR_AFNOSUPPORT);
+            RETURNWITHERROR(UnsupportedAddressFamily, false);
     }
 
-    return true;
+    RETURNWITHSUCCESS(true);
 }
 
 bool socket_unpacksockaddr(const SocketAddressInterface *sockaddr, SocketAddressFamily af, IPAddressInterface *addr, unsigned short *port)
 {
-    ENSURE_INIT;
+    //ENSURE_INIT;
 
-    if (((const struct sockaddr *)sockaddr)->sa_family != af) { SETLASTERROR(SOCKERR_INVAL); return false; }
+    if (GETSOCKADDRAF(sockaddr) != af) RETURNWITHERROR(IncorrectArgumentValue, false);
 
     switch (af)
     {
@@ -68,9 +68,9 @@ bool socket_unpacksockaddr(const SocketAddressInterface *sockaddr, SocketAddress
             break;
 
         default:
-            SETLASTERROR(SOCKERR_AFNOSUPPORT);
-            return false;
+            //SETLASTERROR(SOCKERR_AFNOSUPPORT);
+            RETURNWITHERROR(UnsupportedAddressFamily, false);
     }
 
-    return true;
+    RETURNWITHSUCCESS(true);
 }

@@ -106,8 +106,10 @@ const char *socket_strerror(SocketError errcode)
             return "name too long";
 
         // Windows-specific:
+        /*
         case InitializationError:
             return "WinSock not initialized";
+        */
 
         default:
             return NULL;

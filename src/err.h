@@ -1,5 +1,5 @@
-#ifndef ERRORCODES_H
-#define ERRORCODES_H
+#ifndef ERR_H
+#define ERR_H
 
 #include "libsocket.h"
 
@@ -9,8 +9,8 @@
 
 #ifdef LIBSOCKET_OS_WINDOWS
     #define GETLASTERROR() (WSAGetLastError())
-    #define SETLASTERROR(x) (WSASetLastError(x))
 
+    //#define SOCKERR_NOTINITED WSANOTINITIALISED
     #define SOCKERR_NOMEM WSA_NOT_ENOUGH_MEMORY
 
     #define SOCKERR_INTR WSAEINTR
@@ -21,14 +21,14 @@
     #define SOCKERR_INPROGRESS WSAEINPROGRESS
     #define SOCKERR_ALREADY WSAEALREADY
     #define SOCKERR_INVDESC WSA_INVALID_HANDLE
-    #define SOCKERR_NOSPC CUSTOMERR(3)
+    #define SOCKERR_NOSPC CUSTOMERR(0)
     #define SOCKERR_NOTSOCK WSAENOTSOCK
     #define SOCKERR_OPNOTSUPP WSAEOPNOTSUPP
     #define SOCKERR_NOBUFFS WSAENOBUFS
     #define SOCKERR_LOOP WSAELOOP
     #define SOCKERR_NAMETOOLONG WSAENAMETOOLONG
 
-    #define SOCKERR_AGAIN CUSTOMERR(2)
+    #define SOCKERR_AGAIN CUSTOMERR(1)
     #define SOCKERR_WOULDBLOCK WSAEWOULDBLOCK
 
     #define SOCKERR_ADDRINUSE WSAEADDRINUSE
@@ -54,8 +54,8 @@
     #include <errno.h>
 
     #define GETLASTERROR() (errno)
-    #define SETLASTERROR(x) (errno = x)
 
+    //#define SOCKERR_NOTINITED CUSTOMERR(2)
     #define SOCKERR_NOMEM ENOMEM
 
     #define SOCKERR_INTR EINTR
@@ -97,7 +97,15 @@
     #define SOCKERR_ISCONN EISCONN
 #endif
 
-#define SOCKERR_INTERNALERR CUSTOMERR(0)
-#define SOCKERR_PARSEADDRFAIL CUSTOMERR(1)
+//#define SOCKERR_INTERNALERR CUSTOMERR(0)
+//#define SOCKERR_PARSEADDRFAIL CUSTOMERR(1)
+
+//#define SOCKERR_ALREADYINITED CUSTOMERR(5)
+
+SocketError translateerror(int err);
+
+#define RETURNWITHSUCCESS(return_value) { socket_lasterror = Success; return return_value; }
+#define RETURNWITHERROR(errorcode, return_value) { socket_lasterror = errorcode; return return_value; }
+#define RETURNWITHSYSERR(return_value) { socket_lasterror = translateerror(GETLASTERROR()); return return_value; }
 
 #endif

@@ -1,19 +1,19 @@
 #include "libsocket.h"
 #include "err.h"
 
-#include "init.h"
+SocketError socket_lasterror = Success;
 
-SocketError socket_getlasterror(void)
+SocketError translateerror(int err)
 {
-    ENSURE_INIT;
-
-    switch (GETLASTERROR())
+    switch (err)
     {
         case SOCKERR_NOMEM:
             return MemoryAllocationFailed;
 
+        /*
         case SOCKERR_PARSEADDRFAIL:
             return ParsingAddressFailed;
+        */
 
         case SOCKERR_INTR:
             return Interrupted;
@@ -109,12 +109,14 @@ SocketError socket_getlasterror(void)
         case SOCKERR_NAMETOOLONG:
             return NameTooLong;
 
+        /*
         #ifdef LIBSOCKET_OS_WINDOWS
             case WSANOTINITIALISED:
                 return InitializationError;
         #endif
+        */
 
-        case SOCKERR_INTERNALERR:
+        //case SOCKERR_INTERNALERR:
         default:
             return InternalUnknownError;
     }

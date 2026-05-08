@@ -38,21 +38,16 @@ Socket *socket_open(SocketAddressFamily af, SocketType type, SocketProtocol prot
     ENSURE_INIT;
 
     SOCKETDESCRIPTOR desc = socket(af, type, protocol);
-    if (desc == INVALID_SOCKET) return NULL;
+    if (desc == INVALID_SOCKET) RETURNWITHSYSERR(NULL);
 
     Socket *ret = libsocket_malloc(sizeof(Socket));
-    if (!ret)
-    {
-        SETLASTERROR(SOCKERR_NOMEM);
-        return NULL;
-    }
-
+    if (!ret) RETURNWITHERROR(MemoryAllocationFailed, NULL);
     ret->af = af;
     ret->type = type;
     ret->protocol = protocol;
     ret->desc = desc;
 
-    return ret;
+    RETURNWITHSUCCESS(ret);
 }
 
 bool socket_close(Socket *socket)
@@ -60,57 +55,72 @@ bool socket_close(Socket *socket)
     ENSURE_INIT;
 
     #ifdef LIBSOCKET_OS_WINDOWS
-        if (closesocket(socket->desc)) return false;
+        if (closesocket(socket->desc))
     #else
-        if (close(socket->desc)) return false;
+        if (close(socket->desc))
     #endif
+    RETURNWITHSYSERR(false);
 
     libsocket_free(socket);
-
-    return true;
+    RETURNWITHSUCCESS(true);
 }
 
-bool socket_listen(const Socket *socket, int backlog) { ENSURE_INIT; return !listen(socket->desc, backlog); }
+bool socket_listen(const Socket *socket, int backlog)
+{
+    ENSURE_INIT;
+    if (listen(socket->desc, backlog)) RETURNWITHSYSERR(false);
+    RETURNWITHSUCCESS(true);
+}
 
 bool socket_connect(const Socket *socket, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen)
-{ ENSURE_INIT; return !connect(socket->desc, (struct sockaddr *)sockaddr, sockaddrlen); }
+{
+    ENSURE_INIT;
+    if (connect(socket->desc, (struct sockaddr *)sockaddr, sockaddrlen)) RETURNWITHSYSERR(false);
+    RETURNWITHSUCCESS(true);
+}
 
 bool socket_bind(const Socket *socket, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen)
-{ ENSURE_INIT; return !bind(socket->desc, (struct sockaddr *)sockaddr, sockaddrlen); }
+{
+    ENSURE_INIT;
+    if (bind(socket->desc, (struct sockaddr *)sockaddr, sockaddrlen)) RETURNWITHSYSERR(false);
+    RETURNWITHSUCCESS(true);
+}
 
 Socket *socket_accept(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen)
 {
     ENSURE_INIT;
 
     SOCKETDESCRIPTOR desc = accept(socket->desc, sockaddr, sockaddrlen);
-    if (desc == INVALID_SOCKET) return NULL;
+    if (desc == INVALID_SOCKET) RETURNWITHSYSERR(NULL);
 
     Socket *ret = libsocket_malloc(sizeof(Socket));
-    if (!ret)
-    {
-        SETLASTERROR(SOCKERR_NOMEM);
-        return NULL;
-    }
-
+    if (!ret) RETURNWITHERROR(MemoryAllocationFailed, NULL);
     ret->af = socket->af;
     ret->type = socket->type;
     ret->protocol = socket->protocol;
     ret->desc = desc;
 
-    return ret;
+    RETURNWITHSUCCESS(ret);
 }
 
+#define SOCKIOFUNCPROTO(func) \
+    ENSURE_INIT;\
+    ssize_t ret = func;\
+    if (ret < 0) socket_lasterror = translateerror(GETLASTERROR());\
+    else socket_lasterror = Success;\
+    return ret;
+
 ssize_t socket_recv(const Socket *socket, void *buffer, size_t len, int flags)
-{ ENSURE_INIT; return recv(socket->desc, buffer, CLAMPSIZET(len), flags); }
+{ SOCKIOFUNCPROTO(recv(socket->desc, buffer, CLAMPSIZET(len), flags)) }
 
 ssize_t socket_recvfrom(const Socket *socket, void *buffer, size_t len, int flags, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen)
-{ ENSURE_INIT; return recvfrom(socket->desc, buffer, CLAMPSIZET(len), flags, (struct sockaddr *)sockaddr, sockaddrlen); }
+{ SOCKIOFUNCPROTO(recvfrom(socket->desc, buffer, CLAMPSIZET(len), flags, (struct sockaddr *)sockaddr, sockaddrlen)) }
 
 ssize_t socket_send(const Socket *socket, const void *data, size_t len, int flags)
-{ ENSURE_INIT; return send(socket->desc, data, CLAMPSIZET(len), flags); }
+{ SOCKIOFUNCPROTO(send(socket->desc, data, CLAMPSIZET(len), flags)) }
 
 ssize_t socket_sendto(const Socket *socket, const void *buffer, size_t len, int flags, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen)
-{ ENSURE_INIT; return sendto(socket->desc, buffer, CLAMPSIZET(len), flags, (const struct sockaddr *)sockaddr, sockaddrlen); }
+{ SOCKIOFUNCPROTO(sendto(socket->desc, buffer, CLAMPSIZET(len), flags, (const struct sockaddr *)sockaddr, sockaddrlen)) }
 
 #ifdef LIBSOCKET_OS_WINDOWS
     #define IOCTLSOCKET(desc, option, value_ptr) (ioctlsocket(desc, option, value_ptr))
@@ -128,16 +138,16 @@ bool socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value)
         {
             #ifdef LIBSOCKET_OS_WINDOWS
                 unsigned long val = *(bool *)value;
-                return !IOCTLSOCKET(socket->desc, FIONBIO, &val);
+                if (IOCTLSOCKET(socket->desc, FIONBIO, &val)) RETURNWITHSYSERR(false);
             #else
                 int flags = fcntl(socket->desc, F_GETFL, 0);
-                if (flags < 0) return false;
+                if (flags < 0) RETURNWITHSYSERR(false);
 
-                if (*(bool *)value && fcntl(socket->desc, F_SETFL, flags | O_NONBLOCK) < 0) return false;
-                else if (!(*(bool *)value) && fcntl(socket->desc, F_SETFL, flags & (~O_NONBLOCK)) < 0) return false;
-
-                return true;
+                if (*(bool *)value && fcntl(socket->desc, F_SETFL, flags | O_NONBLOCK) < 0) RETURNWITHSYSERR(false)
+                else if (!(*(bool *)value) && fcntl(socket->desc, F_SETFL, flags & (~O_NONBLOCK)) < 0) RETURNWITHSYSERR(false);
             #endif
+
+            RETURNWITHSUCCESS(true);
         }
 
         case AvailableDataToRead:
@@ -147,18 +157,22 @@ bool socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value)
             #else
                 int val;
             #endif
-            if (IOCTLSOCKET(socket->desc, FIONREAD, &val)) return false;
+            if (IOCTLSOCKET(socket->desc, FIONREAD, &val)) RETURNWITHSYSERR(false);
             *(uint32_t *)value = val;
-            return true;
+            RETURNWITHSUCCESS(true);
         }
 
         default:
-            SETLASTERROR(SOCKERR_INVAL);
-            return false;
+            RETURNWITHERROR(IncorrectArgumentValue, false);
     }
 }
 
-bool socket_shutdown(const Socket *socket, SocketShutdownMode mode) { ENSURE_INIT; return !shutdown(socket->desc, mode); }
+bool socket_shutdown(const Socket *socket, SocketShutdownMode mode)
+{
+    ENSURE_INIT;
+    if (shutdown(socket->desc, mode)) RETURNWITHSYSERR(false);
+    RETURNWITHSUCCESS(true);
+}
 
 SocketAddressFamily socket_getaf(const Socket *socket) { return socket->af; }
 SocketType socket_gettype(const Socket *socket) { return socket->type; }
@@ -172,12 +186,12 @@ bool socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionNa
     {
         case Socket_Linger:;
             // this can do getsockopt -> if (level != SocketLevel) { SETLASTERROR(SOCKERR_NOPROTOOPT); return false; }
-            if (!optval) { SETLASTERROR(SOCKERR_FAULT); return false; }
+            if (!optval) RETURNWITHERROR(Fault, false);
 
             struct linger ling;
             socklen_t lingsz = sizeof(ling);
-            if (getsockopt(socket->desc, SocketLevel, Socket_Linger, (void *)&ling, &lingsz)) return false;
-            if (lingsz > sizeof(ling)) { SETLASTERROR(SOCKERR_INTERNALERR); return false; }
+            if (getsockopt(socket->desc, SocketLevel, Socket_Linger, (void *)&ling, &lingsz)) RETURNWITHSYSERR(false);
+            if (lingsz > sizeof(ling)) RETURNWITHERROR(InternalUnknownError, false);
 
             SocketLingerOptions lingopts;
             lingopts.enable = ling.l_onoff;
@@ -185,23 +199,23 @@ bool socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionNa
 
             if (*optlen > 0) memcpy(optval, &lingopts, (*optlen > sizeof(lingopts)) ? sizeof(lingopts) : *optlen);
             *optlen = sizeof(lingopts);
-            return true;
+            RETURNWITHSUCCESS(true);
 
         case Socket_RecvTimeout:;
         case Socket_SendTimeout:;
             // this can do getsockopt -> if (level != SocketLevel) { SETLASTERROR(SOCKERR_NOPROTOOPT); return false; }
-            if (!optval) { SETLASTERROR(SOCKERR_FAULT); return false; }
+            if (!optval) RETURNWITHERROR(Fault, false);
 
             uint32_t millis;
             #ifdef LIBSOCKET_OS_WINDOWS
                 socklen_t millissz = sizeof(millis);
-                if (getsockopt(socket->desc, level, optname, (void *)&millis, &millissz)) return false;
-                if (millissz > sizeof(millis)) { SETLASTERROR(SOCKERR_INTERNALERR); return false; }
+                if (getsockopt(socket->desc, level, optname, (void *)&millis, &millissz)) RETURNWITHSYSERR(false);
+                if (millissz > sizeof(millis)) RETURNWITHERROR(InternalUnknownError, false);
             #else
                 struct timeval tv;
                 socklen_t tvsz = sizeof(tv);
-                if (getsockopt(socket->desc, level, optname, (void *)&tv, &tvsz)) return false;
-                if (tvsz > sizeof(tv)) { SETLASTERROR(SOCKERR_INTERNALERR); return false; }
+                if (getsockopt(socket->desc, level, optname, (void *)&tv, &tvsz)) RETURNWITHSYSERR(false);
+                if (tvsz > sizeof(tv)) RETURNWITHERROR(InternalUnknownError, false);
 
                 uint64_t usecs;
                 
@@ -220,10 +234,11 @@ bool socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionNa
 
             if (*optlen > 0) memcpy(optval, &millis, (*optlen > sizeof(millis)) ? sizeof(millis) : *optlen);
             *optlen = sizeof(millis);
-            return true;
+            RETURNWITHSUCCESS(true);
 
         default:
-            return !getsockopt(socket->desc, level, optname, optval, optlen);
+            if (getsockopt(socket->desc, level, optname, optval, optlen)) RETURNWITHSYSERR(false);
+            RETURNWITHSUCCESS(true);
     }
 }
 
@@ -235,21 +250,22 @@ bool socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionNa
     {
         case Socket_Linger:;
             // this can do setsockopt -> if (level != SocketLevel) { SETLASTERROR(SOCKERR_NOPROTOOPT); return false; }
-            if (!optval) { SETLASTERROR(SOCKERR_FAULT); return false; }
-            if (optlen < sizeof(SocketLingerOptions)) { SETLASTERROR(SOCKERR_INVAL); return false; }
+            if (!optval) RETURNWITHERROR(Fault, false);
+            if (optlen < sizeof(SocketLingerOptions)) RETURNWITHERROR(IncorrectArgumentValue, false);
 
             const SocketLingerOptions *lingopts = optval;
 
             struct linger ling;
             ling.l_onoff = lingopts->enable;
             ling.l_linger = lingopts->linger;
-            return !setsockopt(socket->desc, level, Socket_Linger, (void *)&ling, sizeof(ling));
+            if (setsockopt(socket->desc, level, Socket_Linger, (void *)&ling, sizeof(ling))) RETURNWITHSYSERR(false);
+            RETURNWITHSUCCESS(true);
 
         case Socket_RecvTimeout:;
         case Socket_SendTimeout:;
             // this can do setsockopt -> if (level != SocketLevel) { SETLASTERROR(SOCKERR_NOPROTOOPT); return false; }
-            if (!optval) { SETLASTERROR(SOCKERR_FAULT); return false; }
-            if (optlen < sizeof(uint32_t)) { SETLASTERROR(SOCKERR_INVAL); return false; }
+            if (!optval) RETURNWITHERROR(Fault, false);
+            if (optlen < sizeof(uint32_t)) RETURNWITHERROR(IncorrectArgumentValue, false);
 
             #ifdef LIBSOCKET_OS_WINDOWS
                 const void *data = optval;
@@ -265,17 +281,27 @@ bool socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionNa
                 const socklen_t size = sizeof(tv);
             #endif
 
-            return !setsockopt(socket->desc, level, optname, data, size);
+            if (setsockopt(socket->desc, level, optname, data, size)) RETURNWITHSYSERR(false);
+            RETURNWITHSUCCESS(true);
 
         default:
-            return !setsockopt(socket->desc, level, optname, optval, optlen);
+            if (setsockopt(socket->desc, level, optname, optval, optlen)) RETURNWITHSYSERR(false);
+            RETURNWITHSUCCESS(true);
     }
 }
 
 bool socket_getpeername(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size)
-{ ENSURE_INIT; return !getpeername(socket->desc, (struct sockaddr *)sockaddr, size); }
+{
+    ENSURE_INIT;
+    if (getpeername(socket->desc, (struct sockaddr *)sockaddr, size)) RETURNWITHSYSERR(false);
+    RETURNWITHSUCCESS(true);
+}
 
 bool socket_getsockname(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size)
-{ ENSURE_INIT; return !getsockname(socket->desc, (struct sockaddr *)sockaddr, size); }
+{
+    ENSURE_INIT;
+    if (getsockname(socket->desc, (struct sockaddr *)sockaddr, size)) RETURNWITHSYSERR(false);
+    RETURNWITHSUCCESS(true);
+}
 
 SOCKETDESCRIPTOR socket_gethandle(const Socket *socket) { return socket->desc; }
