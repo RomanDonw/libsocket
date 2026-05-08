@@ -6,6 +6,15 @@ const char *socket_strerror(SocketError errcode)
 {
     switch (errcode)
     {
+        case Success:
+            return "success (no error)";
+
+        case NotInitialized:
+            return "not initialized";
+
+        case AlreadyInitialized:
+            return "already initialized";
+
         case InternalUnknownError:
             return "internal unknown socket error";
 
@@ -105,11 +114,14 @@ const char *socket_strerror(SocketError errcode)
         case NameTooLong:
             return "name too long";
 
-        // Windows-specific:
-        /*
-        case InitializationError:
-            return "WinSock not initialized";
-        */
+        case TooManyProcesses:
+            return "too many processes";
+
+        case NetworkSystemNotReady:
+            return "network system not ready";
+
+        case WSAVersionNotSupported:
+            return "WinSock version not supported";
 
         default:
             return NULL;

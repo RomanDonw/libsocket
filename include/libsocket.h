@@ -169,6 +169,11 @@ enum
     CannotTranslateName, // ELOOP
     DestinationAddressRequired, // EDESTADDRREQ
     NameTooLong, // ENAMETOOLONG
+    TooManyProcesses, // EPROCLIM
+
+    // Windows-specific:
+    NetworkSystemNotReady, // WSASYSNOTREADY
+    WSAVersionNotSupported, // WSAVERNOTSUPPORTED
 } typedef SocketError;
 
 struct

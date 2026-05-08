@@ -22,6 +22,7 @@
     #define SOCKERR_LOOP WSAELOOP
     #define SOCKERR_NAMETOOLONG WSAENAMETOOLONG
     #define SOCKERR_NOMEM WSA_NOT_ENOUGH_MEMORY
+    #define SOCKERR_PROCLIM WSAEPROCLIM
 
     #define SOCKERR_WOULDBLOCK WSAEWOULDBLOCK
 
@@ -60,6 +61,10 @@
     #define SOCKERR_LOOP ELOOP
     #define SOCKERR_NAMETOOLONG ENAMETOOLONG
     #define SOCKERR_NOMEM ENOMEM
+
+    #ifdef EPROCLIM
+        #define SOCKERR_PROCLIM EPROCLIM
+    #endif
 
     #define SOCKERR_WOULDBLOCK EWOULDBLOCK
 
@@ -178,12 +183,23 @@ SocketError translateerror(int err)
         case SOCKERR_NAMETOOLONG:
             return NameTooLong;
 
+        #ifdef SOCKERR_PROCLIM
+            case SOCKERR_PROCLIM:
+                return TooManyProcesses;
+        #endif
+
         #ifdef LIBSOCKET_OS_WINDOWS
             case SOCKERR_WOULDBLOCK:
                 return WouldBlock;
 
             case WSANOTINITIALISED:
                 return NotInitialized;
+
+            case WSASYSNOTREADY:
+                return NetworkSystemNotReady;
+
+            case WSAVERNOTSUPPORTED:
+                return WSAVersionNotSupported;
         #else
             #if EAGAIN != SOCKERR_WOULDBLOCK
                 case EAGAIN:
