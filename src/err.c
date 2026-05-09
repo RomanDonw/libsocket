@@ -1,12 +1,6 @@
 #include "libsocket.h"
 #include "err.h"
 
-/*
-#define CUSTOMERR_STARTOFFSET -1024
-#define CUSTOMERR_STEP -1
-#define CUSTOMERR(index) ((CUSTOMERR_STARTOFFSET) + (CUSTOMERR_STEP) * index)
-*/
-
 #ifdef LIBSOCKET_OS_WINDOWS
     #define SOCKERR_INTR WSAEINTR
     #define SOCKERR_ACCES WSAEACCES
