@@ -3,9 +3,10 @@
 
 #include <stdbool.h>
 
+#include "err.h"
+
 extern volatile bool inited;
 
-#define ENSURE_INIT
-//#define ENSURE_INIT(return_value) { if (!inited) return return_value; }
+#define ENSURE_INIT(return_value_on_error) { if (!inited) RETURNWITHERROR(NotInitialized, return_value_on_error); }
 
 #endif

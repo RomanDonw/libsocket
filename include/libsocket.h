@@ -219,7 +219,7 @@ LIBSOCKET_API extern void *(*libsocket_malloc)(size_t);
 LIBSOCKET_API extern void *(*libsocket_realloc)(void *, size_t);
 LIBSOCKET_API extern void (*libsocket_free)(void *);
 
-LIBSOCKET_API extern SocketError socket_lasterror;
+LIBSOCKET_API extern SocketError socket_lasterror; // can be accessed without library initialization.
 
 LIBSOCKET_API const char * LIBSOCKET_ABI socket_strerror(SocketError errcode); // can be accessed without library initialization.
 

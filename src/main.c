@@ -35,7 +35,7 @@ struct Socket
 
 Socket *socket_open(SocketAddressFamily af, SocketType type, SocketProtocol protocol)
 {
-    ENSURE_INIT;
+    ENSURE_INIT(NULL);
 
     SOCKETDESCRIPTOR desc = socket(af, type, protocol);
     if (desc == INVALID_SOCKET) RETURNWITHSYSERR(NULL);
@@ -52,7 +52,7 @@ Socket *socket_open(SocketAddressFamily af, SocketType type, SocketProtocol prot
 
 bool socket_close(Socket *socket)
 {
-    ENSURE_INIT;
+    ENSURE_INIT(false);
 
     #ifdef LIBSOCKET_OS_WINDOWS
         if (closesocket(socket->desc))
@@ -67,28 +67,28 @@ bool socket_close(Socket *socket)
 
 bool socket_listen(const Socket *socket, int backlog)
 {
-    ENSURE_INIT;
+    ENSURE_INIT(false);
     if (listen(socket->desc, backlog)) RETURNWITHSYSERR(false);
     RETURNWITHSUCCESS(true);
 }
 
 bool socket_connect(const Socket *socket, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen)
 {
-    ENSURE_INIT;
+    ENSURE_INIT(false);
     if (connect(socket->desc, (struct sockaddr *)sockaddr, sockaddrlen)) RETURNWITHSYSERR(false);
     RETURNWITHSUCCESS(true);
 }
 
 bool socket_bind(const Socket *socket, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen)
 {
-    ENSURE_INIT;
+    ENSURE_INIT(false);
     if (bind(socket->desc, (struct sockaddr *)sockaddr, sockaddrlen)) RETURNWITHSYSERR(false);
     RETURNWITHSUCCESS(true);
 }
 
 Socket *socket_accept(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen)
 {
-    ENSURE_INIT;
+    ENSURE_INIT(NULL);
 
     SOCKETDESCRIPTOR desc = accept(socket->desc, sockaddr, sockaddrlen);
     if (desc == INVALID_SOCKET) RETURNWITHSYSERR(NULL);
@@ -104,7 +104,7 @@ Socket *socket_accept(const Socket *socket, SocketAddressInterface *sockaddr, so
 }
 
 #define SOCKIOFUNCPROTO(func) \
-    ENSURE_INIT;\
+    ENSURE_INIT(-1);\
     ssize_t ret = func;\
     if (ret < 0) socket_lasterror = translateerror(GETLASTERROR());\
     else socket_lasterror = Success;\
@@ -130,7 +130,7 @@ ssize_t socket_sendto(const Socket *socket, const void *buffer, size_t len, int 
 
 bool socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value)
 {
-    ENSURE_INIT;
+    ENSURE_INIT(false);
 
     switch (option)
     {
@@ -169,7 +169,7 @@ bool socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value)
 
 bool socket_shutdown(const Socket *socket, SocketShutdownMode mode)
 {
-    ENSURE_INIT;
+    ENSURE_INIT(false);
     if (shutdown(socket->desc, mode)) RETURNWITHSYSERR(false);
     RETURNWITHSUCCESS(true);
 }
@@ -180,7 +180,7 @@ SocketProtocol socket_getprotocol(const Socket *socket) { return socket->protoco
 
 bool socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, void *optval, socklen_t *optlen)
 {
-    ENSURE_INIT;
+    ENSURE_INIT(false);
 
     switch (optname)
     {
@@ -244,7 +244,7 @@ bool socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionNa
 
 bool socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, const void *optval, socklen_t optlen)
 {
-    ENSURE_INIT;
+    ENSURE_INIT(false);
 
     switch (optname)
     {
@@ -292,14 +292,14 @@ bool socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionNa
 
 bool socket_getpeername(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size)
 {
-    ENSURE_INIT;
+    ENSURE_INIT(false);
     if (getpeername(socket->desc, (struct sockaddr *)sockaddr, size)) RETURNWITHSYSERR(false);
     RETURNWITHSUCCESS(true);
 }
 
 bool socket_getsockname(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size)
 {
-    ENSURE_INIT;
+    ENSURE_INIT(false);
     if (getsockname(socket->desc, (struct sockaddr *)sockaddr, size)) RETURNWITHSYSERR(false);
     RETURNWITHSUCCESS(true);
 }

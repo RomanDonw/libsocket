@@ -13,7 +13,7 @@
 
 bool socket_parseaddr(IPAddressInterface *addr, SocketAddressFamily af, const char *straddr)
 {
-    ENSURE_INIT;
+    ENSURE_INIT(false);
     int ret = inet_pton(af, straddr, addr);
     if (ret == 0) RETURNWITHERROR(ParsingAddressFailed, false);
     if (ret == -1) RETURNWITHSYSERR(false);
@@ -22,7 +22,7 @@ bool socket_parseaddr(IPAddressInterface *addr, SocketAddressFamily af, const ch
 
 bool socket_addrtostr(const IPAddressInterface *addr, SocketAddressFamily af, char *straddr, socklen_t size)
 {
-    ENSURE_INIT;
+    ENSURE_INIT(false);
 
     if (!inet_ntop(af, addr, straddr, size))
     {
