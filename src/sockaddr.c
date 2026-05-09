@@ -15,8 +15,6 @@ SocketAddressFamily socket_getsockaddraf(const SocketAddressInterface *sockaddr)
 
 bool socket_packsockaddr(SocketAddressInterface *sockaddr, SocketAddressFamily af, const IPAddressInterface *addr, unsigned short port)
 {
-    //ENSURE_INIT;
-
     switch (af)
     {
         case IPv4:;
@@ -40,7 +38,6 @@ bool socket_packsockaddr(SocketAddressInterface *sockaddr, SocketAddressFamily a
             break;
 
         default:
-            //SETLASTERROR(SOCKERR_AFNOSUPPORT);
             RETURNWITHERROR(UnsupportedAddressFamily, false);
     }
 
@@ -49,8 +46,6 @@ bool socket_packsockaddr(SocketAddressInterface *sockaddr, SocketAddressFamily a
 
 bool socket_unpacksockaddr(const SocketAddressInterface *sockaddr, SocketAddressFamily af, IPAddressInterface *addr, unsigned short *port)
 {
-    //ENSURE_INIT;
-
     if (GETSOCKADDRAF(sockaddr) != af) RETURNWITHERROR(IncorrectArgumentValue, false);
 
     switch (af)
@@ -68,7 +63,6 @@ bool socket_unpacksockaddr(const SocketAddressInterface *sockaddr, SocketAddress
             break;
 
         default:
-            //SETLASTERROR(SOCKERR_AFNOSUPPORT);
             RETURNWITHERROR(UnsupportedAddressFamily, false);
     }
 
