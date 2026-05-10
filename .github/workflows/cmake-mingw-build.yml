@@ -41,8 +41,6 @@ jobs:
           mkdir lib
           mv build/*.a lib/
 
-          cd build
-
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -56,5 +54,6 @@ jobs:
       - name: Run Tests
         shell: msys2 {0}
         run: |
-          ls
+          cd build
+
           ./test1
