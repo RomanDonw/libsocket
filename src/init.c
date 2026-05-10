@@ -21,7 +21,7 @@ bool socket_startup(const SocketStartupOptions *options)
     #ifdef LIBSOCKET_OS_WINDOWS
         static const SocketStartupOptions defaultopts =
         {
-            .winsock_version = MAKEWORD(LIBSOCKET_WINSOCK_DEFAULT_VERSION_LOW, LIBSOCKET_WINSOCK_DEFAULT_VERSION_HIGH);
+            .winsock_version = MAKEWORD(LIBSOCKET_WINSOCK_DEFAULT_VERSION_LOW, LIBSOCKET_WINSOCK_DEFAULT_VERSION_HIGH)
         };
 
         if (!options) options = &defaultopts;
