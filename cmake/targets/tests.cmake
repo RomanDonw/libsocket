@@ -1,0 +1,10 @@
+function(setuptargets_tests tests_dir libsocket_target)
+    macro(test name sources)
+        add_executable(${name} ${sources} "${tests_dir}/base/base.c")
+        target_include_directories(${name} PRIVATE "${tests_dir}/base")
+        target_link_libraries(${name} PRIVATE ${libsocket_target})
+    endmacro()
+
+    test(test0 "${tests_dir}/0.c")
+    test(test1 "${tests_dir}/1.c")
+endfunction()

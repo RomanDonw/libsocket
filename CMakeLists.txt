@@ -14,50 +14,23 @@ set(CMAKE_C_EXTENSIONS OFF)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-# add target for build
-
-file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.h" "src/*.c")
-
 set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 
-add_library(${PROJECT_NAME} ${SOURCES})
+# ========== TARGETS ===========
+set(TARGETS_FOLDER "${CMAKE_CURRENT_SOURCE_DIR}/cmake/targets/")
 
-target_compile_definitions(${PROJECT_NAME}
-    PRIVATE $<$<BOOL:${BUILD_SHARED_LIBS}>:LIBSOCKET_EXPORT>
-    PUBLIC $<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:LIBSOCKET_STATIC>
-)
+set(TARGET_LIBSOCKET_NAME socket)
+set(TARGET_LIBSOCKET_AUTOINIT_NAME socket_autoinit)
 
-# setup includes & required libs
+# socket
+include("${TARGETS_FOLDER}/socket.cmake")
+setuptarget_socket(${TARGET_LIBSOCKET_NAME} "src/socket")
 
-target_include_directories(${PROJECT_NAME} PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-)
+# socket_autoinit
+include("${TARGETS_FOLDER}/autoinit.cmake")
+setuptarget_autoinit(${TARGET_LIBSOCKET_AUTOINIT_NAME} "src/autoinit/" ${TARGET_LIBSOCKET_NAME})
 
-if(WIN32)
-    target_link_libraries(${PROJECT_NAME} PUBLIC "ws2_32")
-endif()
-
-# setup correct installation process
-
-install(TARGETS ${PROJECT_NAME}
-    EXPORT libsocketTargets
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-)
-install(DIRECTORY "include/" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/configure.cmake")
-
-install(EXPORT libsocketTargets
-    FILE libsocketTargets.cmake
-    NAMESPACE libsocket::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/libsocket
-)
-
-# ===== TESTS =====
-
-include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/tests.cmake")
+# (tests)
+include("${TARGETS_FOLDER}/tests.cmake")
+setuptargets_tests("tests/" ${TARGET_LIBSOCKET_AUTOINIT_NAME})

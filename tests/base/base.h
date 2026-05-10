@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 #include "libsocket.h"
+#include "util/autoinit.h"
 
 void waitms(uint32_t milliseconds);
 void handleerror(const char *funcname);
