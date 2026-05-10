@@ -5,7 +5,7 @@
 
 #include "err.h"
 
-extern volatile bool inited;
+extern bool inited;
 
 #define ENSURE_INIT(return_value_on_error) { if (!inited) RETURNWITHERROR(NotInitialized, return_value_on_error); }
 
