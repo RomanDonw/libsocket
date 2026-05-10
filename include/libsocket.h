@@ -37,8 +37,8 @@
         #endif
     #endif
 
-    #define LIBSOCKET_WINSOCK_VERSION_HIGH 2
-    #define LIBSOCKET_WINSOCK_VERSION_LOW 2
+    #define LIBSOCKET_WINSOCK_DEFAULT_VERSION_HIGH 2
+    #define LIBSOCKET_WINSOCK_DEFAULT_VERSION_LOW 2
 
     typedef SSIZE_T ssize_t;
     typedef SOCKET SOCKETDESCRIPTOR;
@@ -58,7 +58,6 @@
     #include <netinet/tcp.h>
 
     #define LIBSOCKET_API __attribute__((visibility("default")))
-    #define LIBSOCKET_ABI
 
     typedef int SOCKETDESCRIPTOR;
     #define INVALID_SOCKET -1
@@ -227,8 +226,13 @@ LIBSOCKET_API extern SocketError socket_lasterror; // can be accessed without li
 
 LIBSOCKET_API const char * LIBSOCKET_ABI socket_strerror(SocketError errcode); // can be accessed without library initialization.
 
+struct
+{
+    unsigned short winsock_version;
+} typedef SocketStartupOptions;
+
 LIBSOCKET_API bool LIBSOCKET_ABI socket_initialized(void);
-LIBSOCKET_API bool LIBSOCKET_ABI socket_startup(void);
+LIBSOCKET_API bool LIBSOCKET_ABI socket_startup(const SocketStartupOptions *options); // options can be NULL.
 LIBSOCKET_API bool LIBSOCKET_ABI socket_cleanup(void);
 
 LIBSOCKET_API bool LIBSOCKET_ABI socket_parseaddr(IPAddressInterface *addr, SocketAddressFamily af, const char *straddr);
