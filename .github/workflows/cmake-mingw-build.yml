@@ -56,4 +56,5 @@ jobs:
       - name: Run Tests
         shell: msys2 {0}
         run: |
+          ls
           ./test1
