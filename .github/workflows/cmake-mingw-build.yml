@@ -44,7 +44,7 @@ jobs:
       - name: Run Tests
         shell: msys2 {0}
         run: |
-          cd build
+          cd bin
 
           ./test1
 
