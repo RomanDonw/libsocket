@@ -40,7 +40,7 @@ sockslisterr_t sockslist_remove(Socket *socket)
 
     if (sockets_count > 0)
     {
-        Socket **new_sockets = (Socket **)libsocket_realloc(sockets, sizeof(Socket *) * sockets_count));
+        Socket **new_sockets = (Socket **)libsocket_realloc(sockets, sizeof(Socket *) * sockets_count);
         if (new_sockets) sockets = new_sockets;
     }
     else

@@ -77,24 +77,11 @@ bool socket_close(Socket *socket)
 {
     ENSURE_INIT(false);
 
-    sockslisterr_t err = sockslist_remove(socket);
-    if (err != SOCKSLISTERR_SUCCESS)
-    {
-        switch (err)
-        {
-            case SOCKSLISTERR_NOMEM:
-                RETURNWITHERROR(MemoryAllocationFailed, false);
+    if (!sockslist_has(socket)) RETURNWITHERROR(Fault, false);
 
-            default:
-                RETURNWITHERROR(Fault, false);
-        }
-    }
+    if (CLOSESOCKET(socket->desc)) RETURNWITHSYSERR(false);
 
-    //if (CLOSESOCKET(socket->desc)) RETURNWITHSYSERR(false);
-
-    // this necessary because we can't handle all nested errors.
-    if (CLOSESOCKET(socket->desc)) abort();
-
+    sockslist_remove(socket);
     libsocket_free(socket);
     RETURNWITHSUCCESS(true);
 }
