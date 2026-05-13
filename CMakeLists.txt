@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.23)
 
 # ========== SETTINGS ==========
-project(socket VERSION 1.0)
+project(socket VERSION 1.0 LANGUAGES C)
 
 set(VERSION_CHECK_METHOD SameMajorVersion)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
