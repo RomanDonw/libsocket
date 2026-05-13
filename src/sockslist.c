@@ -35,7 +35,7 @@ sockslisterr_t sockslist_remove(Socket *socket)
     for (pos = 0; pos < sockets_count; pos++) if (sockets[pos] == socket) { found = true; break; }
     if (!found) return SOCKSLISTERR_ITEMNOTEXIST;
 
-    sockets[pos] = sockets[sockets_count - 1];
+    /*if (pos != sockets_count - 1) */sockets[pos] = sockets[sockets_count - 1];
     sockets_count--;
 
     if (sockets_count > 0)
