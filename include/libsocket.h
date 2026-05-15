@@ -43,7 +43,7 @@
     typedef SSIZE_T ssize_t;
     typedef SOCKET SOCKETDESCRIPTOR;
 
-    enum
+    enum SocketShutdownMode
     {
         OnlyRecv = SD_RECEIVE,
         OnlySend = SD_SEND,
@@ -62,7 +62,7 @@
     typedef int SOCKETDESCRIPTOR;
     #define INVALID_SOCKET -1
 
-    enum
+    enum SocketShutdownMode
     {
         OnlyRecv = SHUT_RD,
         OnlySend = SHUT_WR,
@@ -79,37 +79,37 @@
 #define SOCKET_NTOHS(x) SOCKET_HTONS(x)
 #define SOCKET_NTOHL(x) SOCKET_HTONL(x)
 
-enum
+enum SocketAddressFamily
 {
     IPv4 = AF_INET,
     IPv6 = AF_INET6
 } typedef SocketAddressFamily;
 
-enum
+enum SocketType
 {
     Stream = SOCK_STREAM,
     Datagram = SOCK_DGRAM
 } typedef SocketType;
 
-enum
+enum SocketProtocol
 {
     TCP = IPPROTO_TCP,
     UDP = IPPROTO_UDP
 } typedef SocketProtocol;
 
-enum
+enum SocketIOCTLOption
 {
     NonBlockingIO, // bool, writeonly.
     AvailableDataToRead // uint32_t, readonly.
 } typedef SocketIOCTLOption;
 
-enum
+enum SocketOptionLevel
 {
     SocketLevel = SOL_SOCKET,
     TCPLevel = IPPROTO_TCP
 } typedef SocketOptionLevel;
 
-enum
+enum SocketOptionName
 {
     // SocketLevel
     Socket_RecvBufferSize = SO_RCVBUF, // int, readable/writable.
@@ -128,7 +128,7 @@ enum
     TCP_MaximumDataSegmentSize = TCP_MAXSEG, // int, readable/writable.
 } typedef SocketOptionName;
 
-enum
+enum SocketError
 {
     Success = 0,
 
@@ -179,13 +179,13 @@ enum
     WSAVersionsNotMatch, // responced WinSock version != requested version.
 } typedef SocketError;
 
-struct
+struct SocketLingerOptions
 {
     bool enable;
     unsigned short linger; // in seconds.
 } typedef SocketLingerOptions;
 
-struct
+struct SocketStartupOptions
 {
     unsigned short winsock_version;
 } typedef SocketStartupOptions;
