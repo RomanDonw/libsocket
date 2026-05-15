@@ -1,6 +1,10 @@
 #include "libsocket.h"
 #include "err.h"
 
+#ifdef LIBSOCKET_DEBUG
+    #include <stdio.h>
+#endif
+
 SocketError socket_lasterror = Success;
 
 SocketError translateerror(int err)
@@ -124,6 +128,10 @@ SocketError translateerror(int err)
         #endif
 
         default:
+            #ifdef LIBSOCKET_DEBUG
+                fprintf(stderr, "Got unhandled system error: %i.\n", err);
+            #endif
+
             return InternalUnknownError;
     }
 }

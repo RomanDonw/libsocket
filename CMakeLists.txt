@@ -14,16 +14,17 @@ set(CMAKE_C_EXTENSIONS OFF)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-# add target for build
-
-file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.h" "src/*.c")
-
 set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 
+# add target for build
+
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.h" "src/*.c")
 add_library(${PROJECT_NAME} ${SOURCES})
+unset(SOURCES)
 
 target_compile_definitions(${PROJECT_NAME}
+    PRIVATE $<$<BOOL:${DEBUG}>:LIBSOCKET_DEBUG>
     PRIVATE $<$<BOOL:${BUILD_SHARED_LIBS}>:LIBSOCKET_EXPORT>
     PUBLIC $<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:LIBSOCKET_STATIC>
 )
