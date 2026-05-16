@@ -6,9 +6,6 @@
     {
 #endif
 
-#include <stdbool.h>
-#include <stdint.h>
-
 #if defined(_WIN32) || defined(WIN32) || defined(_WIN64)
     #define LIBSOCKET_OS_WINDOWS
 #endif
@@ -53,6 +50,17 @@
 #else
     // POSIX environment.
 
+    // required for getaddrinfo & freeaddrinfo.
+    #ifdef _POSIX_C_SOURCE
+        #if _POSIX_C_SOURCE < 200112L
+            #undef _POSIX_C_SOURCE
+            #define _POSIX_C_SOURCE 200112L
+        #endif
+    #else
+        #define _POSIX_C_SOURCE 200112L
+    #endif
+
+    #include <sys/types.h>
     #include <sys/socket.h>
     #include <netinet/in.h>
     #include <netinet/tcp.h>
@@ -71,6 +79,9 @@
 
 #endif
 
+#include <stdbool.h>
+#include <stdint.h>
+
 #define LIBSOCKET_ABI
 
 #define SOCKET_HTONS(x) (((uint16_t)(x) & 0xFF00) >> 8) | (((uint16_t)(x) & 0x00FF) << 8)
@@ -88,12 +99,14 @@ enum SocketAddressFamily
 
 enum SocketType
 {
+    AnySocketType = 0,
     Stream = SOCK_STREAM,
     Datagram = SOCK_DGRAM
 } typedef SocketType;
 
 enum SocketProtocol
 {
+    AnyProtocol = 0,
     TCP = IPPROTO_TCP,
     UDP = IPPROTO_UDP
 } typedef SocketProtocol;
@@ -142,6 +155,7 @@ enum SocketError
     Interrupted, // EINTR
     AccessDenied, // EACCES
     Fault, // EFAULT
+    InsufficientBufferSize, // ERANGE
     IncorrectArgumentValue, // EINVAL
     TooManyOpenedSockets, // EMFILE
     WouldBlock, // EAGAIN/EWOULDBLOCK
@@ -173,6 +187,7 @@ enum SocketError
     DNSTemporaryError, // EAI_AGAIN
     DNSHostNotFound, // EAI_NONAME
     DNSUnsupportedServiceName, // EAI_SERVICE
+    DNSFailure, // EAI_FAIL
 
     // Windows-specific:
     NetworkSystemNotReady, // WSASYSNOTREADY
@@ -223,6 +238,30 @@ LIBSOCKET_API extern const IPv4Address IPV4ADDR_BROADCAST;
 LIBSOCKET_API extern const IPv6Address IPV6ADDR_ANY;
 LIBSOCKET_API extern const IPv6Address IPV6ADDR_LOOPBACK;
 
+#define LIBSOCKET_SOCKETDNSBASE \
+    int flags;\
+    SocketAddressFamily af;\
+    SocketType type;\
+    SocketProtocol protocol;
+
+struct SocketDNSRequest
+{
+    LIBSOCKET_SOCKETDNSBASE
+} typedef SocketDNSRequest;
+
+struct SocketDNSResponse
+{
+    LIBSOCKET_SOCKETDNSBASE
+
+    SocketAddressInterface *sockaddr;
+    size_t sockaddrlen;
+    char *canonname;
+
+    struct SocketDNSResponse *next;
+} typedef SocketDNSResponse;
+
+#undef LIBSOCKET_SOCKETDNSBASE
+
 LIBSOCKET_API extern void *(*libsocket_malloc)(size_t);
 LIBSOCKET_API extern void *(*libsocket_realloc)(void *, size_t);
 LIBSOCKET_API extern void (*libsocket_free)(void *);
@@ -241,6 +280,10 @@ LIBSOCKET_API bool LIBSOCKET_ABI socket_addrtostr(const IPAddressInterface *addr
 LIBSOCKET_API SocketAddressFamily LIBSOCKET_ABI socket_getsockaddraf(const SocketAddressInterface *sockaddr);
 LIBSOCKET_API bool LIBSOCKET_ABI socket_packsockaddr(SocketAddressInterface *sockaddr, SocketAddressFamily af, const IPAddressInterface *addr, unsigned short port);
 LIBSOCKET_API bool LIBSOCKET_ABI socket_unpacksockaddr(const SocketAddressInterface *sockaddr, SocketAddressFamily af, IPAddressInterface *addr, unsigned short *port);
+
+// [socket_getaddrinfo]: request can be NULL.
+LIBSOCKET_API bool LIBSOCKET_ABI socket_getaddrinfo(const char *node, const char *service, const SocketDNSRequest *request, SocketDNSResponse **response);
+LIBSOCKET_API void LIBSOCKET_ABI socket_freeaddrinfo(SocketDNSResponse *response);
 
 LIBSOCKET_API Socket * LIBSOCKET_ABI socket_open(SocketAddressFamily af, SocketType type, SocketProtocol protocol);
 LIBSOCKET_API bool LIBSOCKET_ABI socket_close(Socket *socket);

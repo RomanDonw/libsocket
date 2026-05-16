@@ -32,6 +32,9 @@ const char *socket_strerror(SocketError errcode)
 
         case Fault:
             return "fault";
+
+        case InsufficientBufferSize:
+            return "insufficient buffer size";
         
         case IncorrectArgumentValue:
             return "incorrect argument value";
@@ -125,6 +128,18 @@ const char *socket_strerror(SocketError errcode)
 
         case WSAVersionsNotMatch:
             return "responced WinSock version doesn't match requested version";
+
+        case DNSFailure:
+            return "DNS failure";
+
+        case DNSHostNotFound:
+            return "(DNS) host not found";
+
+        case DNSTemporaryError:
+            return "DNS temporary error";
+
+        case DNSUnsupportedServiceName:
+            return "(DNS) unsupported service name";
 
         default:
             return NULL;
