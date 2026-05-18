@@ -111,4 +111,14 @@ void test(void)
     };
 
     printdnsinfo("github.com", "http", &req);
+
+    SocketIPv4Address saddr;
+    IPv4Address addr4 = IPV4ADDR_INIT(IPV4ADDR_PACK(127, 0, 0, 1));
+    if (!socket_packsockaddr(&saddr, IPv4, &addr4, 9418)) handlesockerror("socket_packsockaddr");
+
+    char nodename[NI_MAXHOST];
+    char servicename[NI_MAXSERV];
+    if (!socket_getnameinfo(&saddr, sizeof(saddr), nodename, sizeof(nodename), servicename, sizeof(servicename), 0)) handlesockerror("socket_getnameinfo");
+
+    printf("127.0.0.1:9418 resolved to (service | node) %s | %s.\n", servicename, nodename);
 }
