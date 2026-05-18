@@ -51,16 +51,6 @@ SocketError translateeaierror(int err)
         #endif
         default:
             return translateerror(err);
-            /*
-            #ifdef LIBSOCKET_OS_WINDOWS
-                ret.err = translateerror(err);
-            #else
-                #ifdef LIBSOCKET_DEBUG
-                    fprintf(stderr, "Got unhandled error: %i.\n", err);
-                #endif
-                ret.err = InternalUnknownError;
-            #endif
-            */
     }
 }
 
