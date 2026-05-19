@@ -38,7 +38,7 @@ bool socket_packsockaddr(SocketAddressInterface *sockaddr, SocketAddressFamily a
             break;
 
         default:
-            RETURNWITHERROR(UnsupportedAddressFamily, false);
+            RETURNWITHERROR(SocketError_UnsupportedAddressFamily, false);
     }
 
     RETURNWITHSUCCESS(true);
@@ -46,7 +46,7 @@ bool socket_packsockaddr(SocketAddressInterface *sockaddr, SocketAddressFamily a
 
 bool socket_unpacksockaddr(const SocketAddressInterface *sockaddr, SocketAddressFamily af, IPAddressInterface *addr, unsigned short *port)
 {
-    if (GETSOCKADDRAF(sockaddr) != af) RETURNWITHERROR(IncorrectArgumentValue, false);
+    if (GETSOCKADDRAF(sockaddr) != af) RETURNWITHERROR(SocketError_IncorrectArgumentValue, false);
 
     switch (af)
     {
@@ -63,7 +63,7 @@ bool socket_unpacksockaddr(const SocketAddressInterface *sockaddr, SocketAddress
             break;
 
         default:
-            RETURNWITHERROR(UnsupportedAddressFamily, false);
+            RETURNWITHERROR(SocketError_UnsupportedAddressFamily, false);
     }
 
     RETURNWITHSUCCESS(true);

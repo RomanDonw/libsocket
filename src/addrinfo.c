@@ -15,35 +15,35 @@ static SocketError translateeaierror(int err)
     switch (err)
     {
         case 0:
-            return Success;
+            return SocketError_Success;
 
         case EAI_AGAIN:
-            return DNSTemporaryError;
+            return SocketError_DNSTemporaryError;
 
         case EAI_NONAME:
-            return DNSHostNotFound;
+            return SocketError_DNSHostNotFound;
 
         case EAI_SERVICE:
-            return DNSUnsupportedServiceName;
+            return SocketError_DNSUnsupportedServiceName;
 
         case EAI_SOCKTYPE:
-            return UnsupportedSocketType;
+            return SocketError_UnsupportedSocketType;
 
         case EAI_MEMORY:
-            return MemoryAllocationFailed;
+            return SocketError_MemoryAllocationFailed;
 
         case EAI_FAMILY:
-            return UnsupportedAddressFamily;
+            return SocketError_UnsupportedAddressFamily;
 
         case EAI_FAIL:
-            return DNSFailure;
+            return SocketError_DNSFailure;
 
         case EAI_BADFLAGS:
-            return IncorrectArgumentValue;
+            return SocketError_IncorrectArgumentValue;
 
         #ifdef EAI_OVERFLOW
             case EAI_OVERFLOW:
-                return InsufficientBufferSize;
+                return SocketError_InsufficientBufferSize;
         #endif
 
         #ifdef EAI_SYSTEM
@@ -87,14 +87,14 @@ bool socket_getaddrinfo(const char *nodename, const char *servicename, const Soc
     struct addrinfo *result;
     {
         SocketError err = translateeaierror(getaddrinfo(nodename, servicename, hints, &result));
-        if (err != Success) RETURNWITHERROR(err, false);
+        if (err != SocketError_Success) RETURNWITHERROR(err, false);
     }
 
     #define LOOPALLOCFAILEDHANDLE \
         {\
             freeaddrinfo(result);\
             if (firstresp) __socket_freeaddrinfo(firstresp);\
-            RETURNWITHERROR(MemoryAllocationFailed, false);\
+            RETURNWITHERROR(SocketError_MemoryAllocationFailed, false);\
         }
 
     SocketDNSResponse *firstresp = NULL;
@@ -156,7 +156,7 @@ bool socket_getaddrinfo(const char *nodename, const char *servicename, const Soc
 bool socket_freeaddrinfo(SocketDNSResponse *response)
 {
     ENSURE_INIT(false);
-    if (!response) RETURNWITHERROR(Fault, false);
+    if (!response) RETURNWITHERROR(SocketError_Fault, false);
     __socket_freeaddrinfo(response);
     RETURNWITHSUCCESS(true);
 }

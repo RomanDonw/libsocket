@@ -15,7 +15,7 @@ bool socket_parseaddr(IPAddressInterface *addr, SocketAddressFamily af, const ch
 {
     ENSURE_INIT(false);
     int ret = inet_pton(af, straddr, addr);
-    if (ret == 0) RETURNWITHERROR(ParsingAddressFailed, false);
+    if (ret == 0) RETURNWITHERROR(SocketError_ParsingAddressFailed, false);
     if (ret == -1) RETURNWITHSYSERR(false);
     RETURNWITHSUCCESS(true);
 }
@@ -28,7 +28,7 @@ bool socket_addrtostr(const IPAddressInterface *addr, SocketAddressFamily af, ch
     {
         int err = GETLASTERROR();
         #ifdef LIBSOCKET_OS_WINDOWS
-            if (err == SOCKERR_INVAL) socket_lasterror = NoSpaceLeft;
+            if (err == SOCKERR_INVAL) socket_lasterror = SocketError_NoSpaceLeft;
             else socket_lasterror = translateerror(err);
         #else
             socket_lasterror = translateerror(err);

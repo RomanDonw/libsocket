@@ -6,139 +6,139 @@ const char *socket_strerror(SocketError errcode)
 {
     switch (errcode)
     {
-        case Success:
+        case SocketError_Success:
             return "success (no error)";
 
-        case NotInitialized:
+        case SocketError_NotInitialized:
             return "not initialized";
 
-        case AlreadyInitialized:
+        case SocketError_AlreadyInitialized:
             return "already initialized";
 
-        case InternalUnknownError:
+        case SocketError_InternalUnknownError:
             return "internal unknown socket error";
 
-        case MemoryAllocationFailed:
+        case SocketError_MemoryAllocationFailed:
             return "memory allocation failed";
 
-        case ParsingAddressFailed:
+        case SocketError_ParsingAddressFailed:
             return "parsing address failed";
 
-        case Interrupted:
+        case SocketError_Interrupted:
             return "socket operation interrupted";
 
-        case AccessDenied:
+        case SocketError_AccessDenied:
             return "access denied";
 
-        case Fault:
+        case SocketError_Fault:
             return "fault";
 
-        case InsufficientBufferSize:
+        case SocketError_InsufficientBufferSize:
             return "insufficient buffer size";
         
-        case IncorrectArgumentValue:
+        case SocketError_IncorrectArgumentValue:
             return "incorrect argument value";
 
-        case TooManyOpenedSockets:
+        case SocketError_TooManyOpenedSockets:
             return "too many opened sockets";
 
-        case WouldBlock:
+        case SocketError_WouldBlock:
             return "would block";
 
-        case OperationInProgress:
+        case SocketError_OperationInProgress:
             return "operation in progress";
 
-        case InExecutionProcess:
+        case SocketError_InExecutionProcess:
             return "processing task";
 
-        case UnsupportedAddressFamily:
+        case SocketError_UnsupportedAddressFamily:
             return "unsupported address family";
 
-        case UnsupportedProtocol:
+        case SocketError_UnsupportedProtocol:
             return "unsupported network protocol";
 
-        case UnsupportedSocketType:
+        case SocketError_UnsupportedSocketType:
             return "unsupported socket type";
 
-        case AddressInUse:
+        case SocketError_AddressInUse:
             return "address already in use";
 
-        case AddressNotAvailable:
+        case SocketError_AddressNotAvailable:
             return "address not available";
 
-        case NetworkUnreachable:
+        case SocketError_NetworkUnreachable:
             return "network unreachable";
 
-        case NetworkDown:
+        case SocketError_NetworkDown:
             return "network down";
 
-        case NetworkReset:
+        case SocketError_NetworkReset:
             return "network reset";
 
-        case ConnectionReset:
+        case SocketError_ConnectionReset:
             return "connection reset";
 
-        case ConnectionRefused:
+        case SocketError_ConnectionRefused:
             return "connection refused";
 
-        case ConnectionTimedOut:
+        case SocketError_ConnectionTimedOut:
             return "connection timed out";
 
-        case NotConnected:
+        case SocketError_NotConnected:
             return "not connected";
 
-        case InvalidDescriptor:
+        case SocketError_InvalidDescriptor:
             return "invalid descriptor";
 
-        case NoSpaceLeft:
+        case SocketError_NoSpaceLeft:
             return "no space left";
 
-        case ProtocolOptionUnsupported:
+        case SocketError_ProtocolOptionUnsupported:
             return "protocol option unsupported";
 
-        case OperationNotSupported:
+        case SocketError_OperationNotSupported:
             return "operation not supported";
 
-        case SystemBufferOverflowed:
+        case SocketError_SystemBufferOverflowed:
             return "system buffer overflowed";
 
-        case ConnectionAborted:
+        case SocketError_ConnectionAborted:
             return "connection aborted";
 
-        case CannotTranslateName:
+        case SocketError_CannotTranslateName:
             return "cannot translate name";
 
-        case DestinationAddressRequired:
+        case SocketError_DestinationAddressRequired:
             return "destination address required";
 
-        case AlreadyConnected:
+        case SocketError_AlreadyConnected:
             return "already connected";
 
-        case NameTooLong:
+        case SocketError_NameTooLong:
             return "name too long";
 
-        case TooManyProcesses:
+        case SocketError_TooManyProcesses:
             return "too many processes";
 
-        case NetworkSystemNotReady:
+        case SocketError_NetworkSystemNotReady:
             return "network system not ready";
 
-        case WSAVersionNotSupported:
+        case SocketError_WSAVersionNotSupported:
             return "WinSock version not supported";
 
-        case WSAVersionsNotMatch:
+        case SocketError_WSAVersionsNotMatch:
             return "responced WinSock version doesn't match requested version";
 
-        case DNSFailure:
+        case SocketError_DNSFailure:
             return "DNS failure";
 
-        case DNSHostNotFound:
+        case SocketError_DNSHostNotFound:
             return "(DNS) host not found";
 
-        case DNSTemporaryError:
+        case SocketError_DNSTemporaryError:
             return "DNS temporary error";
 
-        case DNSUnsupportedServiceName:
+        case SocketError_DNSUnsupportedServiceName:
             return "(DNS) unsupported service name";
 
         default:

@@ -5,129 +5,129 @@
     #include <stdio.h>
 #endif
 
-SocketError socket_lasterror = Success;
+SocketError socket_lasterror = SocketError_Success;
 
 SocketError translateerror(int err)
 {
     switch (err)
     {
         case 0:
-            return Success;
+            return SocketError_Success;
 
         case SOCKERR_NOMEM:
-            return MemoryAllocationFailed;
+            return SocketError_MemoryAllocationFailed;
 
         case SOCKERR_INTR:
-            return Interrupted;
+            return SocketError_Interrupted;
 
         case SOCKERR_ACCES:
-            return AccessDenied;
+            return SocketError_AccessDenied;
 
         case SOCKERR_FAULT:
-            return Fault;
+            return SocketError_Fault;
 
         case SOCKERR_INVAL:
-            return IncorrectArgumentValue;
+            return SocketError_IncorrectArgumentValue;
 
         case SOCKERR_MFILE:
-            return TooManyOpenedSockets;
+            return SocketError_TooManyOpenedSockets;
 
         case SOCKERR_ALREADY:
-            return InExecutionProcess;
+            return SocketError_InExecutionProcess;
 
         case SOCKERR_AFNOSUPPORT:
-            return UnsupportedAddressFamily;
+            return SocketError_UnsupportedAddressFamily;
 
         case SOCKERR_PROTONOSUPPORT:
-            return UnsupportedProtocol;
+            return SocketError_UnsupportedProtocol;
 
         case SOCKERR_SOCKTNOSUPPORT:
-            return UnsupportedSocketType;
+            return SocketError_UnsupportedSocketType;
 
         case SOCKERR_ADDRINUSE:
-            return AddressInUse;
+            return SocketError_AddressInUse;
 
         case SOCKERR_ADDRNOTAVAIL:
-            return AddressNotAvailable;
+            return SocketError_AddressNotAvailable;
 
         case SOCKERR_NETUNREACH:
-            return NetworkUnreachable;
+            return SocketError_NetworkUnreachable;
         
         case SOCKERR_NETDOWN:
-            return NetworkDown;
+            return SocketError_NetworkDown;
 
         case SOCKERR_NETRESET:
-            return NetworkReset;
+            return SocketError_NetworkReset;
 
         case SOCKERR_CONNRESET:
-            return ConnectionReset;
+            return SocketError_ConnectionReset;
 
         case SOCKERR_CONNREFUSED:
-            return ConnectionRefused;
+            return SocketError_ConnectionRefused;
 
         case SOCKERR_TIMEDOUT:
-            return ConnectionTimedOut;
+            return SocketError_ConnectionTimedOut;
 
         case SOCKERR_NOTCONN:
-            return NotConnected;
+            return SocketError_NotConnected;
 
         case SOCKERR_NOTSOCK:
         case SOCKERR_INVDESC:
-            return InvalidDescriptor;
+            return SocketError_InvalidDescriptor;
 
 	    case SOCKERR_INPROGRESS:
-	        return OperationInProgress;
+	        return SocketError_OperationInProgress;
 
         case SOCKERR_NOPROTOOPT:
-            return ProtocolOptionUnsupported;
+            return SocketError_ProtocolOptionUnsupported;
 
         case SOCKERR_OPNOTSUPP:
-            return OperationNotSupported;
+            return SocketError_OperationNotSupported;
 
         case SOCKERR_NOBUFFS:
-            return SystemBufferOverflowed;
+            return SocketError_SystemBufferOverflowed;
 
         case SOCKERR_CONNABORTED:
-            return ConnectionAborted;
+            return SocketError_ConnectionAborted;
 
         case SOCKERR_LOOP:
-            return CannotTranslateName;
+            return SocketError_CannotTranslateName;
 
         case SOCKERR_DESTADDRREQ:
-            return DestinationAddressRequired;
+            return SocketError_DestinationAddressRequired;
 
         case SOCKERR_ISCONN:
-            return AlreadyConnected;
+            return SocketError_AlreadyConnected;
 
         case SOCKERR_NAMETOOLONG:
-            return NameTooLong;
+            return SocketError_NameTooLong;
 
         #ifdef SOCKERR_PROCLIM
             case SOCKERR_PROCLIM:
-                return TooManyProcesses;
+                return SocketError_TooManyProcesses;
         #endif
 
         #ifdef LIBSOCKET_OS_WINDOWS
             case SOCKERR_WOULDBLOCK:
-                return WouldBlock;
+                return SocketError_WouldBlock;
 
             case WSANOTINITIALISED:
-                return NotInitialized;
+                return SocketError_NotInitialized;
 
             case WSASYSNOTREADY:
-                return NetworkSystemNotReady;
+                return SocketError_NetworkSystemNotReady;
 
             case WSAVERNOTSUPPORTED:
-                return WSAVersionNotSupported;
+                return SocketError_WSAVersionNotSupported;
         #else
             #if EAGAIN != SOCKERR_WOULDBLOCK
                 case EAGAIN:
             #endif
             case SOCKERR_WOULDBLOCK:
-                return WouldBlock;
+                return SocketError_WouldBlock;
 
             case ENOSPC:
-                return NoSpaceLeft;
+                return SocketError_NoSpaceLeft;
         #endif
 
         default:
@@ -135,6 +135,6 @@ SocketError translateerror(int err)
                 fprintf(stderr, "Got unhandled system error: %i.\n", err);
             #endif
 
-            return InternalUnknownError;
+            return SocketError_InternalUnknownError;
     }
 }

@@ -48,7 +48,7 @@ Socket *socket_open(SocketAddressFamily af, SocketType type, SocketProtocol prot
     if (desc == INVALID_SOCKET) RETURNWITHSYSERR(NULL);
 
     Socket *ret = libsocket_malloc(sizeof(Socket));
-    if (!ret) RETURNWITHERROR(MemoryAllocationFailed, NULL);
+    if (!ret) RETURNWITHERROR(SocketError_MemoryAllocationFailed, NULL);
     ret->af = af;
     ret->type = type;
     ret->protocol = protocol;
@@ -63,10 +63,10 @@ Socket *socket_open(SocketAddressFamily af, SocketType type, SocketProtocol prot
         switch (err)
         {
             case SOCKSLISTERR_NOMEM:
-                RETURNWITHERROR(MemoryAllocationFailed, NULL);
+                RETURNWITHERROR(SocketError_MemoryAllocationFailed, NULL);
 
             default:
-                RETURNWITHERROR(Fault, NULL);
+                RETURNWITHERROR(SocketError_Fault, NULL);
         }
     }
 
@@ -77,7 +77,7 @@ bool socket_close(Socket *socket)
 {
     ENSURE_INIT(false);
 
-    if (!sockslist_has(socket)) RETURNWITHERROR(Fault, false);
+    if (!sockslist_has(socket)) RETURNWITHERROR(SocketError_Fault, false);
 
     if (CLOSESOCKET(socket->desc)) RETURNWITHSYSERR(false);
 
@@ -115,7 +115,7 @@ Socket *socket_accept(const Socket *socket, SocketAddressInterface *sockaddr, so
     if (desc == INVALID_SOCKET) RETURNWITHSYSERR(NULL);
 
     Socket *ret = libsocket_malloc(sizeof(Socket));
-    if (!ret) RETURNWITHERROR(MemoryAllocationFailed, NULL);
+    if (!ret) RETURNWITHERROR(SocketError_MemoryAllocationFailed, NULL);
     ret->af = socket->af;
     ret->type = socket->type;
     ret->protocol = socket->protocol;
@@ -130,10 +130,10 @@ Socket *socket_accept(const Socket *socket, SocketAddressInterface *sockaddr, so
         switch (err)
         {
             case SOCKSLISTERR_NOMEM:
-                RETURNWITHERROR(MemoryAllocationFailed, NULL);
+                RETURNWITHERROR(SocketError_MemoryAllocationFailed, NULL);
 
             default:
-                RETURNWITHERROR(Fault, NULL);
+                RETURNWITHERROR(SocketError_Fault, NULL);
         }
     }
 
@@ -144,7 +144,7 @@ Socket *socket_accept(const Socket *socket, SocketAddressInterface *sockaddr, so
     ENSURE_INIT(-1);\
     ssize_t ret = func;\
     if (ret < 0) socket_lasterror = translateerror(GETLASTERROR());\
-    else socket_lasterror = Success;\
+    else socket_lasterror = SocketError_Success;\
     return ret;
 
 ssize_t socket_recv(const Socket *socket, void *buffer, size_t len, int flags)
@@ -200,7 +200,7 @@ bool socket_ioctl(const Socket *socket, SocketIOCTLOption option, void *value)
         }
 
         default:
-            RETURNWITHERROR(IncorrectArgumentValue, false);
+            RETURNWITHERROR(SocketError_IncorrectArgumentValue, false);
     }
 }
 
@@ -223,12 +223,12 @@ bool socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionNa
     {
         case Socket_Linger:;
             // this can do getsockopt -> if (level != SocketLevel) { SETLASTERROR(SOCKERR_NOPROTOOPT); return false; }
-            if (!optval) RETURNWITHERROR(Fault, false);
+            if (!optval) RETURNWITHERROR(SocketError_Fault, false);
 
             struct linger ling;
             socklen_t lingsz = sizeof(ling);
             if (getsockopt(socket->desc, SocketLevel, Socket_Linger, (void *)&ling, &lingsz)) RETURNWITHSYSERR(false);
-            if (lingsz > sizeof(ling)) RETURNWITHERROR(InternalUnknownError, false);
+            if (lingsz > sizeof(ling)) RETURNWITHERROR(SocketError_InternalUnknownError, false);
 
             SocketLingerOptions lingopts;
             lingopts.enable = ling.l_onoff;
@@ -241,18 +241,18 @@ bool socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionNa
         case Socket_RecvTimeout:;
         case Socket_SendTimeout:;
             // this can do getsockopt -> if (level != SocketLevel) { SETLASTERROR(SOCKERR_NOPROTOOPT); return false; }
-            if (!optval) RETURNWITHERROR(Fault, false);
+            if (!optval) RETURNWITHERROR(SocketError_Fault, false);
 
             uint32_t millis;
             #ifdef LIBSOCKET_OS_WINDOWS
                 socklen_t millissz = sizeof(millis);
                 if (getsockopt(socket->desc, level, optname, (void *)&millis, &millissz)) RETURNWITHSYSERR(false);
-                if (millissz > sizeof(millis)) RETURNWITHERROR(InternalUnknownError, false);
+                if (millissz > sizeof(millis)) RETURNWITHERROR(SocketError_InternalUnknownError, false);
             #else
                 struct timeval tv;
                 socklen_t tvsz = sizeof(tv);
                 if (getsockopt(socket->desc, level, optname, (void *)&tv, &tvsz)) RETURNWITHSYSERR(false);
-                if (tvsz > sizeof(tv)) RETURNWITHERROR(InternalUnknownError, false);
+                if (tvsz > sizeof(tv)) RETURNWITHERROR(SocketError_InternalUnknownError, false);
 
                 uint64_t usecs;
                 
@@ -287,8 +287,8 @@ bool socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionNa
     {
         case Socket_Linger:;
             // this can do setsockopt -> if (level != SocketLevel) { SETLASTERROR(SOCKERR_NOPROTOOPT); return false; }
-            if (!optval) RETURNWITHERROR(Fault, false);
-            if (optlen < sizeof(SocketLingerOptions)) RETURNWITHERROR(IncorrectArgumentValue, false);
+            if (!optval) RETURNWITHERROR(SocketError_Fault, false);
+            if (optlen < sizeof(SocketLingerOptions)) RETURNWITHERROR(SocketError_IncorrectArgumentValue, false);
 
             const SocketLingerOptions *lingopts = optval;
 
@@ -301,8 +301,8 @@ bool socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionNa
         case Socket_RecvTimeout:;
         case Socket_SendTimeout:;
             // this can do setsockopt -> if (level != SocketLevel) { SETLASTERROR(SOCKERR_NOPROTOOPT); return false; }
-            if (!optval) RETURNWITHERROR(Fault, false);
-            if (optlen < sizeof(uint32_t)) RETURNWITHERROR(IncorrectArgumentValue, false);
+            if (!optval) RETURNWITHERROR(SocketError_Fault, false);
+            if (optlen < sizeof(uint32_t)) RETURNWITHERROR(SocketError_IncorrectArgumentValue, false);
 
             #ifdef LIBSOCKET_OS_WINDOWS
                 const void *data = optval;

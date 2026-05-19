@@ -17,7 +17,7 @@ bool socket_initialized(void) { return inited; }
 
 bool socket_startup(const SocketStartupOptions *options)
 {
-    if (inited) RETURNWITHERROR(AlreadyInitialized, false);
+    if (inited) RETURNWITHERROR(SocketError_AlreadyInitialized, false);
 
     #ifdef LIBSOCKET_OS_WINDOWS
         static const SocketStartupOptions defaultopts =
@@ -30,8 +30,8 @@ bool socket_startup(const SocketStartupOptions *options)
         WSADATA data;
         int err = WSAStartup(options->winsock_version, &data);
         if (err) RETURNWITHERROR(translateerror(err), false);
-        //if (data.wVersion != version) { if (WSACleanup()) RETURNWITHSYSERR(false); RETURNWITHERROR(WSAVersionNotSupported, false); }
-        if (data.wVersion != options->winsock_version) { WSACleanup(); RETURNWITHERROR(WSAVersionsNotMatch, false); }
+        //if (data.wVersion != version) { if (WSACleanup()) RETURNWITHSYSERR(false); RETURNWITHERROR(SocketError_WSAVersionNotSupported, false); }
+        if (data.wVersion != options->winsock_version) { WSACleanup(); RETURNWITHERROR(SocketError_WSAVersionsNotMatch, false); }
     #endif
 
     inited = true;
@@ -40,7 +40,7 @@ bool socket_startup(const SocketStartupOptions *options)
 
 bool socket_cleanup(void)
 {
-    if (!inited) RETURNWITHERROR(NotInitialized, false);
+    if (!inited) RETURNWITHERROR(SocketError_NotInitialized, false);
 
     #ifdef LIBSOCKET_OS_WINDOWS
         if (WSACleanup()) RETURNWITHSYSERR(false);

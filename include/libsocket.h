@@ -149,55 +149,55 @@ enum SocketOptionName
 
 enum SocketError
 {
-    Success = 0,
+    SocketError_Success = 0,
 
-    NotInitialized,
-    AlreadyInitialized,
-    InternalUnknownError,
-    ParsingAddressFailed,
+    SocketError_NotInitialized,
+    SocketError_AlreadyInitialized,
+    SocketError_InternalUnknownError,
+    SocketError_ParsingAddressFailed,
 
-    MemoryAllocationFailed, // ENOMEM
-    Interrupted, // EINTR
-    AccessDenied, // EACCES
-    Fault, // EFAULT
-    InsufficientBufferSize, // ERANGE
-    IncorrectArgumentValue, // EINVAL
-    TooManyOpenedSockets, // EMFILE
-    WouldBlock, // EAGAIN/EWOULDBLOCK
-    OperationInProgress, // EINPROGRESS
-    InExecutionProcess, // EALREADY
-    UnsupportedAddressFamily, // EAFNOSUPPORT
-    UnsupportedProtocol, // EPROTONOSUPPORT
-    UnsupportedSocketType, // ESOCKTNOSUPPORT
-    AddressInUse, // EADDRINUSE
-    AddressNotAvailable, // EADDRNOTAVAIL
-    NetworkUnreachable, // ENETUNREACH
-    NetworkDown, // ENETDOWN
-    NetworkReset, // ENETRESET
-    ConnectionReset, // ECONNRESET
-    ConnectionRefused, // ECONNREFUSED
-    ConnectionAborted, // ECONNABORTED
-    ConnectionTimedOut, // ETIMEDOUT
-    NotConnected, // ENOTCONN
-    AlreadyConnected, // EISCONN
-    InvalidDescriptor, // EBADF
-    NoSpaceLeft, // ENOSPC
-    ProtocolOptionUnsupported, // ENOPROTOOPT
-    OperationNotSupported, // EOPNOTSUPP
-    SystemBufferOverflowed, // ENOBUFS
-    CannotTranslateName, // ELOOP
-    DestinationAddressRequired, // EDESTADDRREQ
-    NameTooLong, // ENAMETOOLONG
-    TooManyProcesses, // EPROCLIM
-    DNSTemporaryError, // EAI_AGAIN
-    DNSHostNotFound, // EAI_NONAME
-    DNSUnsupportedServiceName, // EAI_SERVICE
-    DNSFailure, // EAI_FAIL
+    SocketError_MemoryAllocationFailed, // ENOMEM
+    SocketError_Interrupted, // EINTR
+    SocketError_AccessDenied, // EACCES
+    SocketError_Fault, // EFAULT
+    SocketError_InsufficientBufferSize, // ERANGE
+    SocketError_IncorrectArgumentValue, // EINVAL
+    SocketError_TooManyOpenedSockets, // EMFILE
+    SocketError_WouldBlock, // EAGAIN/EWOULDBLOCK
+    SocketError_OperationInProgress, // EINPROGRESS
+    SocketError_InExecutionProcess, // EALREADY
+    SocketError_UnsupportedAddressFamily, // EAFNOSUPPORT
+    SocketError_UnsupportedProtocol, // EPROTONOSUPPORT
+    SocketError_UnsupportedSocketType, // ESOCKTNOSUPPORT
+    SocketError_AddressInUse, // EADDRINUSE
+    SocketError_AddressNotAvailable, // EADDRNOTAVAIL
+    SocketError_NetworkUnreachable, // ENETUNREACH
+    SocketError_NetworkDown, // ENETDOWN
+    SocketError_NetworkReset, // ENETRESET
+    SocketError_ConnectionReset, // ECONNRESET
+    SocketError_ConnectionRefused, // ECONNREFUSED
+    SocketError_ConnectionAborted, // ECONNABORTED
+    SocketError_ConnectionTimedOut, // ETIMEDOUT
+    SocketError_NotConnected, // ENOTCONN
+    SocketError_AlreadyConnected, // EISCONN
+    SocketError_InvalidDescriptor, // EBADF
+    SocketError_NoSpaceLeft, // ENOSPC
+    SocketError_ProtocolOptionUnsupported, // ENOPROTOOPT
+    SocketError_OperationNotSupported, // EOPNOTSUPP
+    SocketError_SystemBufferOverflowed, // ENOBUFS
+    SocketError_CannotTranslateName, // ELOOP
+    SocketError_DestinationAddressRequired, // EDESTADDRREQ
+    SocketError_NameTooLong, // ENAMETOOLONG
+    SocketError_TooManyProcesses, // EPROCLIM
+    SocketError_DNSTemporaryError, // EAI_AGAIN
+    SocketError_DNSHostNotFound, // EAI_NONAME
+    SocketError_DNSUnsupportedServiceName, // EAI_SERVICE
+    SocketError_DNSFailure, // EAI_FAIL
 
     // Windows-specific:
-    NetworkSystemNotReady, // WSASYSNOTREADY
-    WSAVersionNotSupported, // WSAVERNOTSUPPORTED
-    WSAVersionsNotMatch, // responced WinSock version != requested version.
+    SocketError_NetworkSystemNotReady, // WSASYSNOTREADY
+    SocketError_WSAVersionNotSupported, // WSAVERNOTSUPPORTED
+    SocketError_WSAVersionsNotMatch, // responced WinSock version != requested version.
 } typedef SocketError;
 
 struct SocketLingerOptions
