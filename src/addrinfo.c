@@ -10,7 +10,7 @@
 #include "init.h"
 #include "err.h"
 
-SocketError translateeaierror(int err)
+static SocketError translateeaierror(int err)
 {
     switch (err)
     {
@@ -54,6 +54,20 @@ SocketError translateeaierror(int err)
     }
 }
 
+static void __socket_freeaddrinfo(SocketDNSResponse *response)
+{
+    for (SocketDNSResponse *resp = response; resp;)
+    {
+        SocketDNSResponse *_resp = resp;
+        resp = resp->next;
+
+        libsocket_free(_resp->canonname);
+        libsocket_free(_resp->sockaddr);
+
+        libsocket_free(_resp); 
+    }
+}
+
 bool socket_getaddrinfo(const char *nodename, const char *servicename, const SocketDNSRequest *request, SocketDNSResponse **response)
 {
     ENSURE_INIT(false);
@@ -73,13 +87,13 @@ bool socket_getaddrinfo(const char *nodename, const char *servicename, const Soc
     struct addrinfo *result;
     {
         SocketError err = translateeaierror(getaddrinfo(nodename, servicename, hints, &result));
-        if (err) RETURNWITHERROR(err, false);
+        if (err != Success) RETURNWITHERROR(err, false);
     }
 
     #define LOOPALLOCFAILEDHANDLE \
         {\
             freeaddrinfo(result);\
-            if (firstresp) socket_freeaddrinfo(firstresp);\
+            if (firstresp) __socket_freeaddrinfo(firstresp);\
             RETURNWITHERROR(MemoryAllocationFailed, false);\
         }
 
@@ -143,18 +157,7 @@ bool socket_freeaddrinfo(SocketDNSResponse *response)
 {
     ENSURE_INIT(false);
     if (!response) RETURNWITHERROR(Fault, false);
-
-    for (SocketDNSResponse *resp = response; resp;)
-    {
-        SocketDNSResponse *_resp = resp;
-        resp = resp->next;
-
-        libsocket_free(_resp->canonname);
-        libsocket_free(_resp->sockaddr);
-
-        libsocket_free(_resp); 
-    }
-
+    __socket_freeaddrinfo(response);
     RETURNWITHSUCCESS(true);
 }
 
