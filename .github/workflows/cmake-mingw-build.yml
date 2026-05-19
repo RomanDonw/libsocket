@@ -57,3 +57,4 @@ jobs:
           cd bin
 
           ./test1
+          ./test2
