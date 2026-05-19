@@ -311,7 +311,7 @@ LIBSOCKET_API bool LIBSOCKET_ABI socket_unpacksockaddr(const SocketAddressInterf
 
 // [socket_getaddrinfo]: request can be NULL, and node OR service also can be NULL, but not both. see <netdb.h> getaddrinfo function documentation for more info.
 LIBSOCKET_API bool LIBSOCKET_ABI socket_getaddrinfo(const char *nodename, const char *servicename, const SocketDNSRequest *request, SocketDNSResponse **response);
-LIBSOCKET_API bool LIBSOCKET_ABI socket_freeaddrinfo(SocketDNSResponse *response);
+LIBSOCKET_API void LIBSOCKET_ABI socket_freeaddrinfo(SocketDNSResponse *response); // safe for NULL pointer.
 LIBSOCKET_API bool LIBSOCKET_ABI socket_getnameinfo(const SocketAddressInterface *sockaddr, socklen_t sockaddrlen, char *nodename, uint32_t nodenamesize, char *servicename, uint32_t servicenamesize, int flags);
 
 LIBSOCKET_API Socket * LIBSOCKET_ABI socket_open(SocketAddressFamily af, SocketType type, SocketProtocol protocol);

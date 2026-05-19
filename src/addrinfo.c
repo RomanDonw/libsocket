@@ -54,20 +54,6 @@ static SocketError translateeaierror(int err)
     }
 }
 
-static void __socket_freeaddrinfo(SocketDNSResponse *response)
-{
-    for (SocketDNSResponse *resp = response; resp;)
-    {
-        SocketDNSResponse *_resp = resp;
-        resp = resp->next;
-
-        libsocket_free(_resp->canonname);
-        libsocket_free(_resp->sockaddr);
-
-        libsocket_free(_resp); 
-    }
-}
-
 bool socket_getaddrinfo(const char *nodename, const char *servicename, const SocketDNSRequest *request, SocketDNSResponse **response)
 {
     ENSURE_INIT(false);
@@ -93,7 +79,7 @@ bool socket_getaddrinfo(const char *nodename, const char *servicename, const Soc
     #define LOOPALLOCFAILEDHANDLE \
         {\
             freeaddrinfo(result);\
-            if (firstresp) __socket_freeaddrinfo(firstresp);\
+            socket_freeaddrinfo(firstresp);\
             RETURNWITHERROR(SocketError_MemoryAllocationFailed, false);\
         }
 
@@ -153,12 +139,18 @@ bool socket_getaddrinfo(const char *nodename, const char *servicename, const Soc
     RETURNWITHSUCCESS(true);
 }
 
-bool socket_freeaddrinfo(SocketDNSResponse *response)
+void socket_freeaddrinfo(SocketDNSResponse *response)
 {
-    ENSURE_INIT(false);
-    if (!response) RETURNWITHERROR(SocketError_Fault, false);
-    __socket_freeaddrinfo(response);
-    RETURNWITHSUCCESS(true);
+    for (SocketDNSResponse *resp = response; resp;)
+    {
+        SocketDNSResponse *_resp = resp;
+        resp = resp->next;
+
+        libsocket_free(_resp->canonname);
+        libsocket_free(_resp->sockaddr);
+
+        libsocket_free(_resp); 
+    }
 }
 
 bool socket_getnameinfo(const SocketAddressInterface *sockaddr, socklen_t sockaddrlen, char *nodename, uint32_t nodenamesize, char *servicename, uint32_t servicenamesize, int flags)
