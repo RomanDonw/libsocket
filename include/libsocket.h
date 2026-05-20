@@ -68,13 +68,6 @@
     typedef int SOCKETDESCRIPTOR;
     #define INVALID_SOCKET -1
 
-    enum SocketShutdownMode
-    {
-        SocketShutdownMode_OnlyRecv = SHUT_RD,
-        SocketShutdownMode_OnlySend = SHUT_WR,
-        SocketShutdownMode_Both = SHUT_RDWR
-    } typedef SocketShutdownMode;
-
 #endif
 
 #include <stdbool.h>
