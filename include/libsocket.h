@@ -139,6 +139,7 @@ enum SocketError
 
     SocketError_NotInitialized,
     SocketError_AlreadyInitialized,
+    SocketError_InitializationError,
     SocketError_InternalUnknownError,
     SocketError_ParsingAddressFailed,
 
@@ -288,7 +289,9 @@ LIBSOCKET_API extern void (*libsocket_free)(void *);
 LIBSOCKET_API const char * LIBSOCKET_ABI socket_strerror(SocketError errcode); // can be accessed without library initialization.
 
 LIBSOCKET_API bool LIBSOCKET_ABI socket_initialized(void); // can be accessed without library initialization.
+// [socket_startup]: this function is NOT THREAD-SAFE.
 LIBSOCKET_API SocketError LIBSOCKET_ABI socket_startup(const SocketStartupOptions *options); // options can be NULL.
+// [socket_cleanup]: this function is NOT THREAD-SAFE.
 LIBSOCKET_API SocketError LIBSOCKET_ABI socket_cleanup(void);
 
 LIBSOCKET_API SocketError LIBSOCKET_ABI socket_parseaddr(IPAddressInterface *addr, SocketAddressFamily af, const char *straddr);

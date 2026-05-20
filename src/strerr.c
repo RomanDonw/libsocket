@@ -15,6 +15,9 @@ const char *socket_strerror(SocketError errcode)
         case SocketError_AlreadyInitialized:
             return "already initialized";
 
+        case SocketError_InitializationError:
+            return "initialization error";
+
         case SocketError_InternalUnknownError:
             return "internal unknown socket error";
 

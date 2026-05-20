@@ -1,9 +1,10 @@
 #ifndef RESOURCES_H
 #define RESOURCES_H
 
-#include <stddef.h>
-
 #include "libsocket.h"
+
+#include <stddef.h>
+#include <threads.h>
 
 enum SocketsListError
 {
@@ -12,6 +13,8 @@ enum SocketsListError
     SocketsListError_ItemAlreadyExist = 2,
     SocketsListError_ItemNotExist = 3
 } typedef SocketsListError;
+
+extern mtx_t sockslist_mutex; // recursive mutex.
 
 bool sockslist_has(Socket *socket);
 SocketsListError sockslist_add(Socket *socket);
