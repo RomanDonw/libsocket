@@ -9,7 +9,7 @@ This library provides universal cross-platform network sockets implementation. S
 
 ### Thread-safe
 > [!WARNING]
-> This library`s API is mostly thread-safe, instead of initialization & cleanup functions.
+> This library`s API is mostly thread-safe, instead of initialization & cleanup functions.1
 
 ### Supported platforms
 > [!CAUTION]
