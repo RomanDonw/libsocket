@@ -37,8 +37,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 )
 
 if(WIN32)
-    find_package(Threads REQUIRED)
-    target_link_libraries(${PROJECT_NAME} PUBLIC Threads::Threads)
+    if(MINGW)
+        find_package(Threads REQUIRED)
+        target_link_libraries(${PROJECT_NAME} PUBLIC Threads::Threads)
+    endif()
 
     target_link_libraries(${PROJECT_NAME} PUBLIC "ws2_32")
 endif()
