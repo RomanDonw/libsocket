@@ -28,6 +28,7 @@ jobs:
         shell: msys2 {0}
         run: |
             ls
+            ls dependencies
 
             mkdir build
             cd build
