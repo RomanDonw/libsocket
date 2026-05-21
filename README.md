@@ -20,6 +20,9 @@ This library provides universal cross-platform network sockets implementation. S
 
 <!-- ========================================================================================================================================================== -->
 
+## Dependencies
+- [libmutex](https://github.com/RomanDonw/libmutex).
+
 ## Building the library
 
 ### Windows

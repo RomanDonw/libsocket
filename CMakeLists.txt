@@ -36,12 +36,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-if(WIN32)
-    if(MINGW)
-        find_package(Threads REQUIRED)
-        target_link_libraries(${PROJECT_NAME} PUBLIC Threads::Threads)
-    endif()
+find_package(libmutex REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE libmutex::mutex)
 
+if(WIN32)
     target_link_libraries(${PROJECT_NAME} PUBLIC "ws2_32")
 endif()
 

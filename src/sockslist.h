@@ -3,8 +3,8 @@
 
 #include "libsocket.h"
 
+#include <libmutex.h>
 #include <stddef.h>
-#include <threads.h>
 
 enum SocketsListError
 {
@@ -14,7 +14,7 @@ enum SocketsListError
     SocketsListError_ItemNotExist = 3
 } typedef SocketsListError;
 
-extern mtx_t sockslist_mutex; // recursive mutex.
+extern mutex_t *sockslist_mutex; // recursive mutex.
 
 bool sockslist_has(Socket *socket);
 SocketsListError sockslist_add(Socket *socket);

@@ -18,6 +18,21 @@ jobs:
             mingw-w64-ucrt-x86_64-cmake
             mingw-w64-ucrt-x86_64-make
 
+      - name: Setup dependencies
+        shell: msys2 {0}
+        run: |
+            git clone https://github.com/RomanDonw/libmutex
+            cd libmutex
+
+            mkdir build
+            cd build
+
+            cmake -S .. -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PATH=$MSYSTEM_PREFIX
+            mingw32-make install
+
+            cmake -S .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PATH=$MSYSTEM_PREFIX
+            mingw32-make install
+
       - name: Configure and Build
         shell: msys2 {0}
         run: |

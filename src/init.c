@@ -20,7 +20,13 @@ SocketError socket_startup(const SocketStartupOptions *options)
 {
     if (atomic_load(&inited)) return SocketError_AlreadyInitialized;
 
-    if (mtx_init(&sockslist_mutex, mtx_recursive) != thrd_success) return SocketError_InitializationError;
+    void *(*old_libmutex_malloc)(size_t) = libmutex_malloc;
+    void (*old_libmutex_free)(void *) = libmutex_free;
+    
+    libmutex_malloc = libsocket_malloc;
+    libmutex_free = libsocket_free;
+
+    if (mutex_init(&sockslist_mutex) != MUTEXERROR_SUCCESS) return SocketError_InitializationError;
 
     #ifdef LIBSOCKET_OS_WINDOWS
         static const SocketStartupOptions defaultopts =
@@ -37,6 +43,9 @@ SocketError socket_startup(const SocketStartupOptions *options)
         if (data.wVersion != options->winsock_version) { WSACleanup(); return SocketError_WSAVersionsNotMatch; }
     #endif
 
+    libmutex_malloc = old_libmutex_malloc;
+    libmutex_free = old_libmutex_free;
+
     atomic_store(&inited, true);
     return SocketError_Success;
 }
@@ -51,7 +60,7 @@ SocketError socket_cleanup(void)
     
     sockslist_removeall();
     
-    mtx_destroy(&sockslist_mutex);
+    mutex_destroy(sockslist_mutex);
 
     atomic_store(&inited, false);
     return SocketError_Success;
