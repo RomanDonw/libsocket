@@ -40,7 +40,7 @@ Requirements: `MSYS2 UCRT64`, `MinGW UCRT64`, `make`, `CMake`.
 1. Run **MSYS2 UCRT64 environment** (<ins>**recommended**</ins>). Install all requirements if you haven't it.
 2. Clone this repo and go to repository root folder.
 3. Create folder `build`. Go to this catalog.
-4. Run `cmake -S .. -G "MinGW Makefiles" -DCMAKE_INSTALL_PATH=$MSYSTEM_PREFIX`. Wait for generating Makefile.
+4. Run `cmake -S .. -G "MinGW Makefiles" -DCMAKE_INSTALL_PREFIX=$MSYSTEM_PREFIX`. Wait for generating Makefile.
 5. Run `mingw32-make` and wait for building library.
 
 ### Linux (UNIX)
