@@ -89,9 +89,9 @@ This will fully automatily setup <ins>libsocket</ins> for your project. By defau
 ## Tests
 Tests are available in `/tests/` folder in the root of repo. You can also use they as examples. Also in `/tests/` folder available README.md file with (short) description of every available test.
 
-## Debugging & Troubleshooting
-
 <!-- ========================================================================================================================================================== -->
+
+## Debugging & Troubleshooting
 
 ### Got SocketError_InternalUnknownError
 Rebuild library with CMake `-DDEBUG=ON` flag, rebuild & rerun you program to again got this error. You will see message in <ins>stderr</ins> like *Got unhandled system error...*. Copy this message & open an issue on this repo with this error message.
