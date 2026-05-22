@@ -8,8 +8,7 @@
 This library provides universal cross-platform network sockets implementation. Supports Windows (recommended MinGW UCRT64 env., MSVC also supported), and any other OS that provides POSIX socket implementation. Also this library supports both static & dynamic linking and building (if set CMake `BUILD_SHARED_LIBS` to `ON`).
 
 ### Thread-safe
-> [!WARNING]
-> This library`s API is mostly thread-safe, instead of initialization & cleanup functions.
+Now this API is <ins>**fully thread-safe**</ins> (but can has some stupid or not bugs, about that you can report by creating an issue on this repo).
 
 ### Supported platforms
 > [!CAUTION]

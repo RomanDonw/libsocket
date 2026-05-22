@@ -19,14 +19,17 @@ void *(*libsocket_realloc)(void *, size_t) = realloc;
 void (*libsocket_free)(void *) = free;
 
 static atomic_bool inited = ATOMIC_VAR_INIT(false);
+static atomic_flag initfuncsbusyflag = ATOMIC_FLAG_INIT;
 
 bool socket_initialized(void) { return atomic_load(&inited); }
 
 SocketError socket_startup(const SocketStartupOptions *options)
 {
-    if (atomic_load(&inited)) return SocketError_AlreadyInitialized;
+    if (atomic_flag_test_and_set(&initfuncsbusyflag)) return SocketError_OperationInProgress;
+    if (atomic_load(&inited)) { atomic_flag_clear(&initfuncsbusyflag); return SocketError_AlreadyInitialized; }
 
-    if (mutex_init(&sockslist_mutex) != MUTEXERROR_SUCCESS) return SocketError_InitializationError;
+    if (mutex_init(&sockslist_mutex) != MUTEXERROR_SUCCESS)
+    { atomic_flag_clear(&initfuncsbusyflag); return SocketError_InitializationError; }
 
     #ifdef LIBSOCKET_OS_WINDOWS
         static const SocketStartupOptions defaultopts =
@@ -38,27 +41,40 @@ SocketError socket_startup(const SocketStartupOptions *options)
 
         WSADATA data;
         int err = WSAStartup(options->winsock_version, &data);
-        if (err) return translateerror(err);
+        if (err) { atomic_flag_clear(&initfuncsbusyflag); return translateerror(err); }
+
         //if (data.wVersion != version) { if (WSACleanup()) RETURNWITHSYSERR(false); RETURNWITHERROR(SocketError_WSAVersionNotSupported, false); }
-        if (data.wVersion != options->winsock_version) { WSACleanup(); return SocketError_WSAVersionsNotMatch; }
+        if (data.wVersion != options->winsock_version)
+        {
+            WSACleanup();
+            
+            atomic_flag_clear(&initfuncsbusyflag);
+            return SocketError_WSAVersionsNotMatch;
+        }
     #endif
 
     atomic_store(&inited, true);
+    atomic_flag_clear(&initfuncsbusyflag);
     return SocketError_Success;
 }
 
 SocketError socket_cleanup(void)
 {
-    if (!atomic_load(&inited)) return SocketError_NotInitialized;
+    if (atomic_flag_test_and_set(&initfuncsbusyflag)) return SocketError_OperationInProgress;
+    if (!atomic_load(&inited)) { atomic_flag_clear(&initfuncsbusyflag); return SocketError_NotInitialized; }
 
     #ifdef LIBSOCKET_OS_WINDOWS
-        if (WSACleanup()) return GETLASTTRANSLATEDSYSERR();
+        if (WSACleanup())
+        {
+            atomic_flag_clear(&initfuncsbusyflag);
+            return GETLASTTRANSLATEDSYSERR();
+        }
     #endif
     
     sockslist_removeall();
-    
     mutex_destroy(sockslist_mutex);
 
     atomic_store(&inited, false);
+    atomic_flag_clear(&initfuncsbusyflag);
     return SocketError_Success;
 }
