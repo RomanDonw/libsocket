@@ -11,8 +11,7 @@ This library provides universal cross-platform network sockets implementation. S
 Now this API is <ins>**fully thread-safe**</ins> (but can has some stupid or not bugs, about that you can report by creating an issue on this repo).
 
 ### Supported platforms
-> [!CAUTION]
-> Note, that <ins>**now supported only little-endian CPU arch.-es**</ins>, because host to network byte order convertion macroses hardcoded in header(-s) only for little-endian CPU arch.-es.
+Now this library supports both little- and big- -endian architectures, such as PowerPC, ARM, x86 (IA-32, AMD64) and same other.
 
 - **Windows** (fully x86-64, theoretically x86-32 (IA-32), "ARM64", "ARM32") with WinSock 2.2 support <ins>(but you can change WinSock version through initialization options struct when you initializating the library)</ins>.
 - any **POSIX-compatible OS**, such as Linux (inclues Android; library tested in Termux), BSD-s and other **(arch.-es same as for Windows)**.

@@ -16,6 +16,23 @@
     #define LIBSOCKET_OS_WINDOWS
 #endif
 
+#if defined(__BYTE_ORDER__)
+    #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+        #define LIBSOCKET_BIG_ENDIAN
+    #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+        #define LIBSOCKET_LITTLE_ENDIAN
+    #endif
+
+#elif defined(__BIG_ENDIAN__) || defined(__BIG_ENDIAN) || defined(_BIG_ENDIAN)
+    #define LIBSOCKET_BIG_ENDIAN
+
+#elif defined(LIBSOCKET_OS_WINDOWS)
+    #if defined(_M_IX86) || defined(_M_X64) || defined(_M_ARM) || defined(_M_ARM64)
+        #define LIBSOCKET_LITTLE_ENDIAN
+    #endif
+    
+#endif
+
 #ifdef LIBSOCKET_OS_WINDOWS
     // Windows environment.
 
@@ -82,8 +99,15 @@
 
 #define LIBSOCKET_ABI
 
-#define SOCKET_HTONS(x) (((uint16_t)(x) & 0xFF00) >> 8) | (((uint16_t)(x) & 0x00FF) << 8)
-#define SOCKET_HTONL(x) ((((uint32_t)(x) & 0xFF000000) >> 24) | (((uint32_t)(x) & 0x000000FF) << 24) | (((uint32_t)(x) & 0x00FF0000) >> 8) | (((uint32_t)(x) & 0x0000FF00) << 8))
+#if defined(LIBSOCKET_LITTLE_ENDIAN)
+    #define SOCKET_HTONS(x) (((uint16_t)(x) & 0xFF00) >> 8) | (((uint16_t)(x) & 0x00FF) << 8)
+    #define SOCKET_HTONL(x) ((((uint32_t)(x) & 0xFF000000) >> 24) | (((uint32_t)(x) & 0x000000FF) << 24) | (((uint32_t)(x) & 0x00FF0000) >> 8) | (((uint32_t)(x) & 0x0000FF00) << 8))
+#elif defined(LIBSOCKET_BIG_ENDIAN)
+    #define SOCKET_HTONS(x) ((uint16_t)x)
+    #define SOCKET_HTONL(x) ((uint32_t)x)
+#else
+    #error Unsupported/unknown CPU architecture endianness.
+#endif
 
 #define SOCKET_NTOHS(x) SOCKET_HTONS(x)
 #define SOCKET_NTOHL(x) SOCKET_HTONL(x)
