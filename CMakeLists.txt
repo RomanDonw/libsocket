@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.23)
 
 # ========== SETTINGS ==========
-project(socket VERSION 0.0.0 LANGUAGES C)
+project(socket VERSION 0.0 LANGUAGES C)
 
 set(VERSION_CHECK_METHOD SameMajorVersion)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
@@ -36,7 +36,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-find_package(libmutex REQUIRED 2.0.0)
+find_package(libmutex 1.0 REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE libmutex::mutex)
 
 if(WIN32)
