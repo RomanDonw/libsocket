@@ -43,7 +43,6 @@ SocketError socket_startup(const SocketStartupOptions *options)
         int err = WSAStartup(options->winsock_version, &data);
         if (err) { atomic_flag_clear(&initfuncsbusyflag); return translateerror(err); }
 
-        //if (data.wVersion != version) { if (WSACleanup()) RETURNWITHSYSERR(false); RETURNWITHERROR(SocketError_WSAVersionNotSupported, false); }
         if (data.wVersion != options->winsock_version)
         {
             WSACleanup();
