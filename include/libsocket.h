@@ -150,17 +150,17 @@ enum SocketOptionName
     // Socket level.
     SocketOptionName_Socket_RecvBufferSize = SO_RCVBUF, // int, readable/writable.
     SocketOptionName_Socket_SendBufferSize = SO_SNDBUF, // int, readable/writable.
-    SocketOptionName_Socket_KeepAliveConnection = SO_KEEPALIVE, // int (bool), readable/writable.
-    SocketOptionName_Socket_AcceptConnections = SO_ACCEPTCONN, // int (bool), readonly.
+    SocketOptionName_Socket_KeepAliveConnection = SO_KEEPALIVE, // bool, readable/writable.
+    SocketOptionName_Socket_AcceptConnections = SO_ACCEPTCONN, // bool, readonly.
     SocketOptionName_Socket_InternalError = SO_ERROR, // int, readonly.
-    SocketOptionName_Socket_AllowReuseAddress = SO_REUSEADDR, // int (bool), readable/writable.
-    SocketOptionName_Socket_Broadcast = SO_BROADCAST, // int (bool), readable/writable.
+    SocketOptionName_Socket_AllowReuseAddress = SO_REUSEADDR, // bool, readable/writable.
+    SocketOptionName_Socket_Broadcast = SO_BROADCAST, // bool, readable/writable.
     SocketOptionName_Socket_Linger = SO_LINGER, // struct SocketLingerOptions, readable/writable.
     SocketOptionName_Socket_RecvTimeout = SO_RCVTIMEO, // uint32_t (milliseconds), readable/writable.
     SocketOptionName_Socket_SendTimeout = SO_SNDTIMEO, // uint32_t (milliseconds), readable/writable.
 
     // TCP level.
-    SocketOptionName_TCP_DisableDelay = TCP_NODELAY, // int (bool), readable/writable.
+    SocketOptionName_TCP_DisableDelay = TCP_NODELAY, // bool, readable/writable.
     SocketOptionName_TCP_MaximumDataSegmentSize = TCP_MAXSEG, // int, readable/writable.
 } typedef SocketOptionName;
 
