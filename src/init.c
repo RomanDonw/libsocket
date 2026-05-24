@@ -8,15 +8,10 @@
 #include "init.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <stdatomic.h>
 
 #include "err.h"
 #include "sockslist.h"
-
-void *(*libsocket_malloc)(size_t) = malloc;
-void *(*libsocket_realloc)(void *, size_t) = realloc;
-void (*libsocket_free)(void *) = free;
 
 static atomic_bool inited = ATOMIC_VAR_INIT(false);
 static atomic_flag initfuncsbusyflag = ATOMIC_FLAG_INIT;

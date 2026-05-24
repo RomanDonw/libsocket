@@ -14,6 +14,7 @@
 #include "init.h"
 #include "err.h"
 #include "util.h"
+#include "socket.h"
 #include "sockslist.h"
 
 #ifndef LIBSOCKET_OS_WINDOWS
@@ -23,22 +24,6 @@
     #include <sys/ioctl.h>
     #include <fcntl.h>
 #endif
-
-const IPv4Address IPV4ADDR_ANY = IPV4ADDR_INIT(INADDR_ANY);
-const IPv4Address IPV4ADDR_LOOPBACK = IPV4ADDR_INIT(INADDR_LOOPBACK);
-const IPv4Address IPV4ADDR_BROADCAST = IPV4ADDR_INIT(INADDR_BROADCAST);
-
-const IPv6Address IPV6ADDR_ANY = IN6ADDR_ANY_INIT;
-const IPv6Address IPV6ADDR_LOOPBACK = IN6ADDR_LOOPBACK_INIT;
-
-struct Socket
-{
-    SOCKETDESCRIPTOR desc;
-
-    SocketAddressFamily af;
-    SocketType type;
-    SocketProtocol protocol;
-};
 
 #ifdef LIBSOCKET_OS_WINDOWS
     #define CLOSESOCKET(descr) closesocket(descr)

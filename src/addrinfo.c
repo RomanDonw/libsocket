@@ -82,19 +82,12 @@ SocketError socket_getaddrinfo(const char *nodename, const char *servicename, co
         if (err != SocketError_Success) return err;
     }
 
-    #define LOOPALLOCFAILEDHANDLE \
-        {\
-            freeaddrinfo(result);\
-            socket_freeaddrinfo(firstresp);\
-            return SocketError_MemoryAllocationFailed;\
-        }
-
     SocketDNSResponse *firstresp = NULL;
     SocketDNSResponse *currresp = NULL;
     for (struct addrinfo *currai = result; currai; currai = currai->ai_next)
     {
         SocketDNSResponse *resp = libsocket_malloc(sizeof(SocketDNSResponse));
-        if (!resp) LOOPALLOCFAILEDHANDLE;
+        if (!resp) goto allocfail_resp;
 
         // =============================================================================
 
@@ -111,7 +104,7 @@ SocketError socket_getaddrinfo(const char *nodename, const char *servicename, co
         {
             size_t size = strlen(currai->ai_canonname) + 1;
             resp->canonname = libsocket_malloc(size);
-            if (!resp->canonname) { libsocket_free(resp); LOOPALLOCFAILEDHANDLE; }
+            if (!resp->canonname) goto allocfail_cannonname;
             memcpy(resp->canonname, currai->ai_canonname, size);
         }
         else resp->canonname = NULL;
@@ -121,12 +114,7 @@ SocketError socket_getaddrinfo(const char *nodename, const char *servicename, co
         if (resp->sockaddrlen && currai->ai_addr)
         {
             resp->sockaddr = libsocket_malloc(resp->sockaddrlen);
-            if (!resp->sockaddr)
-            {
-                if (resp->canonname) libsocket_free(resp->canonname);
-                libsocket_free(resp);
-                LOOPALLOCFAILEDHANDLE;
-            }
+            if (!resp->sockaddr) goto allocfail_sockaddr;
             memcpy(resp->sockaddr, currai->ai_addr, resp->sockaddrlen);
         }
         else resp->sockaddr = NULL;
@@ -136,9 +124,20 @@ SocketError socket_getaddrinfo(const char *nodename, const char *servicename, co
         if (currresp) currresp->next = resp;
         currresp = resp;
         if (!firstresp) firstresp = currresp;
-    }
 
-    #undef LOOPALLOCFAILEDHANDLE
+        // =============================================================================
+        continue;
+        // =============================================================================
+
+        allocfail_sockaddr:
+            if (resp->canonname) libsocket_free(resp->canonname);
+        allocfail_cannonname:
+            libsocket_free(resp);
+        allocfail_resp:
+            freeaddrinfo(result);
+            socket_freeaddrinfo(firstresp);
+            return SocketError_MemoryAllocationFailed;
+    }
 
     freeaddrinfo(result);
     *response = firstresp;
