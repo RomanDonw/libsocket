@@ -324,9 +324,9 @@ struct SocketDNSResponse
 
 #undef LIBSOCKET_SOCKETDNSBASE
 
-LIBSOCKET_API extern void *(*libsocket_malloc)(size_t);
-LIBSOCKET_API extern void *(*libsocket_realloc)(void *, size_t);
-LIBSOCKET_API extern void (*libsocket_free)(void *);
+LIBSOCKET_API extern void *(*libsocket_malloc)(size_t); // = malloc from stdlib.h by default.
+LIBSOCKET_API extern void *(*libsocket_realloc)(void *, size_t); // = realloc from stdlib.h by default.
+LIBSOCKET_API extern void (*libsocket_free)(void *); // = free from stdlib.h by default.
 
 LIBSOCKET_API const char * LIBSOCKET_ABI socket_strerror(SocketError errcode); // can be accessed without library initialization.
 
