@@ -92,5 +92,5 @@ Tests are available in `/tests/` folder in the root of repo. You can also use th
 
 ## Debugging & Troubleshooting
 
-### Got SocketError_InternalUnknownError
+### Got `SocketError_InternalUnknownError`
 Rebuild library with CMake `-DDEBUG=ON` flag, rebuild & rerun you program to again got this error. You will see message in <ins>stderr</ins> like *Got unhandled system error...*. Copy this message & open an issue on this repo with this error message.
