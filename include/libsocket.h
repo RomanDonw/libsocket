@@ -168,10 +168,6 @@ enum SocketOptionName
 
     // TCP level.
     SocketOptionName_TCP_NoDelay = TCP_NODELAY, // bool, R/W.
-    SocketOptionName_TCP_MaxDataSegmentSize = TCP_MAXSEG, // int, R/W.
-    SocketOptionName_TCP_MaxKeepAliveProbes = TCP_KEEPCNT, // int, R/W.
-    SocketOptionName_TCP_KeepAliveProbesInterval = TCP_KEEPINTVL, // int (seconds), R/W.
-    SocketOptionName_TCP_ConnectionKeepIdleTime = TCP_KEEPIDLE, // int (seconds), R/W.
 } typedef SocketOptionName;
 
 enum SocketError

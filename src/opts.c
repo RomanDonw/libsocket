@@ -91,12 +91,6 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
             {
                 case SocketOptionName_TCP_NoDelay:
                     goto handlebool;
-
-                case SocketOptionName_TCP_MaxDataSegmentSize:
-                case SocketOptionName_TCP_MaxKeepAliveProbes:
-                case SocketOptionName_TCP_KeepAliveProbesInterval:
-                case SocketOptionName_TCP_ConnectionKeepIdleTime:
-                    goto handleint;
             }
             break;
 
@@ -104,7 +98,7 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
             return SocketError_IncorrectArgumentValue;
     }
 
-    return SocketError_ProtocolOptionUnsupported;
+    return SocketError_UnsupportedProtocolOption;
 
     // =============================================================================
 
@@ -206,12 +200,6 @@ SocketError socket_setopt(const Socket *socket, SocketOptionLevel level, SocketO
             {
                 case SocketOptionName_TCP_NoDelay:
                     goto handlebool;
-
-                case SocketOptionName_TCP_MaxDataSegmentSize:
-                case SocketOptionName_TCP_MaxKeepAliveProbes:
-                case SocketOptionName_TCP_KeepAliveProbesInterval:
-                case SocketOptionName_TCP_ConnectionKeepIdleTime:
-                    goto handleint;
             }
             break;
 
@@ -219,7 +207,7 @@ SocketError socket_setopt(const Socket *socket, SocketOptionLevel level, SocketO
             return SocketError_IncorrectArgumentValue;
     }
 
-    return SocketError_ProtocolOptionUnsupported;
+    return SocketError_UnsupportedProtocolOption;
 
     // =============================================================================
 
@@ -228,7 +216,7 @@ SocketError socket_setopt(const Socket *socket, SocketOptionLevel level, SocketO
         if (optlen < sizeof(bool)) return SocketError_IncorrectArgumentValue;
 
         #ifdef LIBSOCKET_OS_WINDOWS
-            DWORD val = *(bool *)optval;
+            DWORD val = (*(bool *)optval) ? TRUE : FALSE;
         #else
             int val = *(bool *)optval;
         #endif
