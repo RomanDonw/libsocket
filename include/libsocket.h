@@ -165,6 +165,7 @@ enum SocketOptionName
     SocketOptionName_Socket_Linger = SO_LINGER, // struct SocketLingerOptions, R/W.
     SocketOptionName_Socket_RecvTimeout = SO_RCVTIMEO, // uint32_t (milliseconds), R/W.
     SocketOptionName_Socket_SendTimeout = SO_SNDTIMEO, // uint32_t (milliseconds), R/W.
+    SocketOptionName_Socket_Type = SO_TYPE, // int (enum SocketType), R/O.
 
     // TCP level.
     SocketOptionName_TCP_NoDelay = TCP_NODELAY, // bool, R/W.

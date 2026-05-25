@@ -32,6 +32,7 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
                 case SocketOptionName_Socket_RecvBufferSize:
                 case SocketOptionName_Socket_SendBufferSize:
                 case SocketOptionName_Socket_InternalError:
+                case SocketOptionName_Socket_Type:
                     goto handleint;
 
                 case SocketOptionName_Socket_Linger:
@@ -156,6 +157,7 @@ SocketError socket_setopt(const Socket *socket, SocketOptionLevel level, SocketO
             {
                 case SocketOptionName_Socket_AcceptConnections:
                 case SocketOptionName_Socket_InternalError:
+                case SocketOptionName_Socket_Type:
                     return SocketError_UnsupportedOperation;
 
                 case SocketOptionName_Socket_KeepAliveConnection:
