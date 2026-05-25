@@ -90,7 +90,13 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
             switch (optname)
             {
                 case SocketOptionName_TCP_NoDelay:
+                case SocketOptionName_TCP_FastOpen:
                     goto handlebool;
+
+                case SocketOptionName_TCP_MaxKeepAliveProbes:
+                case SocketOptionName_TCP_KeepAliveProbesInterval:
+                case SocketOptionName_TCP_ConnectionKeepIdleTime:
+                    goto handleint;
             }
             break;
 
@@ -203,7 +209,13 @@ SocketError socket_setopt(const Socket *socket, SocketOptionLevel level, SocketO
             switch (optname)
             {
                 case SocketOptionName_TCP_NoDelay:
+                case SocketOptionName_TCP_FastOpen:
                     goto handlebool;
+
+                case SocketOptionName_TCP_MaxKeepAliveProbes:
+                case SocketOptionName_TCP_KeepAliveProbesInterval:
+                case SocketOptionName_TCP_ConnectionKeepIdleTime:
+                    goto handleint;
             }
             break;
 
