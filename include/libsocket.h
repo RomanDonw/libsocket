@@ -186,6 +186,7 @@ enum SocketError
     SocketError_AlreadyInitialized,
     SocketError_InitializationError,
     SocketError_InternalUnknownError,
+    SocketError_InternalSizeMismatch,
     SocketError_ParsingAddressFailed,
 
     SocketError_MemoryAllocationFailed, // ENOMEM

@@ -25,7 +25,10 @@ const char *socket_strerror(SocketError errcode)
             return "initialization error";
 
         case SocketError_InternalUnknownError:
-            return "internal unknown socket error";
+            return "internal unknown socket error (this is a bug, report about it after debugging)";
+
+        case SocketError_InternalSizeMismatch:
+            return "internal size mismatch (this is a bug, report about it after debugging)";
 
         case SocketError_MemoryAllocationFailed:
             return "memory allocation failed";
