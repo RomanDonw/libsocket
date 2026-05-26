@@ -120,6 +120,8 @@ SocketError socket_setopt(const Socket *socket, SocketOptionLevel level, SocketO
             int val_dwint;
         #endif
 
+        // =============================================================================
+
         handle_bool:
             if (optlen < sizeof(bool)) return SocketError_IncorrectArgumentValue;
             #ifdef LIBSOCKET_OS_WINDOWS
@@ -128,17 +130,6 @@ SocketError socket_setopt(const Socket *socket, SocketOptionLevel level, SocketO
                 val_dwint = (*(bool *)optval) ? true : false;
             #endif
         goto load_dwint;
-
-        /*
-        handle_int:
-            if (optlen < sizeof(int)) return SocketError_IncorrectArgumentValue;
-            #ifdef LIBSOCKET_OS_WINDOWS
-                val_dwint = *(int *)optval;
-                goto load_dwint;
-            #else
-                goto processopt;
-            #endif
-        */
 
         handle_posorzeroint:
             if (optlen < sizeof(int) || *(int *)optval < 0) return SocketError_IncorrectArgumentValue;
@@ -162,6 +153,8 @@ SocketError socket_setopt(const Socket *socket, SocketOptionLevel level, SocketO
             if (optlen < sizeof(uint8_t)) return SocketError_IncorrectArgumentValue;
             val_dwint = *(uint8_t *)optval;
         goto load_dwint;
+
+        // =============================================================================
 
         load_dwint:
             optval = &val_dwint;

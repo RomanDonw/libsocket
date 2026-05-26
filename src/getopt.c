@@ -48,17 +48,12 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
                 case SocketOptionName_Socket_Linger:
                 {
                     struct linger ling;
-                    //socklen_t lingsz = sizeof(ling);
-                    //if (getsockopt(socket->desc, level, optname, (void *)&ling, &lingsz)) return GETLASTTRANSLATEDSYSERR();
-                    //if (lingsz != sizeof(ling)) INTRSZMISMATCH("socket_getopt(optname: linger)");
                     if ((err = __getsockopt(socket->desc, level, optname, &ling, sizeof(ling))) != SocketError_Success) return err;
 
                     SocketLingerOptions lingopts;
                     lingopts.enable = ling.l_onoff;
                     lingopts.linger = (ling.l_linger > USHRT_MAX) ? USHRT_MAX : ling.l_linger;
 
-                    //if (*optlen > 0) memcpy(optval, &lingopts, (*optlen > sizeof(lingopts)) ? sizeof(lingopts) : *optlen);
-                    //*optlen = sizeof(lingopts);
                     __filloutopt(&lingopts, sizeof(lingopts), optval, optlen);
                     return SocketError_Success;
                 }
@@ -68,15 +63,9 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
                 {
                     uint32_t millis;
                     #ifdef LIBSOCKET_OS_WINDOWS
-                        //socklen_t millissz = sizeof(millis);
-                        //if (getsockopt(socket->desc, level, optname, (void *)&millis, &millissz)) return GETLASTTRANSLATEDSYSERR();
-                        //if (millissz != sizeof(millis)) return SocketError_InternalUnknownError;
                         if ((err = __getsockopt(socket->desc, level, optname, &millis, sizeof(millis))) != SocketError_Success) return err;
                     #else
                         struct timeval tv;
-                        //socklen_t tvsz = sizeof(tv);
-                        //if (getsockopt(socket->desc, level, optname, (void *)&tv, &tvsz)) return GETLASTTRANSLATEDSYSERR();
-                        //if (tvsz != sizeof(tv)) INTRSZMISMATCH("socket_getopt(optname: recv/send timeout)");
                         if ((err = __getsockopt(socket->desc, level, optname, &tv, sizeof(tv))) != SocketError_Success) return err;
 
                         uint64_t usecs;
@@ -147,6 +136,8 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
         } value;
         socklen_t value_realsize;
 
+        // =============================================================================
+
         handlebool:
             if ((err = __getsockopt(socket->desc, level, optname, &val_dwint, sizeof(val_dwint))) != SocketError_Success) return err;
             value.boolean = val_dwint;
@@ -164,6 +155,8 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
             value.uint8 = val_dwint;
             value_realsize = sizeof(value.uint8);
         goto filloptval;
+
+        // =============================================================================
         
         filloptval:
             __filloutopt(&value, value_realsize, optval, optlen);

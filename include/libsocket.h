@@ -230,7 +230,7 @@ enum SocketError
     // Windows-specific:
     SocketError_NetworkSystemNotReady, // WSASYSNOTREADY
     SocketError_WSAVersionNotSupported, // WSAVERNOTSUPPORTED
-    SocketError_WSAVersionsNotMatch, // responced WinSock version != requested version.
+    SocketError_WSAVersionsNotMatch // responced WinSock version != requested version.
 } typedef SocketError;
 
 struct SocketLingerOptions
