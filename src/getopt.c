@@ -4,14 +4,7 @@
     file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 
-#include "libsocket.h"
-
-#include <string.h>
-#include <limits.h>
-#include <stdint.h>
-
-#include "init.h"
-#include "socket.h"
+#include "optfuncbase.h"
 
 #ifdef LIBSOCKET_DEBUG
     #include <stdio.h>
@@ -86,6 +79,8 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
                     __filloutopt(&millis, sizeof(millis), optval, optlen);
                     return SocketError_Success;
                 }
+
+                SWMISSDEFAULTFIX;
             }
             break;
 
@@ -100,6 +95,8 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
                 case SocketOptionName_TCP_KeepAliveProbesInterval:
                 case SocketOptionName_TCP_ConnectionKeepIdleTime:
                     goto handleint;
+
+                SWMISSDEFAULTFIX;
             }
             break;
 
@@ -109,6 +106,8 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
                 {
                     case SocketOptionName_IP_TimeToLive:
                         goto handleuint8;
+
+                    SWMISSDEFAULTFIX;
                 }
             }
             break;

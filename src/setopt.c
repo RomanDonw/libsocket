@@ -4,16 +4,7 @@
     file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 
-#include "libsocket.h"
-
-#include <string.h>
-#include <limits.h>
-#include <stdint.h>
-
-#include "init.h"
-#include "socket.h"
-
-// =============================================================================
+#include "optfuncbase.h"
 
 SocketError socket_setopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, const void *optval, socklen_t optlen)
 {
@@ -76,6 +67,8 @@ SocketError socket_setopt(const Socket *socket, SocketOptionLevel level, SocketO
                     if (setsockopt(socket->desc, level, optname, data, size)) return GETLASTTRANSLATEDSYSERR();
                     return SocketError_Success;
                 }
+
+                SWMISSDEFAULTFIX;
             }
             break;
 
@@ -92,16 +85,18 @@ SocketError socket_setopt(const Socket *socket, SocketOptionLevel level, SocketO
                 case SocketOptionName_TCP_KeepAliveProbesInterval:
                 case SocketOptionName_TCP_MaxKeepAliveProbes:
                     goto handle_onlyposint;
+
+                SWMISSDEFAULTFIX;
             }
             break;
 
         case SocketOptionLevel_IP:
+            switch (optname)
             {
-                switch (optname)
-                {
-                    case SocketOptionName_IP_TimeToLive:
-                        goto handle_uint8;
-                }
+                case SocketOptionName_IP_TimeToLive:
+                    goto handle_uint8;
+
+                SWMISSDEFAULTFIX;
             }
             break;
 

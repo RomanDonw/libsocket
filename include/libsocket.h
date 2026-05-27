@@ -12,6 +12,7 @@
     {
 #endif
 
+#undef LIBSOCKET_OS_WINDOWS
 #if defined(_WIN32) || defined(WIN32) || defined(_WIN64)
     #define LIBSOCKET_OS_WINDOWS
 #endif
