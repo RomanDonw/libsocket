@@ -1,5 +1,5 @@
 # Universal cross-platform C99\*/C++ sockets library.
-\*this library has C99 API, but implementation wrote on C11.
+\*this library has C99 API, but implementation wrote on C11. sorry guys :>, i need <stdatomic.h> support to have thread-safe init. functions.
 
 <!-- ========================================================================================================================================================== -->
 
