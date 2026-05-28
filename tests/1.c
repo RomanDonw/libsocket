@@ -82,7 +82,7 @@ void test(void)
 
     socklen_t lingsz = sizeof(SocketLingerOptions);
     if ((err = socket_getopt(s, SocketOptionLevel_Socket, SocketOptionName_Socket_Linger, &ling, &lingsz)) != SocketError_Success) handlesockerror(err, "socket_getopt");
-    printf("sizeof(SocketLingerOptions) = %llu    |    lingsz from socket_getopt = %d\n", sizeof(ling), lingsz);
+    printf("sizeof(SocketLingerOptions) = %zu    |    lingsz from socket_getopt = %d\n", sizeof(ling), lingsz);
     if (lingsz != sizeof(ling)) testabort_c("lingsz != sizeof(ling). TEST NOT PASSED. lingsz must be equal to sizeof(ling)! Testing aborted.");
 
     printf("ling.enable = %s\nling.linger = %u seconds.\n", ling.enable ? "true" : "false", ling.linger);

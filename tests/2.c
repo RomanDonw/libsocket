@@ -22,7 +22,7 @@ void printdnsinfo(const char *nodename, const char *servicename, const SocketDNS
     size_t recordn = 0;
     for (SocketDNSResponse *currresp = resps; currresp; currresp = currresp->next)
     {
-        printf("Record name #%llu:\n -  Flags: 0x%x (0%Xh).\n -  Address family: ", recordn, currresp->flags, currresp->flags);
+        printf("Record index #%zu:\n -  Flags: 0x%x (0%Xh).\n -  Address family: ", recordn, currresp->flags, currresp->flags);
 
         switch (currresp->af)
         {
