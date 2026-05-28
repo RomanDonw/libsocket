@@ -34,6 +34,8 @@ SocketError socket_startup(const SocketAllocators *allocators, const SocketStart
         allocs.free = free;
     }
 
+    // =============================================================================
+
     if (mutex_init(&sockslist_mutex) != MUTEXERROR_SUCCESS)
     { atomic_flag_clear(&initfuncsbusyflag); return SocketError_InitializationError; }
 
@@ -58,6 +60,8 @@ SocketError socket_startup(const SocketAllocators *allocators, const SocketStart
         }
     #endif
 
+    // =============================================================================
+
     atomic_store(&inited, true);
     atomic_flag_clear(&initfuncsbusyflag);
     return SocketError_Success;
@@ -67,6 +71,8 @@ SocketError socket_cleanup(void)
 {
     if (atomic_flag_test_and_set(&initfuncsbusyflag)) return SocketError_OperationInProgress;
     if (!atomic_load(&inited)) { atomic_flag_clear(&initfuncsbusyflag); return SocketError_NotInitialized; }
+
+    // =============================================================================
 
     #ifdef LIBSOCKET_OS_WINDOWS
         if (WSACleanup())
@@ -81,6 +87,8 @@ SocketError socket_cleanup(void)
     #endif
     
     mutex_destroy(sockslist_mutex);
+
+    // =============================================================================
 
     memset(&allocs, 0, sizeof(allocs));
 
