@@ -187,7 +187,7 @@ SocketError socket_setnonblocking(Socket *socket, bool enable)
     return SocketError_Success;
 }
 
-SocketError socket_getavailablebytes(const Socket *socket, size_t *availbytes)
+SocketError socket_getreadablebytes(const Socket *socket, size_t *availbytes)
 {
     ENSURE_INIT;
 

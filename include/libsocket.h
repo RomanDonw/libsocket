@@ -373,7 +373,7 @@ LIBSOCKET_API SocketError LIBSOCKET_ABI socket_sendto(const Socket *socket, cons
 
 LIBSOCKET_API bool LIBSOCKET_ABI socket_isnonblocking(const Socket *socket);
 LIBSOCKET_API SocketError LIBSOCKET_ABI socket_setnonblocking(Socket *socket, bool enable);
-LIBSOCKET_API SocketError LIBSOCKET_ABI socket_getavailablebytes(const Socket *socket, size_t *availbytes);
+LIBSOCKET_API SocketError LIBSOCKET_ABI socket_getreadablebytes(const Socket *socket, size_t *availbytes);
 LIBSOCKET_API SocketError LIBSOCKET_ABI socket_shutdown(const Socket *socket, SocketShutdownFlags flags);
 
 LIBSOCKET_API SocketError LIBSOCKET_ABI socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, void *optval, socklen_t *optlen);

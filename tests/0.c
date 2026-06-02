@@ -49,11 +49,10 @@ void test(void)
 
     waitms(100);
 
-    uint32_t avail;
-    if ((err = socket_ioctl(s, SocketIOCTLOption_AvailableDataToRead, &avail)) != SocketError_Success) handlesockerror(err, "socket_ioctl");
-    printf("Available bytes: %u\n\n", avail);
-
-    //const size_t BUFFER_SIZE = 512;
+    size_t avail;
+    if ((err = socket_getreadablebytes(s, &avail)) != SocketError_Success) handlesockerror(err, "socket_getreadablebytes");
+    printf("Available bytes: %zu\n\n", avail);
+    
     #define BUFFER_SIZE 512
     char buffer[BUFFER_SIZE];
     ssize_t readbytes;
