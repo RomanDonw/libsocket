@@ -16,6 +16,7 @@ struct Socket
     SocketAddressFamily af;
     SocketType type;
     SocketProtocol protocol;
+    
     bool nonblocking;
 };
 

@@ -371,7 +371,7 @@ LIBSOCKET_API SocketError LIBSOCKET_ABI socket_recvfrom(const Socket *socket, vo
 LIBSOCKET_API SocketError LIBSOCKET_ABI socket_send(const Socket *socket, const void *data, size_t len, ssize_t *processedbytes, int flags);
 LIBSOCKET_API SocketError LIBSOCKET_ABI socket_sendto(const Socket *socket, const void *buffer, size_t len, ssize_t *processedbytes, int flags, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen);
 
-LIBSOCKET_API bool LIBSOCKET_ABI socket_isnonblocking(const Socket *socket);
+LIBSOCKET_API bool LIBSOCKET_ABI socket_isnonblocking(const Socket *socket); // can be accessed without library initialization.
 LIBSOCKET_API SocketError LIBSOCKET_ABI socket_setnonblocking(Socket *socket, bool enable);
 LIBSOCKET_API SocketError LIBSOCKET_ABI socket_getreadablebytes(const Socket *socket, size_t *availbytes);
 LIBSOCKET_API SocketError LIBSOCKET_ABI socket_shutdown(const Socket *socket, SocketShutdownFlags flags);
