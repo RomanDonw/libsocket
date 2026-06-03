@@ -7,6 +7,7 @@
 #include "base/base.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 static SocketError err;
 
@@ -126,9 +127,15 @@ void test(void)
     IPv4Address addr4 = IPV4ADDR_INIT(IPV4ADDR_PACK(127, 0, 0, 1));
     if ((err = socket_packsockaddr(&saddr, SocketAddressFamily_IPv4, &addr4, 9418)) != SocketError_Success) handlesockerror(err, "socket_packsockaddr");
 
-    char nodename[SOCKET_NI_HOSTMAXSTRSIZE];
-    char servicename[SOCKET_NI_SERVMAXSTRSIZE];
-    if ((err = socket_getnameinfo(&saddr, sizeof(saddr), nodename, sizeof(nodename), servicename, sizeof(servicename), SOCKET_NI_NOFLAGS)) != SocketError_Success) handlesockerror(err, "socket_getnameinfo");
+    size_t hostnamesz = 0, servicesz = 0;
+    if ((err = socket_getnameinfo(&saddr, sizeof(saddr), NULL, &hostnamesz, NULL, &servicesz, SOCKET_NI_NOFLAGS)) != SocketError_Success) handlesockerror(err, "socket_getnameinfo");
 
-    printf("127.0.0.1:9418 resolved to (service | node) %s | %s.\n", servicename, nodename);
+    char *hostname = malloc_s(hostnamesz);
+    char *servicename = malloc_s(servicesz);
+    if ((err = socket_getnameinfo(&saddr, sizeof(saddr), hostname, &hostnamesz, servicename, &servicesz, SOCKET_NI_NOFLAGS)) != SocketError_Success) handlesockerror(err, "socket_getnameinfo");
+
+    printf("127.0.0.1:9418 resolved to (host | service): %s | %s.\n", hostname, servicename);
+
+    free(servicename);
+    free(hostname);
 }

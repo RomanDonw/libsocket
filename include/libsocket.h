@@ -66,20 +66,6 @@
 #else
     // POSIX environment.
 
-    // required for getaddrinfo & freeaddrinfo.
-    #ifdef _POSIX_C_SOURCE
-        #if _POSIX_C_SOURCE < 200112L
-            #undef _POSIX_C_SOURCE
-            #define _POSIX_C_SOURCE 200112L
-        #endif
-    #else
-        #define _POSIX_C_SOURCE 200112L
-    #endif
-
-    #ifndef _GNU_SOURCE 
-        #define _GNU_SOURCE 
-    #endif
-
     #include <sys/types.h>
     #include <sys/socket.h>
     #include <netinet/in.h>
@@ -242,25 +228,24 @@ struct SocketLingerOptions
 #define SOCKET_SEND_FLAG_DONTROUTE MSG_DONTROUTE
 
 // flags for SocketDNSRequest/SocketDNSResponse.
+typedef unsigned char SocketGetAddrInfoFlags;
 #define SOCKET_AI_NOFLAGS 0
-#define SOCKET_AI_FLAG_PASSIVE AI_PASSIVE
-#define SOCKET_AI_FLAG_CANONNAME AI_CANONNAME
-#define SOCKET_AI_FLAG_NUMERICHOST AI_NUMERICHOST
-#define SOCKET_AI_FLAG_NUMERICSERV AI_NUMERICSERV
-#define SOCKET_AI_FLAG_ADDRCONFIG AI_ADDRCONFIG
-#define SOCKET_AI_FLAG_IPV4MAPPED AI_V4MAPPED
-#define SOCKET_AI_FLAG_BOTHIPVERS AI_ALL
+#define SOCKET_AI_FLAG_PASSIVE 1
+#define SOCKET_AI_FLAG_CANONNAME 2
+#define SOCKET_AI_FLAG_NUMERICHOST 4
+#define SOCKET_AI_FLAG_NUMERICSERV 8
+#define SOCKET_AI_FLAG_ADDRCONFIG 16
+#define SOCKET_AI_FLAG_IPV4MAPPED 32
+#define SOCKET_AI_FLAG_BOTHIPVERS 64
 
 // flags for socket_getnameinfo.
+typedef unsigned char SocketGetNameInfoFlags;
 #define SOCKET_NI_NOFLAGS 0
-#define SOCKET_NI_FLAG_NOFQDN NI_NOFQDN
-#define SOCKET_NI_FLAG_NUMERICHOST NI_NUMERICHOST
-#define SOCKET_NI_FLAG_NUMERICSERV NI_NUMERICSERV
-#define SOCKET_NI_FLAG_DGRAM NI_DGRAM
-#define SOCKET_NI_FLAG_NAMEREQD NI_NAMEREQD
-
-#define SOCKET_NI_HOSTMAXSTRSIZE NI_MAXHOST
-#define SOCKET_NI_SERVMAXSTRSIZE NI_MAXSERV
+#define SOCKET_NI_FLAG_NOFQDN 1
+#define SOCKET_NI_FLAG_NUMERICHOST 2
+#define SOCKET_NI_FLAG_NUMERICSERV 4
+#define SOCKET_NI_FLAG_DGRAM 8
+#define SOCKET_NI_FLAG_NAMEREQD 16
 
 // flags & type definitions for socket_shutdown.
 typedef unsigned char SocketShutdownFlags;
@@ -292,7 +277,7 @@ LIBSOCKET_API extern const IPv6Address IPV6ADDR_ANY;
 LIBSOCKET_API extern const IPv6Address IPV6ADDR_LOOPBACK;
 
 #define LIBSOCKET_SOCKETDNSBASE \
-    int flags; /* see SOCKET_AI_... flags for more info. */\
+    SocketGetAddrInfoFlags flags; /* see SOCKET_AI_... flags for more info. */\
     SocketAddressFamily af;\
     SocketType type;\
     SocketProtocol protocol;
@@ -349,10 +334,11 @@ LIBSOCKET_API SocketError LIBSOCKET_ABI socket_packsockaddr(SocketAddressInterfa
 // [socket_unpacksockaddr]: can be accessed without library initialization.
 LIBSOCKET_API SocketError LIBSOCKET_ABI socket_unpacksockaddr(const SocketAddressInterface *sockaddr, SocketAddressFamily af, IPAddressInterface *addr, unsigned short *port);
 
-// [socket_getaddrinfo]: request can be NULL, and node OR service also can be NULL, but not both. see <netdb.h> getaddrinfo function documentation for more info.
-LIBSOCKET_API SocketError LIBSOCKET_ABI socket_getaddrinfo(const char *nodename, const char *servicename, const SocketDNSRequest *request, SocketDNSResponse **response);
+// [socket_getaddrinfo]: request can be NULL, and host OR service also can be NULL, but not both. see <netdb.h> getaddrinfo function documentation for more info.
+LIBSOCKET_API SocketError LIBSOCKET_ABI socket_getaddrinfo(const char *hostname, const char *servicename, const SocketDNSRequest *request, SocketDNSResponse **response);
 LIBSOCKET_API void LIBSOCKET_ABI socket_freeaddrinfo(SocketDNSResponse *response); // safe for NULL pointer and can be accessed without library initialization.
-LIBSOCKET_API SocketError LIBSOCKET_ABI socket_getnameinfo(const SocketAddressInterface *sockaddr, socklen_t sockaddrlen, char *nodename, uint32_t nodenamesize, char *servicename, uint32_t servicenamesize, int flags);
+// [socket_getnameinfo]: hostname & servicename can be NULL, and hostnamesize OR servicenamesize can be NULL, but not both. (see <netdb.h> getnameinfo function documentation for more info.)
+LIBSOCKET_API SocketError LIBSOCKET_ABI socket_getnameinfo(const SocketAddressInterface *sockaddr, socklen_t sockaddrlen, char *hostname, size_t *hostnamesize, char *servicename, size_t *servicenamesize, SocketGetNameInfoFlags flags);
 
 LIBSOCKET_API SocketError LIBSOCKET_ABI socket_open(Socket **socket, SocketAddressFamily af, SocketType type, SocketProtocol protocol);
 LIBSOCKET_API SocketError LIBSOCKET_ABI socket_close(Socket *socket);
