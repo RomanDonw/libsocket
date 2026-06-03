@@ -55,7 +55,7 @@ void test(void)
     
     #define BUFFER_SIZE 512
     char buffer[BUFFER_SIZE];
-    ssize_t readbytes;
+    size_t readbytes;
     while (true)
     {
         if ((err = socket_recv(s, buffer, BUFFER_SIZE, &readbytes, SOCKET_RECV_NOFLAGS)) != SocketError_Success || readbytes <= 0) break;

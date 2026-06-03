@@ -14,7 +14,7 @@
 #include <stdint.h>
 
 #include "init.h"
-#include "socket.h"
+#include "types.h"
 
 #ifndef LIBSOCKET_OS_WINDOWS
     #include <sys/time.h>

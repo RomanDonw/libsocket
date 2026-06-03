@@ -60,7 +60,6 @@
 
     #define LIBSOCKET_WINSOCK_DEFAULT_VERSION MAKEWORD(2, 2)
 
-    typedef SSIZE_T ssize_t;
     typedef SOCKET SOCKETDESCRIPTOR;
 
 #else

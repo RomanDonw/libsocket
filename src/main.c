@@ -13,7 +13,7 @@
 #include "init.h"
 #include "err.h"
 #include "util.h"
-#include "socket.h"
+#include "types.h"
 #include "sockslist.h"
 
 #ifndef LIBSOCKET_OS_WINDOWS

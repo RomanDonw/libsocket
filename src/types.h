@@ -9,6 +9,10 @@
 
 #include "libsocket.h"
 
+#ifdef LIBSOCKET_OS_WINDOWS
+    typedef SSIZE_T ssize_t;
+#endif
+
 struct Socket
 {
     SOCKETDESCRIPTOR desc;

@@ -9,7 +9,7 @@
 #include <stdlib.h>
 
 #include "err.h"
-#include "socket.h"
+#include "types.h"
 
 #ifndef LIBSOCKET_OS_WINDOWS
     #include <unistd.h>
