@@ -143,21 +143,23 @@ SocketError socket_accept(Socket **acceptedsocket, const Socket *socket, SocketA
 #define SOCKIOFUNCPROTO(func) \
     ENSURE_INIT;\
     ssize_t procbytes = func;\
-    if (processedbytes) *processedbytes = procbytes;\
     if (procbytes < 0) return GETLASTTRANSLATEDSYSERR();\
+    if (processedbytes) *processedbytes = procbytes;\
     return SocketError_Success;
 
-SocketError socket_recv(const Socket *socket, void *buffer, size_t len, ssize_t *processedbytes, int flags)
+SocketError socket_recv(const Socket *socket, void *buffer, size_t len, size_t *processedbytes, int flags)
 { SOCKIOFUNCPROTO(recv(socket->desc, buffer, CLAMPSIZET(len), flags)) }
 
-SocketError socket_recvfrom(const Socket *socket, void *buffer, size_t len, ssize_t *processedbytes, int flags, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen)
+SocketError socket_recvfrom(const Socket *socket, void *buffer, size_t len, size_t *processedbytes, int flags, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen)
 { SOCKIOFUNCPROTO(recvfrom(socket->desc, buffer, CLAMPSIZET(len), flags, (struct sockaddr *)sockaddr, sockaddrlen)) }
 
-SocketError socket_send(const Socket *socket, const void *data, size_t len, ssize_t *processedbytes, int flags)
+SocketError socket_send(const Socket *socket, const void *data, size_t len, size_t *processedbytes, int flags)
 { SOCKIOFUNCPROTO(send(socket->desc, data, CLAMPSIZET(len), flags)) }
 
-SocketError socket_sendto(const Socket *socket, const void *buffer, size_t len, ssize_t *processedbytes, int flags, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen)
+SocketError socket_sendto(const Socket *socket, const void *buffer, size_t len, size_t *processedbytes, int flags, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen)
 { SOCKIOFUNCPROTO(sendto(socket->desc, buffer, CLAMPSIZET(len), flags, (const struct sockaddr *)sockaddr, sockaddrlen)) }
+
+#undef SOCKIOFUNCPROTO
 
 #ifdef LIBSOCKET_OS_WINDOWS
     #define IOCTLSOCKET(desc, option, value_ptr) (ioctlsocket(desc, option, value_ptr))
