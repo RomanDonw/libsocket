@@ -20,10 +20,4 @@
     #include <sys/time.h>
 #endif
 
-#ifdef __clang__
-    #define SWMISSDEFAULTFIX default: break;
-#else
-    #define SWMISSDEFAULTFIX
-#endif
-
 #endif

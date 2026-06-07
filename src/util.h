@@ -27,4 +27,6 @@ extern LibSocketAllocators allocs;
 
 SocketError __closesocket(Socket *socket);
 
+//SocketError __setsockdefaultopts(const Socket *socket);
+
 #endif

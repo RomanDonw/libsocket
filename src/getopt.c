@@ -13,6 +13,8 @@
 static SocketError __getsockopt(SOCKETDESCRIPTOR desc, int level, int optname, void *optval, socklen_t optlen);
 static void __filloutopt(const void *value, socklen_t size, void *optval, socklen_t *optlen);
 
+#
+
 SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, void *optval, socklen_t *optlen)
 {
     ENSURE_INIT;
@@ -79,7 +81,8 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
                     return SocketError_Success;
                 }
 
-                SWMISSDEFAULTFIX;
+                default:
+                    break;
             }
             break;
 
@@ -95,7 +98,8 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
                 case SocketOptionName_TCP_ConnectionKeepIdleTime:
                     goto handleint;
 
-                SWMISSDEFAULTFIX;
+                default:
+                    break;
             }
             break;
 
@@ -106,7 +110,8 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
                     case SocketOptionName_IP_TimeToLive:
                         goto handleuint8;
 
-                    SWMISSDEFAULTFIX;
+                    default:
+                        break;
                 }
             }
             break;
@@ -165,6 +170,12 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
         filloptval:
             __filloutopt(&value, value_realsize, optval, optlen);
         return SocketError_Success;
+        
+        varoverflowerr:
+            #ifdef LIBSOCKET_DEBUG
+                fprintf(stderr, "Got internal size overflow in socket_getopt with params: level=%i optname=%i.\n", level, optname);
+            #endif
+        return SocketError_InternalVariableOverflow;
     }
 }
 

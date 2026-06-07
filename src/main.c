@@ -28,45 +28,51 @@ SocketError socket_open(Socket **socket_, SocketAddressFamily af, SocketType typ
 {
     ENSURE_INIT;
     SocketError err;
+    
+    if (af != SocketAddressFamily_IPv4 && af != SocketAddressFamily_IPv6)
+    { err = SocketError_UnsupportedAddressFamily; goto errorquit_beforealloc; }
 
     SOCKETDESCRIPTOR desc = socket(af, type, protocol);
-    if (desc == INVALID_SOCKET) return GETLASTTRANSLATEDSYSERR();
+    if (desc == INVALID_SOCKET) { err = GETLASTTRANSLATEDSYSERR(); goto errorquit_beforealloc; }
 
     Socket *ret = allocs.malloc(sizeof(Socket));
-    if (!ret) { CLOSESOCKETDESC(desc); return SocketError_MemoryAllocationFailed; }
+    if (!ret) { err = SocketError_MemoryAllocationFailed; goto errorquit_onalloc; }
     ret->af = af;
     ret->type = type;
     ret->protocol = protocol;
     ret->desc = desc;
-    if ((err = socket_setnonblocking(ret, false)) != SocketError_Success)
-    {
-        CLOSESOCKETDESC(desc);
-        allocs.free(ret);
-        return err;
-    }
+    if ((err = socket_setnonblocking(ret, false)) != SocketError_Success) goto errorquit_afteralloc;
 
     SocketsListError listerr = sockslist_add(ret);
     if (listerr != SocketsListError_Success)
     {
-        CLOSESOCKETDESC(desc);
-        allocs.free(ret);
-
         switch (listerr)
         {
             case SocketsListError_MemoryAllocationFailed:
-                return SocketError_MemoryAllocationFailed;
+                err = SocketError_MemoryAllocationFailed;
+                break;
 
             default:
-                return SocketError_Fault;
+                err = SocketError_Fault;
         }
+        goto errorquit_afteralloc;
     }
 
     *socket_ = ret;
     return SocketError_Success;
+    
+    errorquit_afteralloc:
+        allocs.free(ret);
+    errorquit_onalloc:
+        CLOSESOCKETDESC(desc);
+    errorquit_beforealloc:
+    return err;
 }
 
 SocketError socket_close(Socket *socket)
 {
+    // TODO: FIX POTENTIAL RACE CONDITION/UB. HERE.
+    
     ENSURE_INIT;
 
     if (!sockslist_has(socket)) return SocketError_Fault;
@@ -101,6 +107,8 @@ SocketError socket_bind(const Socket *socket, const SocketAddressInterface *sock
 
 SocketError socket_accept(Socket **acceptedsocket, const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen)
 {
+    // TODO: CHANGE ERROR HANDLING/RETURNING METHOD HERE.
+    
     ENSURE_INIT;
     SocketError err;
 

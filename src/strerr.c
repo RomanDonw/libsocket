@@ -29,6 +29,9 @@ const char *socket_strerror(SocketError errcode)
 
         case SocketError_InternalSizeMismatch:
             return "internal size mismatch (this is a bug, report about it after debugging)";
+            
+        case SocketError_InternalVariableOverflow:
+            return "internal variable overflow (this is a bug, report about it after debugging)";
 
         case SocketError_MemoryAllocationFailed:
             return "memory allocation failed";

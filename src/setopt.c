@@ -67,7 +67,8 @@ SocketError socket_setopt(const Socket *socket, SocketOptionLevel level, SocketO
                     return SocketError_Success;
                 }
 
-                SWMISSDEFAULTFIX;
+                default:
+                    break;
             }
             break;
 
@@ -85,7 +86,8 @@ SocketError socket_setopt(const Socket *socket, SocketOptionLevel level, SocketO
                 case SocketOptionName_TCP_MaxKeepAliveProbes:
                     goto handle_onlyposint;
 
-                SWMISSDEFAULTFIX;
+                default:
+                    break;
             }
             break;
 
@@ -95,7 +97,8 @@ SocketError socket_setopt(const Socket *socket, SocketOptionLevel level, SocketO
                 case SocketOptionName_IP_TimeToLive:
                     goto handle_uint8;
 
-                SWMISSDEFAULTFIX;
+                default:
+                    break;
             }
             break;
 

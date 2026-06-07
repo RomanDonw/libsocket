@@ -165,6 +165,7 @@ enum SocketError
     SocketError_InitializationError,
     SocketError_InternalUnknownError,
     SocketError_InternalSizeMismatch,
+    SocketError_InternalVariableOverflow,
     SocketError_ParsingAddressFailed,
 
     SocketError_MemoryAllocationFailed, // ENOMEM/EAI_MEMORY
