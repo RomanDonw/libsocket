@@ -37,7 +37,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 )
 
 find_package(libmutex 0.1.0 REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE libmutex::mutex)
+target_link_libraries(${PROJECT_NAME} PUBLIC libmutex::mutex)
 
 if(WIN32)
     target_link_libraries(${PROJECT_NAME} PUBLIC "ws2_32")
