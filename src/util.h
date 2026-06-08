@@ -13,17 +13,20 @@
 
 #ifdef LIBSOCKET_OS_WINDOWS
     #define CLAMPSIZET(x) ((size_t)x > INT_MAX ? (int)INT_MAX : (int)x)
-#else
-    #define CLAMPSIZET(x) ((size_t)x)
-#endif
-
-#ifdef LIBSOCKET_OS_WINDOWS
     #define CLOSESOCKETDESC(descr) (closesocket(descr))
 #else
+    #define CLAMPSIZET(x) ((size_t)x)
     #define CLOSESOCKETDESC(descr) (close(descr))
 #endif
 
 extern LibSocketAllocators allocs;
+
+#ifdef LIBSOCKET_DEBUG
+    void __libsocket_logdbgerr(const char *msgformat, ...);
+    #define LOGDBGERR(msgformat, ...) (__libsocket_logdbgerr(msgformat, __VA_ARGS__))
+#else
+    #define LOGDBGERR(msgformat, ...)
+#endif
 
 SocketError __closesocket(Socket *socket);
 

@@ -12,10 +12,6 @@
 #include <string.h>
 #include <stddef.h>
 
-#ifdef LIBSOCKET_DEBUG
-    #include <stdio.h>
-#endif
-
 #include "init.h"
 #include "err.h"
 #include "util.h"
@@ -221,9 +217,7 @@ static SocketError translateeaierror(int err)
         #endif
 
         default:
-            #ifdef LIBSOCKET_DEBUG
-                fprintf(stderr, "Got unhandled IETF (getaddrinfo/getnameinfo) error: %i.\n", err);
-            #endif
+            LOGDBGERR("got unhandled IETF (getaddrinfo/getnameinfo) error: %i", err);
             return SocketError_InternalUnknownError;
     }
 }

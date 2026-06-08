@@ -9,6 +9,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <libmutex.h>
 
 #include "init.h"
 #include "err.h"
@@ -28,9 +29,19 @@ SocketError socket_open(Socket **socket_, SocketAddressFamily af, SocketType typ
 {
     ENSURE_INIT;
     SocketError err;
+
+    // =============================================================================
     
     if (af != SocketAddressFamily_IPv4 && af != SocketAddressFamily_IPv6)
     { err = SocketError_UnsupportedAddressFamily; goto errorquit_beforealloc; }
+
+    if (type != SocketType_Stream && type != SocketType_Datagram)
+    { err = SocketError_UnsupportedSocketType; goto errorquit_beforealloc; }
+
+    if (protocol != SocketProtocol_Unspecified && protocol != SocketProtocol_TCP && protocol != SocketProtocol_UDP)
+    { err = SocketError_UnsupportedProtocol; goto errorquit_beforealloc; }
+
+    // =============================================================================
 
     SOCKETDESCRIPTOR desc = socket(af, type, protocol);
     if (desc == INVALID_SOCKET) { err = GETLASTTRANSLATEDSYSERR(); goto errorquit_beforealloc; }
@@ -60,6 +71,8 @@ SocketError socket_open(Socket **socket_, SocketAddressFamily af, SocketType typ
 
     *socket_ = ret;
     return SocketError_Success;
+
+    // =============================================================================
     
     errorquit_afteralloc:
         allocs.free(ret);
@@ -71,16 +84,16 @@ SocketError socket_open(Socket **socket_, SocketAddressFamily af, SocketType typ
 
 SocketError socket_close(Socket *socket)
 {
-    // TODO: FIX POTENTIAL RACE CONDITION/UB. HERE.
-    
     ENSURE_INIT;
+    mutex_lock(sockslist_mutex);
 
-    if (!sockslist_has(socket)) return SocketError_Fault;
+    if (!sockslist_has(socket)) { mutex_unlock(sockslist_mutex); return SocketError_Fault; }
 
     SocketError err = __closesocket(socket);
-    if (err != SocketError_Success) return err;
+    if (err != SocketError_Success) { mutex_unlock(sockslist_mutex); return err; }
 
     sockslist_remove(socket);
+    mutex_unlock(sockslist_mutex);
     return SocketError_Success;
 }
 
@@ -107,45 +120,44 @@ SocketError socket_bind(const Socket *socket, const SocketAddressInterface *sock
 
 SocketError socket_accept(Socket **acceptedsocket, const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen)
 {
-    // TODO: CHANGE ERROR HANDLING/RETURNING METHOD HERE.
-    
     ENSURE_INIT;
     SocketError err;
 
     SOCKETDESCRIPTOR desc = accept(socket->desc, sockaddr, sockaddrlen);
-    if (desc == INVALID_SOCKET) return GETLASTTRANSLATEDSYSERR();
+    if (desc == INVALID_SOCKET) { err = GETLASTTRANSLATEDSYSERR(); goto errorquit_beforealloc; }
 
     Socket *ret = allocs.malloc(sizeof(Socket));
-    if (!ret) { CLOSESOCKETDESC(desc); return SocketError_MemoryAllocationFailed; }
+    if (!ret) { err = SocketError_MemoryAllocationFailed; goto errorquit_onalloc; }
     ret->af = socket->af;
     ret->type = socket->type;
     ret->protocol = socket->protocol;
     ret->desc = desc;
-    if ((err = socket_setnonblocking(ret, socket->nonblocking)) != SocketError_Success)
-    {
-        CLOSESOCKETDESC(desc);
-        allocs.free(ret);
-        return err;
-    }
+    if ((err = socket_setnonblocking(ret, socket->nonblocking)) != SocketError_Success) goto errorquit_afteralloc;
 
     SocketsListError listerr = sockslist_add(ret);
     if (listerr != SocketsListError_Success)
     {
-        CLOSESOCKETDESC(desc);
-        allocs.free(ret);
-
         switch (listerr)
         {
             case SocketsListError_MemoryAllocationFailed:
-                return SocketError_MemoryAllocationFailed;
+                err = SocketError_MemoryAllocationFailed;
+                break;
 
             default:
-                return SocketError_Fault;
+                err = SocketError_Fault;
         }
+        goto errorquit_afteralloc;
     }
 
     *acceptedsocket = ret;
     return SocketError_Success;
+
+    errorquit_afteralloc:
+        allocs.free(ret);
+    errorquit_onalloc:
+        CLOSESOCKETDESC(desc);
+    errorquit_beforealloc:
+    return err;
 }
 
 #define SOCKIOFUNCPROTO(func) \

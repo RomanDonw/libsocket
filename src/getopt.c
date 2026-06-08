@@ -6,14 +6,10 @@
 
 #include "optfunc.h"
 
-#ifdef LIBSOCKET_DEBUG
-    #include <stdio.h>
-#endif
+#include "util.h"
 
 static SocketError __getsockopt(SOCKETDESCRIPTOR desc, int level, int optname, void *optval, socklen_t optlen);
 static void __filloutopt(const void *value, socklen_t size, void *optval, socklen_t *optlen);
-
-#
 
 SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, void *optval, socklen_t *optlen)
 {
@@ -21,7 +17,7 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
 
     SocketError err;
 
-    if (!optval) return SocketError_Fault;
+    if (!optval || !optlen) return SocketError_Fault;
 
     switch (level)
     {
@@ -44,9 +40,17 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
                     struct linger ling;
                     if ((err = __getsockopt(socket->desc, level, optname, &ling, sizeof(ling))) != SocketError_Success) return err;
 
+                    /*
+                        on Linux (by POSIX standard) 'l_linger' field has 'int' type, but in WinSock it has 'unsigned short' type,
+                            so we need to cast types with limits checking when we`re not on Windows.
+                    */
+                    #ifndef LIBSOCKET_OS_WINDOWS
+                        if (ling.l_linger > USHRT_MAX || ling.l_linger < 0) goto varoverflowerr;
+                    #endif
+
                     SocketLingerOptions lingopts;
                     lingopts.enable = ling.l_onoff;
-                    lingopts.linger = (ling.l_linger > USHRT_MAX) ? USHRT_MAX : ling.l_linger;
+                    lingopts.linger = ling.l_linger;
 
                     __filloutopt(&lingopts, sizeof(lingopts), optval, optlen);
                     return SocketError_Success;
@@ -63,17 +67,19 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
                         if ((err = __getsockopt(socket->desc, level, optname, &tv, sizeof(tv))) != SocketError_Success) return err;
 
                         uint64_t usecs;
+
+                        // algorithm here isn`t perfect, but it works!
                         
                         // check seconds on possible overflow when it will be converted to microseconds & set usecs variable.
-                        if (tv.tv_sec > UINT64_MAX / 1000000) usecs = UINT64_MAX;
-                        else usecs = tv.tv_sec * 1000000;
+                        if (tv.tv_sec > UINT64_MAX / 1000000) goto varoverflowerr;
+                        usecs = tv.tv_sec * 1000000;
 
-                        // check microseconds on possible overflow before adding & clamp usecs value on overflow.
-                        if (UINT64_MAX - usecs < tv.tv_usec) usecs = UINT64_MAX;
+                        // check microseconds on possible overflow before adding & return error when overflow got.
+                        if (UINT64_MAX - usecs < tv.tv_usec) goto varoverflowerr;
                         else usecs += tv.tv_usec;
 
                         usecs /= 1000;
-                        if (usecs > UINT32_MAX) usecs = UINT32_MAX;
+                        if (usecs > UINT32_MAX) goto varoverflowerr;
                         millis = (uint32_t)usecs;
                     #endif
 
@@ -170,11 +176,11 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
         filloptval:
             __filloutopt(&value, value_realsize, optval, optlen);
         return SocketError_Success;
+
+        // =============================================================================
         
         varoverflowerr:
-            #ifdef LIBSOCKET_DEBUG
-                fprintf(stderr, "Got internal size overflow in socket_getopt with params: level=%i optname=%i.\n", level, optname);
-            #endif
+            LOGDBGERR("got internal size overflow in socket_getopt with params: level=%i optname=%i", level, optname);
         return SocketError_InternalVariableOverflow;
     }
 }
@@ -185,9 +191,7 @@ static SocketError __getsockopt(SOCKETDESCRIPTOR desc, int level, int optname, v
     if (getsockopt(desc, level, optname, optval, &realoptlen)) return GETLASTTRANSLATEDSYSERR();
     if (realoptlen != optlen)
     {
-        #ifdef LIBSOCKET_DEBUG
-            fprintf(stderr, "Got internal size mismatch in __getsockopt with params: level=%i, optname=%i.\n", level, optname);
-        #endif
+        LOGDBGERR("got internal size mismatch in __getsockopt with params: level=%i, optname=%i", level, optname);
         return SocketError_InternalSizeMismatch;
     }
 
