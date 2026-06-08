@@ -3,6 +3,6 @@
 include(CMakeFindDependencyMacro)
 include("${CMAKE_CURRENT_LIST_DIR}/libsocketTargets.cmake")
 
-find_dependency(libmutex 0.1.0 REQUIRED)
+find_dependency(@DEP_LIBMUTEX_PACKNAME@ @DEP_LIBMUTEX_REQMINVER@ REQUIRED)
 
 check_required_components(libsocket)

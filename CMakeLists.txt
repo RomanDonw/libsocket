@@ -9,6 +9,10 @@ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
+
+set(DEP_LIBMUTEX_PACKNAME libmutex)
+set(DEP_LIBMUTEX_TARGETNAME mutex)
+set(DEP_LIBMUTEX_REQMINVER 0.1.0)
 # ========== ======== ==========
 
 include(GNUInstallDirs)
@@ -36,8 +40,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-find_package(libmutex 0.1.0 REQUIRED)
-target_link_libraries(${PROJECT_NAME} PUBLIC libmutex::mutex)
+find_package(${DEP_LIBMUTEX_PACKNAME} ${DEP_LIBMUTEX_REQMINVER} REQUIRED)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${DEP_LIBMUTEX_PACKNAME}::${DEP_LIBMUTEX_TARGETNAME})
 
 if(WIN32)
     target_link_libraries(${PROJECT_NAME} PUBLIC "ws2_32")
