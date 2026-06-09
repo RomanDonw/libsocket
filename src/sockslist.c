@@ -14,12 +14,12 @@
 
 #include "util.h"
 
-mutex_t *sockslist_mutex;
+mutex_t *__libsocket_sockslist_mutex;
 
 static Socket **sockets = NULL;
 static size_t sockets_count = 0;
 
-bool sockslist_has(Socket *socket)
+bool __libsocket_sockslist_has(Socket *socket)
 {
     mutex_lock_ne(sockslist_mutex);
 
@@ -30,7 +30,7 @@ bool sockslist_has(Socket *socket)
     return found;
 }
 
-SocketsListError sockslist_add(Socket *socket)
+SocketsListError __libsocket_sockslist_add(Socket *socket)
 {
     mutex_lock_ne(sockslist_mutex);
 
@@ -51,7 +51,7 @@ SocketsListError sockslist_add(Socket *socket)
     return SocketsListError_Success;
 }
 
-SocketsListError sockslist_remove(Socket *socket)
+SocketsListError __libsocket_sockslist_remove(Socket *socket)
 {
     mutex_lock_ne(sockslist_mutex);
 
@@ -78,7 +78,7 @@ SocketsListError sockslist_remove(Socket *socket)
     return SocketsListError_Success;
 }
 
-void sockslist_removeall(bool closesocks)
+void __libsocket_sockslist_removeall(bool closesocks)
 {
     mutex_lock_ne(sockslist_mutex);
 

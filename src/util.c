@@ -43,7 +43,7 @@ LibSocketAllocators allocs = {0};
     }
 #endif
 
-SocketError __closesocket(Socket *socket)
+SocketError __libsocket_closesocket(Socket *socket)
 {
     if (CLOSESOCKETDESC(socket->desc)) return GETLASTTRANSLATEDSYSERR();
     allocs.free(socket);

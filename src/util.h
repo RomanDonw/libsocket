@@ -28,7 +28,8 @@ extern LibSocketAllocators allocs;
     #define LOGDBGERR(msgformat, ...)
 #endif
 
-SocketError __closesocket(Socket *socket);
+SocketError __libsocket_closesocket(Socket *socket);
+#define __closesocket(...) (__libsocket_closesocket(__VA_ARGS__))
 
 //SocketError __setsockdefaultopts(const Socket *socket);
 

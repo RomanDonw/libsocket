@@ -8,7 +8,7 @@
 #include "err.h"
 #include "util.h"
 
-SocketError translateerror(int err)
+SocketError __libsocket_translateerror(int err)
 {
     switch (err)
     {

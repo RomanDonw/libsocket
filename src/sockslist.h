@@ -4,8 +4,8 @@
     file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 
-#ifndef RESOURCES_H
-#define RESOURCES_H
+#ifndef SOCKSLIST_H
+#define SOCKSLIST_H
 
 #include "libsocket.h"
 
@@ -20,11 +20,17 @@ enum SocketsListError
     SocketsListError_ItemNotExist = 3
 } typedef SocketsListError;
 
-extern mutex_t *sockslist_mutex; // recursive mutex.
+extern mutex_t *__libsocket_sockslist_mutex; // recursive mutex.
+#define sockslist_mutex __libsocket_sockslist_mutex
 
-bool sockslist_has(Socket *socket);
-SocketsListError sockslist_add(Socket *socket);
-SocketsListError sockslist_remove(Socket *socket);
-void sockslist_removeall(bool closesocks);
+bool __libsocket_sockslist_has(Socket *socket);
+SocketsListError __libsocket_sockslist_add(Socket *socket);
+SocketsListError __libsocket_sockslist_remove(Socket *socket);
+void __libsocket_sockslist_removeall(bool closesocks);
+
+#define sockslist_has(...) (__libsocket_sockslist_has(__VA_ARGS__))
+#define sockslist_add(...) (__libsocket_sockslist_add(__VA_ARGS__))
+#define sockslist_remove(...) (__libsocket_sockslist_remove(__VA_ARGS__))
+#define sockslist_removeall(...) (__libsocket_sockslist_removeall(__VA_ARGS__))
 
 #endif

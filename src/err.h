@@ -97,7 +97,8 @@
     #define SOCKERR_ISCONN EISCONN
 #endif
 
-SocketError translateerror(int err);
+SocketError __libsocket_translateerror(int err);
+#define translateerror(...) (__libsocket_translateerror(__VA_ARGS__))
 
 #define GETLASTTRANSLATEDSYSERR() (translateerror(GETLASTERROR()))
 

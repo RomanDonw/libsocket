@@ -35,10 +35,8 @@ SocketError socket_addrtostr(const IPAddressInterface *addr, SocketAddressFamily
         int err = GETLASTERROR();
         #ifdef LIBSOCKET_OS_WINDOWS
             if (err == SOCKERR_INVAL) return SocketError_NoSpaceLeft;
-            else return translateerror(err);
-        #else
-            return translateerror(err);
         #endif
+            return translateerror(err);
     }
 
     return SocketError_Success;
