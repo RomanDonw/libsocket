@@ -155,18 +155,23 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
         
         handleint:
             if ((err = __getsockopt(socket->desc, level, optname, &val_dwint, sizeof(val_dwint))) != SocketError_Success) return err;
-            value.integer = val_dwint > INT_MAX ? INT_MAX : val_dwint;
+            
+            #ifdef LIBSOCKET_OS_WINDOWS
+                if (val_dwint > INT_MAX) goto varoverflowerr;
+            #endif
+
+            value.integer = val_dwint;
             value_realsize = sizeof(value.integer);
         goto filloptval;
             
         handleuint8:
             if ((err = __getsockopt(socket->desc, level, optname, &val_dwint, sizeof(val_dwint))) != SocketError_Success) return err;
 
-            if (val_dwint > UINT8_MAX) value.uint8 = UINT8_MAX;
+            if (val_dwint > UINT8_MAX) goto varoverflowerr;
             #ifndef LIBSOCKET_OS_WINDOWS
-                else if (val_dwint < 0) value.uint8 = 0;
+                if (val_dwint < 0) goto varoverflowerr;
             #endif
-            else value.uint8 = val_dwint;
+            value.uint8 = val_dwint;
 
             value_realsize = sizeof(value.uint8);
         goto filloptval;
