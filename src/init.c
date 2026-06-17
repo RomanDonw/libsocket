@@ -21,12 +21,15 @@ static atomic_flag initfuncsbusyflag = ATOMIC_FLAG_INIT;
 
 bool libsocket_initialized(void) { return atomic_load(&inited); }
 
-SocketError libsocket_startup(const LibSocketAllocators *allocators, const SocketStartupOptions *options)
+SocketError libsocket_startup(const SocketStartupOptions *options)
 {
     if (atomic_flag_test_and_set(&initfuncsbusyflag)) return SocketError_OperationInProgress;
     if (atomic_load(&inited)) { atomic_flag_clear(&initfuncsbusyflag); return SocketError_AlreadyInitialized; }
 
-    if (allocators) allocs = *allocators;
+    static const SocketStartupOptions defaultopts = SOCKSTUPOPTS_DEFAULTINIT;
+    if (!options) options = &defaultopts;
+
+    if (options->allocators) allocs = *options->allocators;
     else
     {
         allocs.malloc = malloc;
@@ -34,40 +37,20 @@ SocketError libsocket_startup(const LibSocketAllocators *allocators, const Socke
         allocs.free = free;
     }
 
+    SocketError err;
+
     // =============================================================================
 
     if (mutex_create(&sockslist_mutex) != MUTEXERROR_SUCCESS)
-    {
-        memset(&allocs, 0, sizeof(allocs));
-
-        atomic_flag_clear(&initfuncsbusyflag);
-        return SocketError_InitializationError;
-    }
+    { err = SocketError_InitializationError; goto errorquit; }
 
     #ifdef LIBSOCKET_OS_WINDOWS
-        static const SocketStartupOptions defaultopts = SOCKSTUPOPTS_DEFAULTINIT;
-
-        if (!options) options = &defaultopts;
-
         WSADATA data;
-        int err = WSAStartup(options->winsock_version, &data);
-        if (err)
-        {
-            memset(&allocs, 0, sizeof(allocs));
-            
-            atomic_flag_clear(&initfuncsbusyflag); 
-            return translateerror(err);
-        }
+        int wsaerr = WSAStartup(options->winsock_version, &data);
+        if (wsaerr) { err = translateerror(wsaerr); goto errorquit; }
 
         if (data.wVersion != options->winsock_version)
-        {
-            WSACleanup();
-
-            memset(&allocs, 0, sizeof(allocs));
-            
-            atomic_flag_clear(&initfuncsbusyflag);
-            return SocketError_WSAVersionsNotMatch;
-        }
+        { WSACleanup(); err = SocketError_WSAVersionNotSupported; goto errorquit; }
     #endif
 
     // =============================================================================
@@ -75,6 +58,11 @@ SocketError libsocket_startup(const LibSocketAllocators *allocators, const Socke
     atomic_store(&inited, true);
     atomic_flag_clear(&initfuncsbusyflag);
     return SocketError_Success;
+
+    errorquit:
+        memset(&allocs, 0, sizeof(allocs));
+        atomic_flag_clear(&initfuncsbusyflag);
+    return err;
 }
 
 SocketError libsocket_cleanup(void)

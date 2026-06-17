@@ -12,7 +12,6 @@
     {
 #endif
 
-#undef LIBSOCKET_OS_WINDOWS
 #if defined(_WIN32) || defined(WIN32) || defined(_WIN64)
     #define LIBSOCKET_OS_WINDOWS
 #endif
@@ -32,6 +31,10 @@
         #define LIBSOCKET_LITTLE_ENDIAN
     #endif
     
+#endif
+
+#if !defined(LIBSOCKET_LITTLE_ENDIAN) && !defined(LIBSOCKET_BIG_ENDIAN)
+    #error Unsupported/unknown CPU architecture endianness.
 #endif
 
 #ifdef LIBSOCKET_OS_WINDOWS
@@ -58,8 +61,6 @@
         #endif
     #endif
 
-    #define LIBSOCKET_WINSOCK_DEFAULT_VERSION MAKEWORD(2, 2)
-
     typedef SOCKET SOCKETDESCRIPTOR;
 
 #else
@@ -84,14 +85,14 @@
 
 #define LIBSOCKET_ABI
 
+#define LIBSOCKET_WINSOCK_DEFAULT_VERSION (((2) << 8) | (2))
+
 #if defined(LIBSOCKET_LITTLE_ENDIAN)
     #define SOCKET_HTONS(x) ((uint16_t)(((uint16_t)(x) & 0xFF00) >> 8) | (((uint16_t)(x) & 0x00FF) << 8))
     #define SOCKET_HTONL(x) ((uint32_t)((((uint32_t)(x) & 0xFF000000) >> 24) | (((uint32_t)(x) & 0x000000FF) << 24) | (((uint32_t)(x) & 0x00FF0000) >> 8) | (((uint32_t)(x) & 0x0000FF00) << 8)))
 #elif defined(LIBSOCKET_BIG_ENDIAN)
     #define SOCKET_HTONS(x) ((uint16_t)(x))
     #define SOCKET_HTONL(x) ((uint32_t)(x))
-#else
-    #error Unsupported/unknown CPU architecture endianness.
 #endif
 
 #define SOCKET_NTOHS(x) SOCKET_HTONS(x)
@@ -210,7 +211,6 @@ enum SocketError
     // Windows-specific:
     SocketError_NetworkSystemNotReady, // WSASYSNOTREADY
     SocketError_WSAVersionNotSupported, // WSAVERNOTSUPPORTED
-    SocketError_WSAVersionsNotMatch // responced WinSock version != requested version.
 } typedef SocketError;
 
 struct SocketLingerOptions
@@ -300,28 +300,47 @@ struct SocketDNSResponse
 
 #undef LIBSOCKET_SOCKETDNSBASE
 
+// memory allocators must work same as in <stdlib.h>.
+struct LibSocketAllocators
+{
+    void *(*malloc)(size_t);
+    void *(*realloc)(void *, size_t); // must be safe for NULL.
+    void (*free)(void *); // must be safe for NULL.
+} typedef LibSocketAllocators;
+
+struct LibSocketPanicInfo
+{
+    // general info.
+    const char *filename;
+    long long line;
+    const char *function;
+    const char *reason;
+
+    // optional (can be NULL).
+    const char *systemfunction;
+} typedef LibSocketPanicInfo;
+
+typedef void (*LibSocketPanicHandler)(const LibSocketPanicInfo *);
+
 struct SocketStartupOptions
 {
+    const LibSocketAllocators *allocators; // can be NULL.
+    LibSocketPanicHandler panichandler; // can be NULL.
+    
     unsigned short winsock_version;
 } typedef SocketStartupOptions;
 
 #define SOCKSTUPOPTS_DEFAULTINIT \
     {\
+        .allocators = NULL,\
+        .panichandler = NULL,\
         .winsock_version = LIBSOCKET_WINSOCK_DEFAULT_VERSION\
     }
-
-struct LibSocketAllocators
-{
-    void *(*malloc)(size_t);
-    void *(*realloc)(void *, size_t);
-    void (*free)(void *); // must be safe for NULL.
-} typedef LibSocketAllocators;
 
 LIBSOCKET_API const char * LIBSOCKET_ABI socket_strerror(SocketError errcode); // can be accessed without library initialization.
 
 LIBSOCKET_API bool LIBSOCKET_ABI libsocket_initialized(void); // can be accessed without library initialization.
-// [libsocket_startup]: options & allocators can be NULL.
-LIBSOCKET_API SocketError LIBSOCKET_ABI libsocket_startup(const LibSocketAllocators *allocators, const SocketStartupOptions *options);
+LIBSOCKET_API SocketError LIBSOCKET_ABI libsocket_startup(const SocketStartupOptions *options); // options can be NULL.
 LIBSOCKET_API SocketError LIBSOCKET_ABI libsocket_cleanup(void);
 
 LIBSOCKET_API SocketError LIBSOCKET_ABI socket_parseaddr(IPAddressInterface *addr, SocketAddressFamily af, const char *straddr);
