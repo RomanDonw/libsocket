@@ -85,15 +85,15 @@ SocketError socket_open(Socket **socket_, SocketAddressFamily af, SocketType typ
 SocketError socket_close(Socket *socket)
 {
     ENSURE_INIT;
-    mutex_lock_ne(sockslist_mutex);
+    if ((mutex_lock(sockslist_mutex)) != MUTEXERROR_SUCCESS) return SocketError_MutexAPIError;
 
-    if (!sockslist_has(socket)) { mutex_unlock_ne(sockslist_mutex); return SocketError_Fault; }
+    if (!sockslist_has(socket)) { SAFE_MUTEX_UNLOCK(sockslist_mutex); return SocketError_Fault; }
 
     SocketError err = __closesocket(socket);
-    if (err != SocketError_Success) { mutex_unlock_ne(sockslist_mutex); return err; }
+    if (err != SocketError_Success) { SAFE_MUTEX_UNLOCK(sockslist_mutex); return err; }
 
     sockslist_remove(socket);
-    mutex_unlock_ne(sockslist_mutex);
+    SAFE_MUTEX_UNLOCK(sockslist_mutex);
     return SocketError_Success;
 }
 

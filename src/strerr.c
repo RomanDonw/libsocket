@@ -21,9 +21,6 @@ const char *socket_strerror(SocketError errcode)
         case SocketError_AlreadyInitialized:
             return "already initialized";
 
-        case SocketError_InitializationError:
-            return "initialization error";
-
         case SocketError_InternalUnknownError:
             return "internal unknown socket error (this is a bug, report about it after debugging)";
 
@@ -38,6 +35,9 @@ const char *socket_strerror(SocketError errcode)
 
         case SocketError_ParsingAddressFailed:
             return "parsing address failed";
+
+        case SocketError_MutexAPIError:
+            return "mutex API error";
 
         case SocketError_Interrupted:
             return "socket operation interrupted";

@@ -163,11 +163,11 @@ enum SocketError
 
     SocketError_NotInitialized,
     SocketError_AlreadyInitialized,
-    SocketError_InitializationError,
     SocketError_InternalUnknownError,
     SocketError_InternalSizeMismatch,
     SocketError_InternalVariableOverflow,
     SocketError_ParsingAddressFailed,
+    SocketError_MutexAPIError,
 
     SocketError_MemoryAllocationFailed, // ENOMEM/EAI_MEMORY
     SocketError_Interrupted, // EINTR

@@ -45,7 +45,7 @@ SocketError libsocket_startup(const SocketStartupOptions *options)
     // =============================================================================
 
     if (mutex_create(&sockslist_mutex) != MUTEXERROR_SUCCESS)
-    { err = SocketError_InitializationError; goto errorquit; }
+    { err = SocketError_MutexAPIError; goto errorquit; }
 
     #ifdef LIBSOCKET_OS_WINDOWS
         WSADATA data;

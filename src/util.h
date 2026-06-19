@@ -11,6 +11,7 @@
 
 #include <limits.h>
 #include <stddef.h>
+#include <libmutex.h>
 
 #ifdef LIBSOCKET_OS_WINDOWS
     #define CLAMPSIZET(x) ((size_t)x > INT_MAX ? (int)INT_MAX : (int)x)
@@ -57,6 +58,14 @@ LibSocketPanicHandler __libsocket_defaultpanichandler;
 
 SocketError __libsocket_closesocket(Socket *socket);
 #define __closesocket(...) (__libsocket_closesocket(__VA_ARGS__))
+
+#define SAFE_MUTEX_LOCK(mutex) \
+    { if (mutex_lock(mutex) != MUTEXERROR_SUCCESS) panic_general(SocketError_MutexAPIError, "mutex_lock error in critical library section."); }
+
+#define SAFE_MUTEX_UNLOCK(mutex) \
+    { if (mutex_unlock(mutex) != MUTEXERROR_SUCCESS) panic_general(SocketError_MutexAPIError, "mutex_unlock error in critical library section."); }
+
+// =============================================================================
 
 #ifdef LIBSOCKET_DEBUG
     void __libsocket_logdbgerr(const char *msgformat, ...);
