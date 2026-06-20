@@ -77,6 +77,7 @@ SocketError socket_open(Socket **socket_, SocketAddressFamily af, SocketType typ
     return SocketError_Success;
 
     // =============================================================================
+
     errorquit_aftermutexcreate:
         if (mutex_destroy(ret->mutex_nonblocking) != MUTEXERROR_SUCCESS)
         { panic_general(GETLASTTRANSLATEDSYSERR(), "Unable to destroy internal socket mutex on cleanup when handling error."); }
@@ -144,7 +145,11 @@ SocketError socket_accept(Socket **acceptedsocket, const Socket *socket, SocketA
     ret->type = socket->type;
     ret->protocol = socket->protocol;
     ret->desc = desc;
-    if ((err = socket_setnonblocking(ret, socket->nonblocking)) != SocketError_Success) goto errorquit_afteralloc;
+
+    if (mutex_create(&ret->mutex_nonblocking) != MUTEXERROR_SUCCESS)
+    { err = SocketError_MutexAPIError; goto errorquit_afteralloc; }
+
+    if ((err = socket_setnonblocking(ret, socket_isnonblocking(socket))) != SocketError_Success) goto errorquit_aftermutexcreate;
 
     SocketsListError listerr = sockslist_add(ret);
     if (listerr != SocketsListError_Success)
@@ -158,12 +163,17 @@ SocketError socket_accept(Socket **acceptedsocket, const Socket *socket, SocketA
             default:
                 err = SocketError_Fault;
         }
-        goto errorquit_afteralloc;
+        goto errorquit_aftermutexcreate;
     }
 
     *acceptedsocket = ret;
     return SocketError_Success;
 
+    // =============================================================================
+
+    errorquit_aftermutexcreate:
+        if (mutex_destroy(ret->mutex_nonblocking) != MUTEXERROR_SUCCESS)
+        { panic_general(GETLASTTRANSLATEDSYSERR(), "Unable to destroy internal socket mutex on cleanup when handling error."); }
     errorquit_afteralloc:
         allocs.free(ret);
     errorquit_onalloc:
@@ -174,7 +184,7 @@ SocketError socket_accept(Socket **acceptedsocket, const Socket *socket, SocketA
 
 #define SOCKIOFUNCPROTO(func) \
     ENSURE_INIT;\
-    ssize_t procbytes = func;\
+    ssize_t procbytes = (func);\
     if (procbytes < 0) return GETLASTTRANSLATEDSYSERR();\
     if (processedbytes) *processedbytes = procbytes;\
     return SocketError_Success;
@@ -213,22 +223,19 @@ SocketError socket_setnonblocking(Socket *socket, bool enable)
 
     if (mutex_lock(socket->mutex_nonblocking) != MUTEXERROR_SUCCESS) return SocketError_MutexAPIError;
 
-    if (socket->nonblocking != enable)
-    {
-        #ifdef LIBSOCKET_OS_WINDOWS
-            unsigned long val = enable;
-            if (IOCTLSOCKET(socket->desc, FIONBIO, &val)) goto errorquit;
-        #else
-            int flags = fcntl(socket->desc, F_GETFL, 0);
-            if (flags < 0) goto errorquit;
+    #ifdef LIBSOCKET_OS_WINDOWS
+        unsigned long val = enable;
+        if (IOCTLSOCKET(socket->desc, FIONBIO, &val)) goto errorquit;
+    #else
+        int flags = fcntl(socket->desc, F_GETFL, 0);
+        if (flags < 0) goto errorquit;
 
-            if ((enable && fcntl(socket->desc, F_SETFL, flags | O_NONBLOCK) < 0) ||\
-                (!enable && fcntl(socket->desc, F_SETFL, flags & (~O_NONBLOCK)) < 0))
-                    goto errorquit;
-        #endif
+        if ((enable && fcntl(socket->desc, F_SETFL, flags | O_NONBLOCK) < 0) ||\
+            (!enable && fcntl(socket->desc, F_SETFL, flags & (~O_NONBLOCK)) < 0))
+                goto errorquit;
+    #endif
 
-        socket->nonblocking = enable;
-    }
+    socket->nonblocking = enable;
 
     SAFE_MUTEX_UNLOCK(socket->mutex_nonblocking);
     return SocketError_Success;
