@@ -272,6 +272,9 @@ LIBSOCKET_API extern const IPv6Address IPV6ADDR_LOOPBACK;
 typedef struct Socket Socket;
 
 typedef void SocketAddressInterface;
+typedef struct sockaddr SocketAddressBase;
+
+#define SOCKET_GETSOCKADDRAF(sockaddr_ptr) ((SocketAddressFamily)(((const SocketAddressBase *)(sockaddr_ptr))->sa_family))
 
 typedef void SocketIPAddressInterface;
 typedef struct sockaddr_in SocketIPv4Address;
@@ -348,10 +351,6 @@ LIBSOCKET_API SocketError LIBSOCKET_ABI libsocket_cleanup(void);
 
 LIBSOCKET_API SocketError LIBSOCKET_ABI socket_parseipaddr(IPAddressInterface *addr, SocketAddressFamily af, const char *straddr);
 LIBSOCKET_API SocketError LIBSOCKET_ABI socket_ipaddrtostr(const IPAddressInterface *addr, SocketAddressFamily af, char *straddr, socklen_t size);
-
-// [socket_getsockaddraf]: can be accessed without library initialization.
-// remove this function.
-LIBSOCKET_API SocketAddressFamily LIBSOCKET_ABI socket_getsockaddraf(const SocketAddressInterface *sockaddr);
 
 // [socket_packsockipaddr]: can be accessed without library initialization.
 LIBSOCKET_API SocketError LIBSOCKET_ABI socket_packsockipaddr(SocketIPAddressInterface *sockaddr, SocketAddressFamily af, const IPAddressInterface *addr, unsigned short port);

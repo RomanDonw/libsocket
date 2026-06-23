@@ -53,7 +53,7 @@ void test(void)
         if ((err = socket_ipaddrtostr(&addr, SocketAddressFamily_IPv4, addrstr, IPV4ADDRSTRSIZE)) != SocketError_Success) handlesockerror(err, "socket_addrtostr");
         printf("Binded to address %s:%u.\n", addrstr, port);
 
-        switch (socket_getsockaddraf(&saddr))
+        switch (SOCKET_GETSOCKADDRAF(&saddr))
         {
             case SocketAddressFamily_IPv4:
                 puts("Socket has IPv4 address family.");
