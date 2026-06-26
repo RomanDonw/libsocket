@@ -334,15 +334,23 @@ struct LibSocketStartupOptions
     LibSocketPanicHandler *panichandler; // can be NULL.
     LibSocketAlertHandler *alerthandler; // can be NULL.
     
-    unsigned short winsock_version; // must be equals 0 to use the default version of WinSock.
+    unsigned short winsock_version; // must be equals to 0 to use the default version of WinSock.
 } typedef LibSocketStartupOptions;
+
+struct LibSocketStartupResults
+{
+    unsigned short used_winsock_version; // equals to 0 on non-WinSock systems.
+    unsigned short max_winsock_version; // equals to 0 on non-WinSock systems.
+    unsigned short max_sockets_count; // equals to 0 if not limited or not specified by system sockets API.
+    unsigned short max_datagram_size; // equals to 0 if not limited or not specified by system sockets API.
+} typedef LibSocketStartupResults;
 
 #define LIBSOCKETSTARTUPOPTIONS_DEFAULTINIT (LibSocketStartupOptions){0}
 
 LIBSOCKET_API const char * LIBSOCKET_ABI socket_strerror(SocketError errcode); // can be accessed without library initialization.
 
 LIBSOCKET_API bool LIBSOCKET_ABI libsocket_initialized(void); // can be accessed without library initialization.
-LIBSOCKET_API SocketError LIBSOCKET_ABI libsocket_startup(const LibSocketStartupOptions *options); // options can be NULL.
+LIBSOCKET_API SocketError LIBSOCKET_ABI libsocket_startup(const LibSocketStartupOptions *options, LibSocketStartupResults *results); // options & results can be NULL.
 LIBSOCKET_API SocketError LIBSOCKET_ABI libsocket_cleanup(void);
 
 LIBSOCKET_API SocketError LIBSOCKET_ABI socket_parseipaddr(IPAddressInterface *addr, SocketAddressFamily af, const char *straddr);

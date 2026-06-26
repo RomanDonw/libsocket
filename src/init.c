@@ -21,7 +21,7 @@ static atomic_flag initfuncsbusyflag = ATOMIC_FLAG_INIT;
 
 bool libsocket_initialized(void) { return atomic_load(&inited); }
 
-SocketError libsocket_startup(const LibSocketStartupOptions *options)
+SocketError libsocket_startup(const LibSocketStartupOptions *options, LibSocketStartupResults *results)
 {
     if (atomic_flag_test_and_set(&initfuncsbusyflag)) return SocketError_OperationInProgress;
     if (atomic_load(&inited)) { atomic_flag_clear(&initfuncsbusyflag); return SocketError_AlreadyInitialized; }
@@ -50,14 +50,16 @@ SocketError libsocket_startup(const LibSocketStartupOptions *options)
     if (mutex_create(&sockslist_mutex) != MUTEXERROR_SUCCESS)
     { err = SocketError_MutexAPIError; goto errorquit; }
 
+    LibSocketStartupResults res = {0};
+
     #ifdef LIBSOCKET_OS_WINDOWS
         unsigned short winsock_version = options->winsock_version ? options->winsock_version : LIBSOCKET_DEFAULT_WINSOCK_VERSION;
 
-        WSADATA data;
-        int wsaerr = WSAStartup(winsock_version, &data);
+        WSADATA wsadata;
+        int wsaerr = WSAStartup(winsock_version, &wsadata);
         if (wsaerr) { err = translateerror(wsaerr); goto errorquit; }
 
-        if (data.wVersion != winsock_version)
+        if (wsadata.wVersion != winsock_version)
         {
             if (WSACleanup()) panic_general(GETLASTTRANSLATEDSYSERR(), "WSACleanup error on cleanup while handling not matching WinSock versions.");
 
@@ -70,6 +72,24 @@ SocketError libsocket_startup(const LibSocketStartupOptions *options)
 
     atomic_store(&inited, true);
     atomic_flag_clear(&initfuncsbusyflag);
+
+    if (results)
+    {
+        #ifdef LIBSOCKET_OS_WINDOWS
+            LibSocketStartupResults res = 
+            {
+                .used_winsock_version = wsadata.wVersion,
+                .max_winsock_version = wsadata.wHighVersion,
+                .max_sockets_count = wsadata.iMaxSockets,
+                .max_datagram_size = wsadata.iMaxUdpDg
+            };
+
+            memcpy(results, res, sizeof(res))
+        #else
+            memset(results, 0, sizeof(LibSocketStartupResults));
+        #endif
+    }
+
     return SocketError_Success;
 
     errorquit:

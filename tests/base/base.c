@@ -20,7 +20,7 @@ int main(void)
 {
     printf(" === TEST \"%s\" STARTED ===\n\n", testname);
 
-    SocketError err = libsocket_startup(NULL);
+    SocketError err = libsocket_startup(NULL, NULL);
     if (err != SocketError_Success) handlesockerror(err, "libsocket_startup");
 
     test();
