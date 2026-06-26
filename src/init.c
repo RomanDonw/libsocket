@@ -51,11 +51,13 @@ SocketError libsocket_startup(const SocketStartupOptions *options)
     { err = SocketError_MutexAPIError; goto errorquit; }
 
     #ifdef LIBSOCKET_OS_WINDOWS
+        unsigned short winsock_version = options->winsock_version ? options->winsock_version : LIBSOCKET_DEFAULT_WINSOCK_VERSION;
+
         WSADATA data;
-        int wsaerr = WSAStartup(options->winsock_version, &data);
+        int wsaerr = WSAStartup(winsock_version, &data);
         if (wsaerr) { err = translateerror(wsaerr); goto errorquit; }
 
-        if (data.wVersion != options->winsock_version)
+        if (data.wVersion != winsock_version)
         {
             if (WSACleanup()) panic_general(GETLASTTRANSLATEDSYSERR(), "WSACleanup error on cleanup while handling not matching WinSock versions.");
 

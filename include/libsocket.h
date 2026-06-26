@@ -63,6 +63,8 @@
 
     typedef SOCKET SOCKETDESCRIPTOR;
 
+    #define LIBSOCKET_DEFAULT_WINSOCK_VERSION (MAKEWORD(2, 2))
+
 #else
     // POSIX environment.
 
@@ -84,8 +86,6 @@
 #include <stddef.h>
 
 #define LIBSOCKET_ABI
-
-#define LIBSOCKET_WINSOCK_DEFAULT_VERSION (((2) << 8) | (2))
 
 #if defined(LIBSOCKET_LITTLE_ENDIAN)
     #define SOCKET_HTONS(x) ((uint16_t)(((uint16_t)(x) & 0xFF00) >> 8) | (((uint16_t)(x) & 0x00FF) << 8))
@@ -324,8 +324,6 @@ struct LibSocketPanicInfo
 
     SocketError error; // optional (equals SocketError_Success if true value not present).
 } typedef LibSocketPanicInfo;
-
-#undef LIBSOCKET_GENERICINFOFIELDS
 
 typedef void LibSocketPanicHandler(const LibSocketPanicInfo *);
 typedef void LibSocketAlertHandler(const char *file, long long line, const char *function, const char *format, ...);
