@@ -84,7 +84,7 @@ SocketError libsocket_startup(const LibSocketStartupOptions *options, LibSocketS
                 .max_datagram_size = wsadata.iMaxUdpDg
             };
 
-            memcpy(results, res, sizeof(res));
+            memcpy(results, &res, sizeof(res));
         #else
             memset(results, 0, sizeof(LibSocketStartupResults));
         #endif
