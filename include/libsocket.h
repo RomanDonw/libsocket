@@ -325,23 +325,21 @@ struct LibSocketPanicInfo
     SocketError error; // optional (equals SocketError_Success if true value not present).
 } typedef LibSocketPanicInfo;
 
+#undef LIBSOCKET_GENERICINFOFIELDS
+
 typedef void LibSocketPanicHandler(const LibSocketPanicInfo *);
-//typedef void LibSocketDebugInfoHandler(const LibSocket)
+typedef void LibSocketAlertHandler(const char *file, long long line, const char *function, const char *format, ...);
 
 struct SocketStartupOptions
 {
     const LibSocketAllocators *allocators; // can be NULL.
     LibSocketPanicHandler *panichandler; // can be NULL.
+    LibSocketAlertHandler *alerthandler; // can be NULL.
     
-    unsigned short winsock_version;
+    unsigned short winsock_version; // must be equals 0 to use the default version of WinSock.
 } typedef SocketStartupOptions;
 
-#define SOCKSTUPOPTS_DEFAULTINIT \
-    {\
-        .allocators = NULL,\
-        .panichandler = NULL,\
-        .winsock_version = LIBSOCKET_WINSOCK_DEFAULT_VERSION\
-    }
+#define SOCKSTUPOPTS_DEFAULTINIT (SocketStartupOptions){0}
 
 LIBSOCKET_API const char * LIBSOCKET_ABI socket_strerror(SocketError errcode); // can be accessed without library initialization.
 

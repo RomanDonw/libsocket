@@ -8,16 +8,13 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 #include "err.h"
 #include "types.h"
 
 #ifndef LIBSOCKET_OS_WINDOWS
     #include <unistd.h>
-#endif
-
-#ifdef LIBSOCKET_DEBUG
-    #include <stdarg.h>
 #endif
 
 const IPv4Address IPV4ADDR_ANY = IPV4ADDR_INIT(INADDR_ANY);
@@ -29,6 +26,7 @@ const IPv6Address IPV6ADDR_LOOPBACK = IN6ADDR_LOOPBACK_INIT;
 
 LibSocketAllocators __libsocket_allocators = {0};
 LibSocketPanicHandler *__libsocket_panichandler = NULL;
+LibSocketAlertHandler *__libsocket_alerthandler = NULL;
 
 #ifdef LIBSOCKET_DEBUG
     void __libsocket_logdbgerr(const char *msgformat, ...)
@@ -64,4 +62,17 @@ void __libsocket_defaultpanichandler(const LibSocketPanicInfo *info)
     if (info->error != PANIC_NOERRORCODE) fprintf(stderr, "    \"%s\" because\n    ", socket_strerror(info->error));
 
     fprintf(stderr, "    %s\n\n###################\n\n", info->description);
+}
+
+void __libsocket_defaultalerthandler(const char *file, long long line, const char *function, const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    fprintf(stderr, "\n\n\n###################\n# LIBSOCKET ALERT #\n###################\n\n");
+
+    fprintf(stderr, "In \"%s\" at line %lld (%s):\n    ", file, line, function);
+    vfprintf(stderr, format, args);
+
+    fputs("\n\n###################\n", stderr);
+    va_end(args);
 }

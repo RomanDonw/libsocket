@@ -26,15 +26,16 @@
 #endif
 
 extern LibSocketAllocators __libsocket_allocators;
-#define allocs __libsocket_allocators
+#define allocs (__libsocket_allocators)
 
 // =============================================================================
 
 extern LibSocketPanicHandler *__libsocket_panichandler;
-#define __panichandler __libsocket_panichandler
+#define __panichandler (__libsocket_panichandler)
 
 LibSocketPanicHandler __libsocket_defaultpanichandler;
-#define __defaultpanichandler __libsocket_defaultpanichandler
+#define __defaultpanichandler (__libsocket_defaultpanichandler)
+
 
 #define PANIC_NOERRORCODE (SocketError_Success)
 
@@ -53,6 +54,17 @@ LibSocketPanicHandler __libsocket_defaultpanichandler;
     }
 
 #define panic_general(errcode, description) __PANICBASE(__PANICINFOBASE(errcode, description))
+
+// =============================================================================
+
+extern LibSocketAlertHandler *__libsocket_alerthandler;
+#define __alerthandler (__libsocket_alerthandler)
+
+LibSocketAlertHandler __libsocket_defaultalerthandler;
+#define __defaultalerthandler (__libsocket_defaultalerthandler)
+
+
+#define alert(format, ...) (__alerthandler(__FILE__, __LINE__, __func__, format, __VA_ARGS__))
 
 // =============================================================================
 

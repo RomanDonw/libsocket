@@ -40,6 +40,9 @@ SocketError libsocket_startup(const SocketStartupOptions *options)
     if (options->panichandler) __panichandler = options->panichandler;
     else __panichandler = __defaultpanichandler;
 
+    if (options->alerthandler) __alerthandler = options->alerthandler;
+    else __alerthandler = __defaultalerthandler;
+
     SocketError err;
 
     // =============================================================================
@@ -68,6 +71,7 @@ SocketError libsocket_startup(const SocketStartupOptions *options)
     return SocketError_Success;
 
     errorquit:
+        __alerthandler = NULL;
         __panichandler = NULL;
         memset(&allocs, 0, sizeof(allocs));
         atomic_flag_clear(&initfuncsbusyflag);
@@ -97,6 +101,7 @@ SocketError libsocket_cleanup(void)
 
     // =============================================================================
 
+    __alerthandler = NULL;
     __panichandler = NULL;
     memset(&allocs, 0, sizeof(allocs));
 
