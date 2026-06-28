@@ -337,6 +337,8 @@ struct LibSocketStartupOptions
     unsigned short winsock_version; // must be equals to 0 to use the default version of WinSock.
 } typedef LibSocketStartupOptions;
 
+#define LIBSOCKETSTARTUPOPTIONS_DEFAULTINIT (LibSocketStartupOptions){0}
+
 struct LibSocketStartupResults
 {
     unsigned short used_winsock_version; // equals to 0 on non-WinSock systems.
@@ -344,8 +346,6 @@ struct LibSocketStartupResults
     unsigned short max_sockets_count; // equals to 0 if not limited or not specified by system sockets API.
     unsigned short max_datagram_size; // equals to 0 if not limited or not specified by system sockets API.
 } typedef LibSocketStartupResults;
-
-#define LIBSOCKETSTARTUPOPTIONS_DEFAULTINIT (LibSocketStartupOptions){0}
 
 LIBSOCKET_API const char * LIBSOCKET_ABI socket_strerror(SocketError errcode); // can be accessed without library initialization.
 
