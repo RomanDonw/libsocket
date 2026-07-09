@@ -52,34 +52,24 @@ NError socket_open(Socket **socket_, SocketAddressFamily af, SocketType type, So
     ret->protocol = protocol;
     ret->desc = desc;
 
-    if (mutex_create(&ret->mutex_nonblocking) != MUTEXERROR_SUCCESS)
-    { err = NError_MutexAPIError; goto errorquit_onmtxapierr; }
+    if ((err = nthread_mutex_create(&ret->mutex_nonblocking)) != NError_Success) goto errorquit_onmtxapierr;
 
-    if ((err = socket_setnonblocking(ret, false)) != NError_Success) goto errorquit_aftermutexcreate;
-
-    SocketsListError listerr = sockslist_add(ret);
-    if (listerr != SocketsListError_Success)
-    {
-        switch (listerr)
-        {
-            case SocketsListError_MemoryAllocationFailed:
-                err = NError_MemoryAllocationFailed;
-                break;
-
-            default:
-                err = NError_Fault;
-        }
-        goto errorquit_aftermutexcreate;
-    }
+    if (((err = socket_setnonblocking(ret, false)) != NError_Success) || ((err = nthread_mutex_lock(sockslistmutex)) != NError_Success))
+    { goto errorquit_aftermutexcreate; }
+    
+    if ((err = n_unorderedset_addelement(sockslist, &ret)) != NError_Success) goto errorquit_afterlocksockslistmtx;
+    SAFE_MUTEX_UNLOCK(sockslistmutex);
 
     *socket_ = ret;
     return NError_Success;
 
     // =============================================================================
 
+    errorquit_afterlocksockslistmtx:
+        SAFE_MUTEX_UNLOCK(sockslistmutex);
     errorquit_aftermutexcreate:
-        if (mutex_destroy(ret->mutex_nonblocking) != MUTEXERROR_SUCCESS)
-        { panic_general(GETLASTTRANSLATEDSYSERR(), "Unable to destroy internal socket mutex on cleanup when handling error."); }
+        if ((err = nthread_mutex_destroy(ret->mutex_nonblocking)) != NError_Success)
+        { panic_general(err, "Unable to destroy internal socket mutex on cleanup when handling error."); }
     errorquit_onmtxapierr:
         allocs.free(ret);
     errorquit_onalloc:
@@ -92,21 +82,23 @@ NError socket_open(Socket **socket_, SocketAddressFamily af, SocketType type, So
 NError socket_close(Socket *socket)
 {
     ENSURE_INIT;
-    if ((mutex_lock(sockslist_mutex)) != MUTEXERROR_SUCCESS) return NError_MutexAPIError;
 
-    NError err;
+    NError nerr = nthread_mutex_lock(sockslistmutex);
+    if (nerr != NError_Success) return nerr;
 
-    if (!sockslist_has(socket)) { err = NError_Fault; goto errorquit; }
+    if (!n_unorderedset_haselement(sockslist, &socket)) { nerr = NError_Fault; goto errorquit; }
 
-    if ((err = __closesocket(socket)) != NError_Success) goto errorquit;
+    if ((nerr = __closesocket(socket)) != NError_Success) goto errorquit;
 
-    sockslist_remove(socket);
-    SAFE_MUTEX_UNLOCK(sockslist_mutex);
+    if ((nerr = n_unorderedset_removeelement(sockslist, &socket)) != NError_Success)
+    { panic_general(nerr, "Unable to remove socket from internal sockets list after closing socket."); }
+
+    SAFE_MUTEX_UNLOCK(sockslistmutex);
     return NError_Success;
 
     errorquit:
-        SAFE_MUTEX_UNLOCK(sockslist_mutex);
-    return err;
+        SAFE_MUTEX_UNLOCK(sockslistmutex);
+    return nerr;
 }
 
 NError socket_listen(const Socket *socket, int backlog)
@@ -145,34 +137,24 @@ NError socket_accept(Socket **acceptedsocket, const Socket *socket, SocketAddres
     ret->protocol = socket->protocol;
     ret->desc = desc;
 
-    if (mutex_create(&ret->mutex_nonblocking) != MUTEXERROR_SUCCESS)
-    { err = NError_MutexAPIError; goto errorquit_onmtxapierr; }
+    if ((err = nthread_mutex_create(&ret->mutex_nonblocking)) != NError_Success) goto errorquit_onmtxapierr;
 
-    if ((err = socket_setnonblocking(ret, socket_isnonblocking(socket))) != NError_Success) goto errorquit_aftermutexcreate;
-
-    SocketsListError listerr = sockslist_add(ret);
-    if (listerr != SocketsListError_Success)
-    {
-        switch (listerr)
-        {
-            case SocketsListError_MemoryAllocationFailed:
-                err = NError_MemoryAllocationFailed;
-                break;
-
-            default:
-                err = NError_Fault;
-        }
-        goto errorquit_aftermutexcreate;
-    }
+    if (((err = socket_setnonblocking(ret, false)) != NError_Success) || ((err = nthread_mutex_lock(sockslistmutex)) != NError_Success))
+    { goto errorquit_aftermutexcreate; }
+    
+    if ((err = n_unorderedset_addelement(sockslist, &ret)) != NError_Success) goto errorquit_afterlocksockslistmtx;
+    SAFE_MUTEX_UNLOCK(sockslistmutex);
 
     *acceptedsocket = ret;
     return NError_Success;
 
     // =============================================================================
 
+    errorquit_afterlocksockslistmtx:
+        SAFE_MUTEX_UNLOCK(sockslistmutex);
     errorquit_aftermutexcreate:
-        if (mutex_destroy(ret->mutex_nonblocking) != MUTEXERROR_SUCCESS)
-        { panic_general(GETLASTTRANSLATEDSYSERR(), "Unable to destroy internal socket mutex on cleanup when handling error."); }
+        if ((err = nthread_mutex_destroy(ret->mutex_nonblocking)) != NError_Success)
+        { panic_general(err, "Unable to destroy internal socket mutex on cleanup when handling error."); }
     errorquit_onmtxapierr:
         allocs.free(ret);
     errorquit_onalloc:
@@ -220,7 +202,8 @@ NError socket_setnonblocking(Socket *socket, bool enable)
 {
     ENSURE_INIT;
 
-    if (mutex_lock(socket->mutex_nonblocking) != MUTEXERROR_SUCCESS) return NError_MutexAPIError;
+    NError nerr = nthread_mutex_lock(socket->mutex_nonblocking);
+    if (nerr != NError_Success) return nerr;
 
     #ifdef LIBSOCKET_OS_WINDOWS
         unsigned long val = enable;

@@ -71,10 +71,10 @@ NError __libsocket_closesocket(Socket *socket);
 #define __closesocket(...) (__libsocket_closesocket(__VA_ARGS__))
 
 #define SAFE_MUTEX_LOCK(mutex) \
-    { if (mutex_lock(mutex) != MUTEXERROR_SUCCESS) panic_general(NError_MutexAPIError, n_panicmsg_mutexlock); }
+    { NError nerr = nthread_mutex_lock(mutex); if (nerr != NError_Success) panic_general(nerr, n_panicmsg_mutexlock); }
 
 #define SAFE_MUTEX_UNLOCK(mutex) \
-    { if (mutex_unlock(mutex) != MUTEXERROR_SUCCESS) panic_general(NError_MutexAPIError, n_panicmsg_mutexunlock); }
+    { NError nerr = nthread_mutex_unlock(mutex); if (nerr != NError_Success) panic_general(nerr, n_panicmsg_mutexunlock); }
 
 // =============================================================================
 

@@ -36,8 +36,8 @@ NError __libsocket_closesocket(Socket *socket)
 {
     if (CLOSESOCKETDESC(socket->desc)) return GETLASTTRANSLATEDSYSERR();
 
-    if (mutex_destroy(socket->mutex_nonblocking) != MUTEXERROR_SUCCESS)
-    { panic_general(NError_MutexAPIError, "Unable to destroy mutex after closing socket descriptor."); }
+    NError nerr = nthread_mutex_destroy(socket->mutex_nonblocking);
+    if (nerr != NError_Success) panic_general(nerr, "Unable to destroy mutex after closing socket descriptor.");
 
     allocs.free(socket);
     return NError_Success;
@@ -49,7 +49,7 @@ void __libsocket_defaultpanichandler(const char *module, const char *file, long 
 
     fprintf(stderr, "In \"%s\" at line %lld (%s):\n", file, line, function);
 
-    if (error != PANIC_NOERRORCODE) fprintf(stderr, "    \"%s\" because\n    ", ncore_strerror(error));
+    if (error != PANIC_NOERRORCODE) fprintf(stderr, "    \"%s\" because\n    ", n_strerror(error));
 
     fprintf(stderr, "    %s\n\n###################\n\n", description);
 }
