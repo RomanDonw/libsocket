@@ -67,8 +67,10 @@ NError socket_open(Socket **socket_, SocketAddressFamily af, SocketType type, So
     errorquit_afterlocksockslistmtx:
         SAFE_MUTEX_UNLOCK(sockslistmutex);
     errorquit_aftermutexcreate:
-        if ((err = nthread_mutex_destroy(ret->mutex_nonblocking)) != NError_Success)
-        { panic_general(err, "Unable to destroy internal socket mutex on cleanup when handling error."); }
+        {
+            NError tmpnerr = nthread_mutex_destroy(ret->mutex_nonblocking);
+            if (tmpnerr != NError_Success) panic_general(tmpnerr, "Unable to destroy internal socket mutex on cleanup when handling error.");
+        }
     errorquit_onmtxapierr:
         allocs.free(ret);
     errorquit_onalloc:
@@ -152,12 +154,15 @@ NError socket_accept(Socket **acceptedsocket, const Socket *socket, SocketAddres
     errorquit_afterlocksockslistmtx:
         SAFE_MUTEX_UNLOCK(sockslistmutex);
     errorquit_aftermutexcreate:
-        if ((err = nthread_mutex_destroy(ret->mutex_nonblocking)) != NError_Success)
-        { panic_general(err, "Unable to destroy internal socket mutex on cleanup when handling error."); }
+        {
+            NError tmpnerr = nthread_mutex_destroy(ret->mutex_nonblocking);
+            if (tmpnerr != NError_Success) panic_general(tmpnerr, "Unable to destroy internal socket mutex on cleanup when handling error.");
+        }
     errorquit_onmtxapierr:
         allocs.free(ret);
     errorquit_onalloc:
-        CLOSESOCKETDESC(desc);
+        if (CLOSESOCKETDESC(desc))
+        { panic_general(GETLASTTRANSLATEDSYSERR(), "Unable to close socket descriptor on cleanup when handling error."); }
     errorquit_generic:
     return err;
 }
