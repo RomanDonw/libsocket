@@ -11,7 +11,7 @@
 
 #include <limits.h>
 #include <stddef.h>
-#include <libmutex.h>
+#include <libnthread.h>
 
 #ifdef LIBSOCKET_OS_WINDOWS
     #define CLAMPSIZET(x) ((size_t)x > INT_MAX ? (int)INT_MAX : (int)x)
@@ -27,6 +27,12 @@
 
 extern NMemoryAllocators __libsocket_allocators;
 #define allocs (__libsocket_allocators)
+
+extern NUnorderedSet *__libsocket_sockslist;
+#define sockslist (__libsocket_sockslist)
+
+extern NThreadMutex *__libsocket_sockslistmutex;
+#define sockslistmutex (__libsocket_sockslistmutex)
 
 // =============================================================================
 

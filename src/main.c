@@ -15,7 +15,6 @@
 #include "err.h"
 #include "util.h"
 #include "types.h"
-#include "sockslist.h"
 
 #ifndef LIBSOCKET_OS_WINDOWS
     #include <unistd.h>

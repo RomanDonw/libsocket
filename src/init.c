@@ -9,22 +9,22 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdatomic.h>
 #include <string.h>
+#include <libnthread.h>
 
 #include "err.h"
-#include "sockslist.h"
 #include "util.h"
 
-static atomic_bool inited = ATOMIC_VAR_INIT(false);
-static atomic_flag initfuncsbusyflag = ATOMIC_FLAG_INIT;
+static NThreadAtomicBool inited = NTHREAD_ATOMICBOOLINIT(false);
+static NThreadAtomicBool funcslock = NTHREAD_ATOMICBOOLINIT(false);
 
-bool libsocket_initialized(void) { return atomic_load(&inited); }
+bool libsocket_initialized(void) { return nthread_atomicbool_load(&inited); }
 
 NError libsocket_startup(const LibSocketStartupOptions *options, LibSocketStartupResults *results)
 {
-    if (atomic_flag_test_and_set(&initfuncsbusyflag)) return NError_OperationInProgress;
-    if (atomic_load(&inited)) { atomic_flag_clear(&initfuncsbusyflag); return NError_AlreadyInitialized; }
+    if (nthread_atomicbool_cmpxchgv(&funcslock, false, true)) return NError_OperationInProgress;
+    if (nthread_atomicbool_load(&inited)) { nthread_atomicbool_store(&funcslock, false); return NError_AlreadyInitialized; }
+    if (!libnthread_initialized()) { nthread_atomicbool_store(&funcslock, false); return NError_DependencyNotInitialized; }
 
     static const LibSocketStartupOptions defaultopts = LIBSOCKETSTARTUPOPTIONS_DEFAULTINIT;
     if (!options) options = &defaultopts;
@@ -43,12 +43,12 @@ NError libsocket_startup(const LibSocketStartupOptions *options, LibSocketStartu
     if (options->alerthandler) __alerthandler = options->alerthandler;
     else __alerthandler = __defaultalerthandler;
 
-    NError err;
-
     // =============================================================================
 
-    if (mutex_create(&sockslist_mutex) != MUTEXERROR_SUCCESS)
-    { err = NError_MutexAPIError; goto errorquit; }
+    NError nerr = n_unorderedset_create(&sockslist, allocs, sizeof(Socket *));
+    if (nerr != NError_Success) goto errorquit_generic;
+
+    if ((nerr = nthread_mutex_create(&sockslistmutex)) != NError_Success) goto errorquit_aftercreatesockslist;
 
     LibSocketStartupResults res = {0};
 
@@ -57,21 +57,21 @@ NError libsocket_startup(const LibSocketStartupOptions *options, LibSocketStartu
 
         WSADATA wsadata;
         int wsaerr = WSAStartup(winsock_version, &wsadata);
-        if (wsaerr) { err = translateerror(wsaerr); goto errorquit; }
+        if (wsaerr) { nerr = translateerror(wsaerr); goto errorquit_aftersockslistmtxcreate; }
 
         if (wsadata.wVersion != winsock_version)
         {
             if (WSACleanup()) panic_general(GETLASTTRANSLATEDSYSERR(), "WSACleanup error on cleanup while handling not matching WinSock versions.");
 
-            err = NError_WSAVersionNotSupported;
-            goto errorquit;
+            nerr = NError_WSAVersionNotSupported;
+            goto errorquit_aftersockslistmtxcreate;
         }
     #endif
 
     // =============================================================================
 
-    atomic_store(&inited, true);
-    atomic_flag_clear(&initfuncsbusyflag);
+    nthread_atomicbool_store(&inited, true);
+    nthread_atomicbool_store(&funcslock, false);
 
     if (results)
     {
@@ -92,34 +92,52 @@ NError libsocket_startup(const LibSocketStartupOptions *options, LibSocketStartu
 
     return NError_Success;
 
-    errorquit:
+    errorquit_aftersockslistmtxcreate:
+        if ((nerr = nthread_mutex_destroy(sockslistmutex)) != NError_Success) panic_general(nerr, "Unable to destroy mutex of sockets list during handling error.");
+        sockslistmutex = NULL;
+    errorquit_aftercreatesockslist:
+        n_unorderedset_destroy(sockslist);
+        sockslist = NULL;
+    errorquit_generic:
         __alerthandler = NULL;
         __panichandler = NULL;
         memset(&allocs, 0, sizeof(allocs));
-        atomic_flag_clear(&initfuncsbusyflag);
-    return err;
+    nthread_atomicbool_store(&funcslock, false);
+    return nerr;
 }
 
 NError libsocket_cleanup(void)
 {
-    if (atomic_flag_test_and_set(&initfuncsbusyflag)) return NError_OperationInProgress;
-    if (!atomic_load(&inited)) { atomic_flag_clear(&initfuncsbusyflag); return NError_NotInitialized; }
+    if (nthread_atomicbool_cmpxchgv(&funcslock, false, true)) return NError_OperationInProgress;
+    if (!nthread_atomicbool_load(&inited)) { nthread_atomicbool_store(&funcslock, false); return NError_NotInitialized; }
 
     // =============================================================================
+
+    NError nerr;
 
     #ifdef LIBSOCKET_OS_WINDOWS
         if (WSACleanup())
         {
-            atomic_flag_clear(&initfuncsbusyflag);
+            nthread_atomicbool_store(&funcslock, false);
             return GETLASTTRANSLATEDSYSERR();
         }
-
-        sockslist_removeall(false);
     #else
-        sockslist_removeall(true);
+        Socket *socket;
+        for (size_t i = 0; i < n_unorderedset_getlength(sockslist); i++)
+        {
+            if (((nerr = n_unorderedset_getelement(sockslist, i, &socket)) != NError_Success) || ((nerr = __closesocket(socket)) != NError_Success))
+            {
+                if (!i) { nthread_atomicbool_store(&funcslock, false); return nerr; }
+                panic_general(nerr, "Unable to close socket during library cleanup.");
+            }
+        }
     #endif
-    
-    if (mutex_destroy(sockslist_mutex) != MUTEXERROR_SUCCESS) panic_general(PANIC_NOERRORCODE, n_panicmsg_mutexdestroyduringlibrarycleanup);
+
+    n_unorderedset_destroy(sockslist);
+    sockslist = NULL;
+
+    if ((nerr = nthread_mutex_destroy(sockslistmutex)) != NError_Success) panic_general(nerr, n_panicmsg_mutexdestroyduringlibrarycleanup);
+    sockslistmutex = NULL;
 
     // =============================================================================
 
@@ -127,7 +145,7 @@ NError libsocket_cleanup(void)
     __panichandler = NULL;
     memset(&allocs, 0, sizeof(allocs));
 
-    atomic_store(&inited, false);
-    atomic_flag_clear(&initfuncsbusyflag);
+    nthread_atomicbool_store(&inited, false);
+    nthread_atomicbool_store(&funcslock, false);
     return NError_Success;
 }

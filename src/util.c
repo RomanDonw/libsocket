@@ -29,6 +29,8 @@ const IPv6Address IPV6ADDR_LOOPBACK = IN6ADDR_LOOPBACK_INIT;
 NMemoryAllocators __libsocket_allocators = {0};
 NPanicHandler *__libsocket_panichandler = NULL;
 NAlertHandler *__libsocket_alerthandler = NULL;
+NUnorderedSet *__libsocket_sockslist = NULL;
+NThreadMutex *__libsocket_sockslistmutex = NULL;
 
 NError __libsocket_closesocket(Socket *socket)
 {
