@@ -9,7 +9,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <libmutex.h>
 
 #include "init.h"
 #include "err.h"

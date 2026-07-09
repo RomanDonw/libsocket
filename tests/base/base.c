@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <libnthread.h>
 
 #ifdef LIBSOCKET_OS_WINDOWS
     #include <windows.h>
@@ -20,13 +21,17 @@ int main(void)
 {
     printf(" === TEST \"%s\" STARTED ===\n\n", testname);
 
-    NError err = libsocket_startup(NULL, NULL);
-    if (err != NError_Success) handlesockerror(err, "libsocket_startup");
+    NError err = libnthread_startup(NULL);
+    if (err != NError_Success) handlesockerror(err, "libnthread_startup");
+
+    if ((err = libsocket_startup(NULL, NULL)) != NError_Success) handlesockerror(err, "libsocket_startup");
 
     test();
 
     err = libsocket_cleanup();
     if (err != NError_Success) handlesockerror(err, "libsocket_cleanup");
+
+    if ((err = libnthread_cleanup()) != NError_Success) handlesockerror(err, "libnthread_cleanup");
 
     printf("\n === TEST \"%s\" PASSED ===\n", testname);
     return 0;
@@ -48,7 +53,7 @@ void testabort_c(const char *reason)
 
 void handlesockerror(NError err, const char *funcname)
 {
-    #define FMTLASTERR(buff, size) snprintf(buff, size, "%s error: %s.\n", funcname, socket_strerror(err))
+    #define FMTLASTERR(buff, size) snprintf(buff, size, "%s error: %s.\n", funcname, n_strerror(err))
 
     int len = FMTLASTERR(NULL, 0);
     if (len <= 0) testabort_c("handlesockerr internal error 1");
