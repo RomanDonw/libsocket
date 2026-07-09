@@ -8,16 +8,16 @@
 
 #include "util.h"
 
-static SocketError __getsockopt(SOCKETDESCRIPTOR desc, int level, int optname, void *optval, socklen_t optlen);
+static NError __getsockopt(SOCKETDESCRIPTOR desc, int level, int optname, void *optval, socklen_t optlen);
 static void __filloutopt(const void *value, size_t size, void *optval, size_t *optlen);
 
-SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, void *optval, size_t *optsize)
+NError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, void *optval, size_t *optsize)
 {
     ENSURE_INIT;
 
-    SocketError err;
+    NError err;
 
-    if (!optval || !optsize) return SocketError_Fault;
+    if (!optval || !optsize) return NError_Fault;
 
     switch (level)
     {
@@ -38,7 +38,7 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
                 case SocketOptionName_Socket_Linger:
                 {
                     struct linger ling;
-                    if ((err = __getsockopt(socket->desc, level, optname, &ling, sizeof(ling))) != SocketError_Success) return err;
+                    if ((err = __getsockopt(socket->desc, level, optname, &ling, sizeof(ling))) != NError_Success) return err;
 
                     /*
                         on Linux (by POSIX standard) 'l_linger' field has 'int' type, but in WinSock it has 'unsigned short' type,
@@ -53,7 +53,7 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
                     lingopts.linger = ling.l_linger;
 
                     __filloutopt(&lingopts, sizeof(lingopts), optval, optsize);
-                    return SocketError_Success;
+                    return NError_Success;
                 }
 
                 case SocketOptionName_Socket_RecvTimeout:
@@ -61,10 +61,10 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
                 {
                     uint32_t millis;
                     #ifdef LIBSOCKET_OS_WINDOWS
-                        if ((err = __getsockopt(socket->desc, level, optname, &millis, sizeof(millis))) != SocketError_Success) return err;
+                        if ((err = __getsockopt(socket->desc, level, optname, &millis, sizeof(millis))) != NError_Success) return err;
                     #else
                         struct timeval tv;
-                        if ((err = __getsockopt(socket->desc, level, optname, &tv, sizeof(tv))) != SocketError_Success) return err;
+                        if ((err = __getsockopt(socket->desc, level, optname, &tv, sizeof(tv))) != NError_Success) return err;
 
                         uint64_t usecs;
 
@@ -84,7 +84,7 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
                     #endif
 
                     __filloutopt(&millis, sizeof(millis), optval, optsize);
-                    return SocketError_Success;
+                    return NError_Success;
                 }
 
                 default:
@@ -123,10 +123,10 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
             break;
 
         default:
-            return SocketError_IncorrectArgumentValue;
+            return NError_IncorrectArgumentValue;
     }
 
-    return SocketError_UnsupportedProtocolOption;
+    return NError_UnsupportedProtocolOption;
 
     // =============================================================================
 
@@ -148,13 +148,13 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
         // =============================================================================
 
         handlebool:
-            if ((err = __getsockopt(socket->desc, level, optname, &val_dwint, sizeof(val_dwint))) != SocketError_Success) return err;
+            if ((err = __getsockopt(socket->desc, level, optname, &val_dwint, sizeof(val_dwint))) != NError_Success) return err;
             value.boolean = val_dwint;
             value_realsize = sizeof(value.boolean);
         goto filloptval;
         
         handleint:
-            if ((err = __getsockopt(socket->desc, level, optname, &val_dwint, sizeof(val_dwint))) != SocketError_Success) return err;
+            if ((err = __getsockopt(socket->desc, level, optname, &val_dwint, sizeof(val_dwint))) != NError_Success) return err;
             
             #ifdef LIBSOCKET_OS_WINDOWS
                 if (val_dwint > INT_MAX) goto varoverflowerr;
@@ -165,7 +165,7 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
         goto filloptval;
             
         handleuint8:
-            if ((err = __getsockopt(socket->desc, level, optname, &val_dwint, sizeof(val_dwint))) != SocketError_Success) return err;
+            if ((err = __getsockopt(socket->desc, level, optname, &val_dwint, sizeof(val_dwint))) != NError_Success) return err;
 
             if (val_dwint > UINT8_MAX) goto varoverflowerr;
             #ifndef LIBSOCKET_OS_WINDOWS
@@ -180,27 +180,27 @@ SocketError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketO
         
         filloptval:
             __filloutopt(&value, value_realsize, optval, optsize);
-        return SocketError_Success;
+        return NError_Success;
 
         // =============================================================================
         
         varoverflowerr:
             alert("Got internal size overflow in socket_getopt with params: level=%i, optname=%i.", level, optname);
-        return SocketError_InternalVariableOverflow;
+        return NError_InternalVariableOverflow;
     }
 }
 
-static SocketError __getsockopt(SOCKETDESCRIPTOR desc, int level, int optname, void *optval, socklen_t optlen)
+static NError __getsockopt(SOCKETDESCRIPTOR desc, int level, int optname, void *optval, socklen_t optlen)
 {
     socklen_t realoptlen = optlen;
     if (getsockopt(desc, level, optname, optval, &realoptlen)) return GETLASTTRANSLATEDSYSERR();
     if (realoptlen != optlen)
     {
         alert("Got internal size mismatch in __getsockopt with params: level=%i, optname=%i.", level, optname);
-        return SocketError_InternalSizeMismatch;
+        return NError_InternalSizeMismatch;
     }
 
-    return SocketError_Success;
+    return NError_Success;
 }
 
 static void __filloutopt(const void *value, size_t size, void *optval, size_t *optsize)

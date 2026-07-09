@@ -16,9 +16,9 @@
 #include "err.h"
 #include "util.h"
 
-static SocketError translateeaierror(int err);
+static NError translateeaierror(int err);
 
-SocketError socket_getaddrinfo(const char *nodename, const char *servicename, const SocketDNSRequest *request, SocketDNSResponse **response)
+NError socket_getaddrinfo(const char *nodename, const char *servicename, const SocketDNSRequest *request, SocketDNSResponse **response)
 {
     ENSURE_INIT;
     
@@ -44,8 +44,8 @@ SocketError socket_getaddrinfo(const char *nodename, const char *servicename, co
 
     struct addrinfo *result;
     {
-        SocketError err = translateeaierror(getaddrinfo(nodename, servicename, hints, &result));
-        if (err != SocketError_Success) return err;
+        NError err = translateeaierror(getaddrinfo(nodename, servicename, hints, &result));
+        if (err != NError_Success) return err;
     }
 
     SocketDNSResponse *firstresp = NULL;
@@ -110,12 +110,12 @@ SocketError socket_getaddrinfo(const char *nodename, const char *servicename, co
         allocfail_resp:
             freeaddrinfo(result);
             socket_freeaddrinfo(firstresp);
-            return SocketError_MemoryAllocationFailed;
+            return NError_MemoryAllocationFailed;
     }
 
     freeaddrinfo(result);
     *response = firstresp;
-    return SocketError_Success;
+    return NError_Success;
 }
 
 void socket_freeaddrinfo(SocketDNSResponse *response)
@@ -132,12 +132,12 @@ void socket_freeaddrinfo(SocketDNSResponse *response)
     }
 }
 
-SocketError socket_getnameinfo(const SocketIPAddressInterface *sockaddr, socklen_t sockaddrlen, char *hostname, size_t *hostnamesize, char *servicename, size_t *servicenamesize, SocketGetNameInfoFlags flags)
+NError socket_getnameinfo(const SocketIPAddressInterface *sockaddr, socklen_t sockaddrlen, char *hostname, size_t *hostnamesize, char *servicename, size_t *servicenamesize, SocketGetNameInfoFlags flags)
 {
     ENSURE_INIT;
-    SocketError err;
+    NError err;
 
-    if (!hostnamesize && !servicenamesize) return SocketError_IncorrectArgumentValue;
+    if (!hostnamesize && !servicenamesize) return NError_IncorrectArgumentValue;
 
     int intrflags = 0;
     if (flags & SOCKET_NI_FLAG_NOFQDN) intrflags |= NI_NOFQDN;
@@ -148,7 +148,7 @@ SocketError socket_getnameinfo(const SocketIPAddressInterface *sockaddr, socklen
 
     char host[NI_MAXHOST];
     char serv[NI_MAXSERV];
-    if ((err = translateeaierror(getnameinfo(sockaddr, sockaddrlen, host, sizeof(host), serv, sizeof(serv), intrflags))) != SocketError_Success) return err;
+    if ((err = translateeaierror(getnameinfo(sockaddr, sockaddrlen, host, sizeof(host), serv, sizeof(serv), intrflags))) != NError_Success) return err;
     size_t hostlen = strlen(host);
     size_t servlen = strlen(serv);
 
@@ -172,43 +172,43 @@ SocketError socket_getnameinfo(const SocketIPAddressInterface *sockaddr, socklen
         *servicenamesize = servlen + 1;
     }
     
-    return SocketError_Success;
+    return NError_Success;
 }
 
-static SocketError translateeaierror(int err)
+static NError translateeaierror(int err)
 {
     switch (err)
     {
         case 0:
-            return SocketError_Success;
+            return NError_Success;
 
         case EAI_AGAIN:
-            return SocketError_DNSTemporaryError;
+            return NError_DNSTemporaryError;
 
         case EAI_NONAME:
-            return SocketError_DNSHostNotFound;
+            return NError_DNSHostNotFound;
 
         case EAI_SERVICE:
-            return SocketError_DNSUnsupportedServiceName;
+            return NError_DNSUnsupportedServiceName;
 
         case EAI_SOCKTYPE:
-            return SocketError_UnsupportedSocketType;
+            return NError_UnsupportedSocketType;
 
         case EAI_MEMORY:
-            return SocketError_MemoryAllocationFailed;
+            return NError_MemoryAllocationFailed;
 
         case EAI_FAMILY:
-            return SocketError_UnsupportedAddressFamily;
+            return NError_UnsupportedAddressFamily;
 
         case EAI_FAIL:
-            return SocketError_DNSFailure;
+            return NError_DNSFailure;
 
         case EAI_BADFLAGS:
-            return SocketError_BadFlags;
+            return NError_BadFlags;
 
         #ifdef EAI_OVERFLOW
             case EAI_OVERFLOW:
-                return SocketError_InsufficientBufferSize;
+                return NError_InsufficientBufferSize;
         #endif
 
         #ifdef EAI_SYSTEM
@@ -218,6 +218,6 @@ static SocketError translateeaierror(int err)
 
         default:
             alert("Got unhandled IETF (getaddrinfo/getnameinfo) error: %i.", err);
-            return SocketError_InternalUnknownError;
+            return NError_InternalUnknownError;
     }
 }

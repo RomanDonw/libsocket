@@ -11,7 +11,7 @@
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
-static SocketError err;
+static NError err;
 
 const char *testname = "socket_getaddrinfo & socket_getnameinfo test";
 
@@ -23,7 +23,7 @@ static size_t ipaddrstrsize = 0;
 void printdnsinfo(const char *nodename, const char *servicename, const SocketDNSRequest *req)
 {
     SocketDNSResponse *resps;
-    if ((err = socket_getaddrinfo(nodename, servicename, req, &resps)) != SocketError_Success) handlesockerror(err, "socket_getaddrinfo");
+    if ((err = socket_getaddrinfo(nodename, servicename, req, &resps)) != NError_Success) handlesockerror(err, "socket_getaddrinfo");
 
     printf("======================================\n   node: %s, service: %s\n======================================\n", nodename, servicename);
 
@@ -94,9 +94,9 @@ void printdnsinfo(const char *nodename, const char *servicename, const SocketDNS
         if (currresp->sockaddr && currresp->sockaddrlen)
         {
             static unsigned short port;
-            if ((err = socket_unpacksockipaddr(currresp->sockaddr, currresp->af, ipaddrbuff, &port)) != SocketError_Success) handlesockerror(err, "socket_unpacksockaddr");
+            if ((err = socket_unpacksockipaddr(currresp->sockaddr, currresp->af, ipaddrbuff, &port)) != NError_Success) handlesockerror(err, "socket_unpacksockaddr");
 
-            if ((err = socket_ipaddrtostr(ipaddrbuff, currresp->af, ipaddrstrbuff, ipaddrstrsize)) != SocketError_Success) handlesockerror(err, "socket_addrtostr");
+            if ((err = socket_ipaddrtostr(ipaddrbuff, currresp->af, ipaddrstrbuff, ipaddrstrsize)) != NError_Success) handlesockerror(err, "socket_addrtostr");
 
             printf(" -  Address: [%s]:%u\n", ipaddrstrbuff, port);
         }
@@ -138,14 +138,14 @@ void test(void)
 
     SocketIPv4Address saddr;
     IPv4Address addr4 = IPV4ADDR_INIT(IPV4ADDR_PACK(127, 0, 0, 1));
-    if ((err = socket_packsockipaddr(&saddr, SocketAddressFamily_IPv4, &addr4, 9418)) != SocketError_Success) handlesockerror(err, "socket_packsockaddr");
+    if ((err = socket_packsockipaddr(&saddr, SocketAddressFamily_IPv4, &addr4, 9418)) != NError_Success) handlesockerror(err, "socket_packsockaddr");
 
     size_t hostnamesz = 0, servicesz = 0;
-    if ((err = socket_getnameinfo(&saddr, sizeof(saddr), NULL, &hostnamesz, NULL, &servicesz, SOCKET_NI_NOFLAGS)) != SocketError_Success) handlesockerror(err, "socket_getnameinfo");
+    if ((err = socket_getnameinfo(&saddr, sizeof(saddr), NULL, &hostnamesz, NULL, &servicesz, SOCKET_NI_NOFLAGS)) != NError_Success) handlesockerror(err, "socket_getnameinfo");
 
     char *hostname = malloc_s(hostnamesz);
     char *servicename = malloc_s(servicesz);
-    if ((err = socket_getnameinfo(&saddr, sizeof(saddr), hostname, &hostnamesz, servicename, &servicesz, SOCKET_NI_NOFLAGS)) != SocketError_Success) handlesockerror(err, "socket_getnameinfo");
+    if ((err = socket_getnameinfo(&saddr, sizeof(saddr), hostname, &hostnamesz, servicename, &servicesz, SOCKET_NI_NOFLAGS)) != NError_Success) handlesockerror(err, "socket_getnameinfo");
 
     printf("127.0.0.1:9418 resolved to (host | service): %s | %s.\n", hostname, servicename);
 

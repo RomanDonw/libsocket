@@ -81,9 +81,9 @@ void __libsocket_sockslist_removeall(bool closesocks)
 {
     SAFE_MUTEX_LOCK(sockslist_mutex);
     
-    SocketError err;
+    NError err;
 
-    if (closesocks) for (size_t i = 0; i < sockets_count; i++) if (( err = __closesocket(sockets[i])) != SocketError_Success)
+    if (closesocks) for (size_t i = 0; i < sockets_count; i++) if (( err = __closesocket(sockets[i])) != NError_Success)
     { panic_general(err, "Unable to close socket successfully in critical section."); }
 
     allocs.free(sockets);

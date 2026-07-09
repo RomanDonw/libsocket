@@ -20,13 +20,13 @@ int main(void)
 {
     printf(" === TEST \"%s\" STARTED ===\n\n", testname);
 
-    SocketError err = libsocket_startup(NULL, NULL);
-    if (err != SocketError_Success) handlesockerror(err, "libsocket_startup");
+    NError err = libsocket_startup(NULL, NULL);
+    if (err != NError_Success) handlesockerror(err, "libsocket_startup");
 
     test();
 
     err = libsocket_cleanup();
-    if (err != SocketError_Success) handlesockerror(err, "libsocket_cleanup");
+    if (err != NError_Success) handlesockerror(err, "libsocket_cleanup");
 
     printf("\n === TEST \"%s\" PASSED ===\n", testname);
     return 0;
@@ -46,7 +46,7 @@ void testabort_c(const char *reason)
     exit(0);
 }
 
-void handlesockerror(SocketError err, const char *funcname)
+void handlesockerror(NError err, const char *funcname)
 {
     #define FMTLASTERR(buff, size) snprintf(buff, size, "%s error: %s.\n", funcname, socket_strerror(err))
 

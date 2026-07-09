@@ -25,62 +25,50 @@
     #define CLOSESOCKETDESC(descr) (close(descr))
 #endif
 
-extern LibSocketAllocators __libsocket_allocators;
+extern NMemoryAllocators __libsocket_allocators;
 #define allocs (__libsocket_allocators)
 
 // =============================================================================
 
-extern LibSocketPanicHandler *__libsocket_panichandler;
+extern NPanicHandler *__libsocket_panichandler;
 #define __panichandler (__libsocket_panichandler)
 
-LibSocketPanicHandler __libsocket_defaultpanichandler;
+NPanicHandler __libsocket_defaultpanichandler;
 #define __defaultpanichandler (__libsocket_defaultpanichandler)
 
 
-#define PANIC_NOERRORCODE (SocketError_Success)
+#define PANIC_NOERRORCODE (NError_Success)
 
-#define __PANICINFOBASE(errcode, _description) \
-    .file = __FILE__,\
-    .line = __LINE__,\
-    .function = __func__,\
-    .description = (_description),\
-    .error = (errcode)
-
-#define __PANICBASE(panicinfo_initializer) \
+#define panic_general(errorcode, description) \
     {\
-        const LibSocketPanicInfo info = { panicinfo_initializer };\
-        __panichandler(&info);\
+        __panichandler(LIBSOCKET_MODULENAME, __FILE__, __LINE__, __func__, (description), (errorcode));\
         abort();\
     }
 
-#define panic_general(errcode, description) __PANICBASE(__PANICINFOBASE(errcode, description))
-
 // =============================================================================
 
-extern LibSocketAlertHandler *__libsocket_alerthandler;
+extern NAlertHandler *__libsocket_alerthandler;
 #define __alerthandler (__libsocket_alerthandler)
 
-LibSocketAlertHandler __libsocket_defaultalerthandler;
+NAlertHandler __libsocket_defaultalerthandler;
 #define __defaultalerthandler (__libsocket_defaultalerthandler)
 
 #ifdef LIBSOCKET_DEBUG
-    #define alert(format, ...) (__alerthandler(__FILE__, __LINE__, __func__, format, __VA_ARGS__))
+    #define alert(format, ...) (__alerthandler(LIBSOCKET_MODULENAME, __FILE__, __LINE__, __func__, format, __VA_ARGS__))
 #else
     #define alert(format, ...)
 #endif
 
 // =============================================================================
 
-SocketError __libsocket_closesocket(Socket *socket);
+NError __libsocket_closesocket(Socket *socket);
 #define __closesocket(...) (__libsocket_closesocket(__VA_ARGS__))
 
-extern const char *__libsocket_panicmsg_unabletolockmtx;
 #define SAFE_MUTEX_LOCK(mutex) \
-    { if (mutex_lock(mutex) != MUTEXERROR_SUCCESS) panic_general(SocketError_MutexAPIError, __libsocket_panicmsg_unabletolockmtx); }
+    { if (mutex_lock(mutex) != MUTEXERROR_SUCCESS) panic_general(NError_MutexAPIError, n_panicmsg_mutexlock); }
 
-extern const char *__libsocket_panicmsg_unabletounlockmtx;
 #define SAFE_MUTEX_UNLOCK(mutex) \
-    { if (mutex_unlock(mutex) != MUTEXERROR_SUCCESS) panic_general(SocketError_MutexAPIError, __libsocket_panicmsg_unabletounlockmtx); }
+    { if (mutex_unlock(mutex) != MUTEXERROR_SUCCESS) panic_general(NError_MutexAPIError, n_panicmsg_mutexunlock); }
 
 // =============================================================================
 

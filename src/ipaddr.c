@@ -17,16 +17,16 @@
     #include <arpa/inet.h>
 #endif
 
-SocketError socket_parseipaddr(IPAddressInterface *addr, SocketAddressFamily af, const char *straddr)
+NError socket_parseipaddr(IPAddressInterface *addr, SocketAddressFamily af, const char *straddr)
 {
     ENSURE_INIT;
     int ret = inet_pton(af, straddr, addr);
-    if (ret == 0) return SocketError_ParsingAddressFailed;
+    if (ret == 0) return NError_ParsingAddressFailed;
     if (ret == -1) return GETLASTTRANSLATEDSYSERR();
-    return SocketError_Success;
+    return NError_Success;
 }
 
-SocketError socket_ipaddrtostr(const IPAddressInterface *addr, SocketAddressFamily af, char *straddr, socklen_t size)
+NError socket_ipaddrtostr(const IPAddressInterface *addr, SocketAddressFamily af, char *straddr, socklen_t size)
 {
     ENSURE_INIT;
 
@@ -34,10 +34,10 @@ SocketError socket_ipaddrtostr(const IPAddressInterface *addr, SocketAddressFami
     {
         int err = GETLASTERROR();
         #ifdef LIBSOCKET_OS_WINDOWS
-            if (err == SOCKERR_INVAL) return SocketError_NoSpaceLeft;
+            if (err == SOCKERR_INVAL) return NError_NoSpaceLeft;
         #endif
             return translateerror(err);
     }
 
-    return SocketError_Success;
+    return NError_Success;
 }

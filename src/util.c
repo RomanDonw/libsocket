@@ -17,6 +17,8 @@
     #include <unistd.h>
 #endif
 
+const char *LIBSOCKET_MODULENAME = "libsocket";
+
 const IPv4Address IPV4ADDR_ANY = IPV4ADDR_INIT(INADDR_ANY);
 const IPv4Address IPV4ADDR_LOOPBACK = IPV4ADDR_INIT(INADDR_LOOPBACK);
 const IPv4Address IPV4ADDR_BROADCAST = IPV4ADDR_INIT(INADDR_BROADCAST);
@@ -24,36 +26,33 @@ const IPv4Address IPV4ADDR_BROADCAST = IPV4ADDR_INIT(INADDR_BROADCAST);
 const IPv6Address IPV6ADDR_ANY = IN6ADDR_ANY_INIT;
 const IPv6Address IPV6ADDR_LOOPBACK = IN6ADDR_LOOPBACK_INIT;
 
-LibSocketAllocators __libsocket_allocators = {0};
-LibSocketPanicHandler *__libsocket_panichandler = NULL;
-LibSocketAlertHandler *__libsocket_alerthandler = NULL;
+NMemoryAllocators __libsocket_allocators = {0};
+NPanicHandler *__libsocket_panichandler = NULL;
+NAlertHandler *__libsocket_alerthandler = NULL;
 
-const char *__libsocket_panicmsg_unabletolockmtx = "Unable to lock mutex in critical library section.";
-const char *__libsocket_panicmsg_unabletounlockmtx = "Unable to unlock mutex in critical library section.";
-
-SocketError __libsocket_closesocket(Socket *socket)
+NError __libsocket_closesocket(Socket *socket)
 {
     if (CLOSESOCKETDESC(socket->desc)) return GETLASTTRANSLATEDSYSERR();
 
     if (mutex_destroy(socket->mutex_nonblocking) != MUTEXERROR_SUCCESS)
-    { panic_general(SocketError_MutexAPIError, "Unable to destroy mutex after closing socket descriptor."); }
+    { panic_general(NError_MutexAPIError, "Unable to destroy mutex after closing socket descriptor."); }
 
     allocs.free(socket);
-    return SocketError_Success;
+    return NError_Success;
 }
 
-void __libsocket_defaultpanichandler(const LibSocketPanicInfo *info)
+void __libsocket_defaultpanichandler(const char *module, const char *file, long long line, const char *function, const char *description, NError error)
 {
     fprintf(stderr, "\n\n\n###################\n# LIBSOCKET PANIC #\n###################\n\n");
 
-    fprintf(stderr, "In \"%s\" at line %lld (%s):\n", info->file, info->line, info->function);
+    fprintf(stderr, "In \"%s\" at line %lld (%s):\n", file, line, function);
 
-    if (info->error != PANIC_NOERRORCODE) fprintf(stderr, "    \"%s\" because\n    ", socket_strerror(info->error));
+    if (error != PANIC_NOERRORCODE) fprintf(stderr, "    \"%s\" because\n    ", ncore_strerror(error));
 
-    fprintf(stderr, "    %s\n\n###################\n\n", info->description);
+    fprintf(stderr, "    %s\n\n###################\n\n", description);
 }
 
-void __libsocket_defaultalerthandler(const char *file, long long line, const char *function, const char *format, ...)
+void __libsocket_defaultalerthandler(const char *module, const char *file, long long line, const char *function, const char *format, ...)
 {
     va_list args;
     va_start(args, format);

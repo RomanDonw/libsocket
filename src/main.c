@@ -25,21 +25,21 @@
     #include <fcntl.h>
 #endif
 
-SocketError socket_open(Socket **socket_, SocketAddressFamily af, SocketType type, SocketProtocol protocol)
+NError socket_open(Socket **socket_, SocketAddressFamily af, SocketType type, SocketProtocol protocol)
 {
     ENSURE_INIT;
-    SocketError err;
+    NError err;
 
     // =============================================================================
     
     if (af != SocketAddressFamily_IPv4 && af != SocketAddressFamily_IPv6)
-    { err = SocketError_UnsupportedAddressFamily; goto errorquit_generic; }
+    { err = NError_UnsupportedAddressFamily; goto errorquit_generic; }
 
     if (type != SocketType_Stream && type != SocketType_Datagram)
-    { err = SocketError_UnsupportedSocketType; goto errorquit_generic; }
+    { err = NError_UnsupportedSocketType; goto errorquit_generic; }
 
     if (protocol != SocketProtocol_Unspecified && protocol != SocketProtocol_TCP && protocol != SocketProtocol_UDP)
-    { err = SocketError_UnsupportedProtocol; goto errorquit_generic; }
+    { err = NError_UnsupportedProtocol; goto errorquit_generic; }
 
     // =============================================================================
 
@@ -47,16 +47,16 @@ SocketError socket_open(Socket **socket_, SocketAddressFamily af, SocketType typ
     if (desc == INVALID_SOCKET) { err = GETLASTTRANSLATEDSYSERR(); goto errorquit_generic; }
 
     Socket *ret = allocs.malloc(sizeof(Socket));
-    if (!ret) { err = SocketError_MemoryAllocationFailed; goto errorquit_onalloc; }
+    if (!ret) { err = NError_MemoryAllocationFailed; goto errorquit_onalloc; }
     ret->af = af;
     ret->type = type;
     ret->protocol = protocol;
     ret->desc = desc;
 
     if (mutex_create(&ret->mutex_nonblocking) != MUTEXERROR_SUCCESS)
-    { err = SocketError_MutexAPIError; goto errorquit_onmtxapierr; }
+    { err = NError_MutexAPIError; goto errorquit_onmtxapierr; }
 
-    if ((err = socket_setnonblocking(ret, false)) != SocketError_Success) goto errorquit_aftermutexcreate;
+    if ((err = socket_setnonblocking(ret, false)) != NError_Success) goto errorquit_aftermutexcreate;
 
     SocketsListError listerr = sockslist_add(ret);
     if (listerr != SocketsListError_Success)
@@ -64,17 +64,17 @@ SocketError socket_open(Socket **socket_, SocketAddressFamily af, SocketType typ
         switch (listerr)
         {
             case SocketsListError_MemoryAllocationFailed:
-                err = SocketError_MemoryAllocationFailed;
+                err = NError_MemoryAllocationFailed;
                 break;
 
             default:
-                err = SocketError_Fault;
+                err = NError_Fault;
         }
         goto errorquit_aftermutexcreate;
     }
 
     *socket_ = ret;
-    return SocketError_Success;
+    return NError_Success;
 
     // =============================================================================
 
@@ -90,66 +90,66 @@ SocketError socket_open(Socket **socket_, SocketAddressFamily af, SocketType typ
     return err;
 }
 
-SocketError socket_close(Socket *socket)
+NError socket_close(Socket *socket)
 {
     ENSURE_INIT;
-    if ((mutex_lock(sockslist_mutex)) != MUTEXERROR_SUCCESS) return SocketError_MutexAPIError;
+    if ((mutex_lock(sockslist_mutex)) != MUTEXERROR_SUCCESS) return NError_MutexAPIError;
 
-    SocketError err;
+    NError err;
 
-    if (!sockslist_has(socket)) { err = SocketError_Fault; goto errorquit; }
+    if (!sockslist_has(socket)) { err = NError_Fault; goto errorquit; }
 
-    if ((err = __closesocket(socket)) != SocketError_Success) goto errorquit;
+    if ((err = __closesocket(socket)) != NError_Success) goto errorquit;
 
     sockslist_remove(socket);
     SAFE_MUTEX_UNLOCK(sockslist_mutex);
-    return SocketError_Success;
+    return NError_Success;
 
     errorquit:
         SAFE_MUTEX_UNLOCK(sockslist_mutex);
     return err;
 }
 
-SocketError socket_listen(const Socket *socket, int backlog)
+NError socket_listen(const Socket *socket, int backlog)
 {
     ENSURE_INIT;
     if (listen(socket->desc, backlog)) return GETLASTTRANSLATEDSYSERR();
-    return SocketError_Success;
+    return NError_Success;
 }
 
-SocketError socket_connect(const Socket *socket, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen)
+NError socket_connect(const Socket *socket, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen)
 {
     ENSURE_INIT;
     if (connect(socket->desc, (struct sockaddr *)sockaddr, sockaddrlen)) return GETLASTTRANSLATEDSYSERR();
-    return SocketError_Success;
+    return NError_Success;
 }
 
-SocketError socket_bind(const Socket *socket, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen)
+NError socket_bind(const Socket *socket, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen)
 {
     ENSURE_INIT;
     if (bind(socket->desc, (struct sockaddr *)sockaddr, sockaddrlen)) return GETLASTTRANSLATEDSYSERR();
-    return SocketError_Success;
+    return NError_Success;
 }
 
-SocketError socket_accept(Socket **acceptedsocket, const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen)
+NError socket_accept(Socket **acceptedsocket, const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen)
 {
     ENSURE_INIT;
-    SocketError err;
+    NError err;
 
     SOCKETDESCRIPTOR desc = accept(socket->desc, sockaddr, sockaddrlen);
     if (desc == INVALID_SOCKET) { err = GETLASTTRANSLATEDSYSERR(); goto errorquit_generic; }
 
     Socket *ret = allocs.malloc(sizeof(Socket));
-    if (!ret) { err = SocketError_MemoryAllocationFailed; goto errorquit_onalloc; }
+    if (!ret) { err = NError_MemoryAllocationFailed; goto errorquit_onalloc; }
     ret->af = socket->af;
     ret->type = socket->type;
     ret->protocol = socket->protocol;
     ret->desc = desc;
 
     if (mutex_create(&ret->mutex_nonblocking) != MUTEXERROR_SUCCESS)
-    { err = SocketError_MutexAPIError; goto errorquit_onmtxapierr; }
+    { err = NError_MutexAPIError; goto errorquit_onmtxapierr; }
 
-    if ((err = socket_setnonblocking(ret, socket_isnonblocking(socket))) != SocketError_Success) goto errorquit_aftermutexcreate;
+    if ((err = socket_setnonblocking(ret, socket_isnonblocking(socket))) != NError_Success) goto errorquit_aftermutexcreate;
 
     SocketsListError listerr = sockslist_add(ret);
     if (listerr != SocketsListError_Success)
@@ -157,17 +157,17 @@ SocketError socket_accept(Socket **acceptedsocket, const Socket *socket, SocketA
         switch (listerr)
         {
             case SocketsListError_MemoryAllocationFailed:
-                err = SocketError_MemoryAllocationFailed;
+                err = NError_MemoryAllocationFailed;
                 break;
 
             default:
-                err = SocketError_Fault;
+                err = NError_Fault;
         }
         goto errorquit_aftermutexcreate;
     }
 
     *acceptedsocket = ret;
-    return SocketError_Success;
+    return NError_Success;
 
     // =============================================================================
 
@@ -187,18 +187,18 @@ SocketError socket_accept(Socket **acceptedsocket, const Socket *socket, SocketA
     ssize_t procbytes = (func);\
     if (procbytes < 0) return GETLASTTRANSLATEDSYSERR();\
     if (processedbytes) *processedbytes = procbytes;\
-    return SocketError_Success;
+    return NError_Success;
 
-SocketError socket_recv(const Socket *socket, void *buffer, size_t len, size_t *processedbytes, int flags)
+NError socket_recv(const Socket *socket, void *buffer, size_t len, size_t *processedbytes, int flags)
 { SOCKIOFUNCPROTO(recv(socket->desc, buffer, CLAMPSIZET(len), flags)) }
 
-SocketError socket_recvfrom(const Socket *socket, void *buffer, size_t len, size_t *processedbytes, int flags, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen)
+NError socket_recvfrom(const Socket *socket, void *buffer, size_t len, size_t *processedbytes, int flags, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen)
 { SOCKIOFUNCPROTO(recvfrom(socket->desc, buffer, CLAMPSIZET(len), flags, (struct sockaddr *)sockaddr, sockaddrlen)) }
 
-SocketError socket_send(const Socket *socket, const void *data, size_t len, size_t *processedbytes, int flags)
+NError socket_send(const Socket *socket, const void *data, size_t len, size_t *processedbytes, int flags)
 { SOCKIOFUNCPROTO(send(socket->desc, data, CLAMPSIZET(len), flags)) }
 
-SocketError socket_sendto(const Socket *socket, const void *buffer, size_t len, size_t *processedbytes, int flags, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen)
+NError socket_sendto(const Socket *socket, const void *buffer, size_t len, size_t *processedbytes, int flags, const SocketAddressInterface *sockaddr, socklen_t sockaddrlen)
 { SOCKIOFUNCPROTO(sendto(socket->desc, buffer, CLAMPSIZET(len), flags, (const struct sockaddr *)sockaddr, sockaddrlen)) }
 
 #undef SOCKIOFUNCPROTO
@@ -217,11 +217,11 @@ bool socket_isnonblocking(const Socket *socket)
     return ret;
 }
 
-SocketError socket_setnonblocking(Socket *socket, bool enable)
+NError socket_setnonblocking(Socket *socket, bool enable)
 {
     ENSURE_INIT;
 
-    if (mutex_lock(socket->mutex_nonblocking) != MUTEXERROR_SUCCESS) return SocketError_MutexAPIError;
+    if (mutex_lock(socket->mutex_nonblocking) != MUTEXERROR_SUCCESS) return NError_MutexAPIError;
 
     #ifdef LIBSOCKET_OS_WINDOWS
         unsigned long val = enable;
@@ -238,14 +238,14 @@ SocketError socket_setnonblocking(Socket *socket, bool enable)
     socket->nonblocking = enable;
 
     SAFE_MUTEX_UNLOCK(socket->mutex_nonblocking);
-    return SocketError_Success;
+    return NError_Success;
 
     errorquit:
         SAFE_MUTEX_UNLOCK(socket->mutex_nonblocking);
     return GETLASTTRANSLATEDSYSERR();
 }
 
-SocketError socket_getreadablebytes(const Socket *socket, size_t *availbytes)
+NError socket_getreadablebytes(const Socket *socket, size_t *availbytes)
 {
     ENSURE_INIT;
 
@@ -257,7 +257,7 @@ SocketError socket_getreadablebytes(const Socket *socket, size_t *availbytes)
     if (IOCTLSOCKET(socket->desc, FIONREAD, &val)) return GETLASTTRANSLATEDSYSERR();
     
     *availbytes = val;
-    return SocketError_Success;
+    return NError_Success;
 }
 
 #ifdef LIBSOCKET_OS_WINDOWS
@@ -266,7 +266,7 @@ SocketError socket_getreadablebytes(const Socket *socket, size_t *availbytes)
     #define SHUT_RDWR SD_BOTH
 #endif
 
-SocketError socket_shutdown(const Socket *socket, SocketShutdownFlags flags)
+NError socket_shutdown(const Socket *socket, SocketShutdownFlags flags)
 {
     ENSURE_INIT;
 
@@ -288,25 +288,25 @@ SocketError socket_shutdown(const Socket *socket, SocketShutdownFlags flags)
 
     if (shutdown(socket->desc, mode)) return GETLASTTRANSLATEDSYSERR();
 
-    return SocketError_Success;
+    return NError_Success;
 }
 
 SocketAddressFamily socket_getaf(const Socket *socket) { return socket->af; }
 SocketType socket_gettype(const Socket *socket) { return socket->type; }
 SocketProtocol socket_getprotocol(const Socket *socket) { return socket->protocol; }
 
-SocketError socket_getpeername(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size)
+NError socket_getpeername(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size)
 {
     ENSURE_INIT;
     if (getpeername(socket->desc, (struct sockaddr *)sockaddr, size)) return GETLASTTRANSLATEDSYSERR();
-    return SocketError_Success;
+    return NError_Success;
 }
 
-SocketError socket_getsockname(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size)
+NError socket_getsockname(const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *size)
 {
     ENSURE_INIT;
     if (getsockname(socket->desc, (struct sockaddr *)sockaddr, size)) return GETLASTTRANSLATEDSYSERR();
-    return SocketError_Success;
+    return NError_Success;
 }
 
 SOCKETDESCRIPTOR socket_gethandle(const Socket *socket) { return socket->desc; }

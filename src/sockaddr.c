@@ -16,7 +16,7 @@
 
 #include "err.h"
 
-SocketError socket_packsockipaddr(SocketIPAddressInterface *sockaddr, SocketAddressFamily af, const IPAddressInterface *addr, unsigned short port)
+NError socket_packsockipaddr(SocketIPAddressInterface *sockaddr, SocketAddressFamily af, const IPAddressInterface *addr, unsigned short port)
 {
     switch (af)
     {
@@ -41,15 +41,15 @@ SocketError socket_packsockipaddr(SocketIPAddressInterface *sockaddr, SocketAddr
             break;
 
         default:
-            return SocketError_UnsupportedAddressFamily;
+            return NError_UnsupportedAddressFamily;
     }
 
-    return SocketError_Success;
+    return NError_Success;
 }
 
-SocketError socket_unpacksockipaddr(const SocketIPAddressInterface *sockaddr, SocketAddressFamily af, IPAddressInterface *addr, unsigned short *port)
+NError socket_unpacksockipaddr(const SocketIPAddressInterface *sockaddr, SocketAddressFamily af, IPAddressInterface *addr, unsigned short *port)
 {
-    if (SOCKET_GETSOCKADDRAF(sockaddr) != af) return SocketError_IncorrectArgumentValue;
+    if (SOCKET_GETSOCKADDRAF(sockaddr) != af) return NError_IncorrectArgumentValue;
 
     switch (af)
     {
@@ -66,8 +66,8 @@ SocketError socket_unpacksockipaddr(const SocketIPAddressInterface *sockaddr, So
             break;
 
         default:
-            return SocketError_UnsupportedAddressFamily;
+            return NError_UnsupportedAddressFamily;
     }
 
-    return SocketError_Success;
+    return NError_Success;
 }
