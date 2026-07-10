@@ -8,7 +8,7 @@
 
 #include "util.h"
 
-static NError __getsockopt(SOCKETDESCRIPTOR desc, int level, int optname, void *optval, socklen_t optlen);
+static inline NError __getsockopt(SOCKETDESCRIPTOR desc, int level, int optname, void *optval, socklen_t optlen);
 static void __filloutopt(const void *value, size_t size, void *optval, size_t *optlen);
 
 NError socket_getopt(const Socket *socket, SocketOptionLevel level, SocketOptionName optname, void *optval, size_t *optsize)
@@ -203,7 +203,7 @@ static NError __getsockopt(SOCKETDESCRIPTOR desc, int level, int optname, void *
     return NError_Success;
 }
 
-static void __filloutopt(const void *value, size_t size, void *optval, size_t *optsize)
+static inline void __filloutopt(const void *value, size_t size, void *optval, size_t *optsize)
 {
     if (*optsize > 0) memcpy(optval, value, (*optsize > size) ? size : *optsize);
     *optsize = size;

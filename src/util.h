@@ -68,7 +68,7 @@ NAlertHandler __libsocket_defaultalerthandler;
 // =============================================================================
 
 NError __libsocket_closesocket(Socket *socket);
-#define __closesocket(...) (__libsocket_closesocket(__VA_ARGS__))
+#define __closesocket (__libsocket_closesocket)
 
 #define SAFE_MUTEX_LOCK(mutex) \
     { NError nerr = nthread_mutex_lock(mutex); if (nerr != NError_Success) panic_general(nerr, n_panicmsg_mutexlock); }

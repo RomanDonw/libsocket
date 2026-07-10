@@ -23,40 +23,54 @@
     #include <fcntl.h>
 #endif
 
+#ifdef LIBSOCKET_OS_WINDOWS
+    static const DWORD sockoptval_bool_true = TRUE;
+#else
+    static const int sockoptval_bool_true = true;
+#endif
+
 NError socket_open(Socket **socket_, SocketAddressFamily af, SocketType type, SocketProtocol protocol)
 {
     ENSURE_INIT;
-    NError err;
+    NError nerr;
 
     // =============================================================================
     
     if (af != SocketAddressFamily_IPv4 && af != SocketAddressFamily_IPv6)
-    { err = NError_UnsupportedAddressFamily; goto errorquit_generic; }
+    { nerr = NError_UnsupportedAddressFamily; goto errorquit_generic; }
 
     if (type != SocketType_Stream && type != SocketType_Datagram)
-    { err = NError_UnsupportedSocketType; goto errorquit_generic; }
+    { nerr = NError_UnsupportedSocketType; goto errorquit_generic; }
 
     if (protocol != SocketProtocol_Unspecified && protocol != SocketProtocol_TCP && protocol != SocketProtocol_UDP)
-    { err = NError_UnsupportedProtocol; goto errorquit_generic; }
+    { nerr = NError_UnsupportedProtocol; goto errorquit_generic; }
 
     // =============================================================================
 
     SOCKETDESCRIPTOR desc = socket(af, type, protocol);
-    if (desc == INVALID_SOCKET) { err = GETLASTTRANSLATEDSYSERR(); goto errorquit_generic; }
+    if (desc == INVALID_SOCKET) { nerr = GETLASTTRANSLATEDSYSERR(); goto errorquit_generic; }
+
+    #ifdef LIBSOCKET_OS_WINDOWS
+        if (setsockopt(desc, SOL_SOCKET, SO_EXCLUSIVEADDRUSE, &sockoptval_bool_true, sizeof(sockoptval_bool_true)))
+        { nerr = GETLASTTRANSLATEDSYSERR(); goto errorquit_afteropendesc; }
+    #else
+        if (setsockopt(desc, SOL_SOCKET, SO_REUSEADDR, &sockoptval_bool_true, sizeof(sockoptval_bool_true)))
+        { nerr = GETLASTTRANSLATEDSYSERR(); goto errorquit_afteropendesc; }
+    #endif
 
     Socket *ret = allocs.malloc(sizeof(Socket));
-    if (!ret) { err = NError_MemoryAllocationFailed; goto errorquit_onalloc; }
+    if (!ret) { nerr = NError_MemoryAllocationFailed; goto errorquit_afteropendesc; }
     ret->af = af;
     ret->type = type;
     ret->protocol = protocol;
     ret->desc = desc;
 
-    if ((err = nthread_mutex_create(&ret->mutex_nonblocking)) != NError_Success) goto errorquit_onmtxapierr;
+    if ((nerr = nthread_mutex_create(&ret->mutex_nonblocking)) != NError_Success) goto errorquit_afteralloc;
 
-    if (((err = socket_setnonblocking(ret, false)) != NError_Success) || ((err = nthread_mutex_lock(sockslistmutex)) != NError_Success))
+    if (((nerr = socket_setnonblocking(ret, false)) != NError_Success) || ((nerr = nthread_mutex_lock(sockslistmutex)) != NError_Success))
     { goto errorquit_aftermutexcreate; }
-    
-    if ((err = n_unorderedset_addelement(sockslist, &ret)) != NError_Success) goto errorquit_afterlocksockslistmtx;
+
+    if ((nerr = n_unorderedset_addelement(sockslist, &ret)) != NError_Success) goto errorquit_afterlocksockslistmtx;
     SAFE_MUTEX_UNLOCK(sockslistmutex);
 
     *socket_ = ret;
@@ -71,13 +85,13 @@ NError socket_open(Socket **socket_, SocketAddressFamily af, SocketType type, So
             NError tmpnerr = nthread_mutex_destroy(ret->mutex_nonblocking);
             if (tmpnerr != NError_Success) panic_general(tmpnerr, "Unable to destroy internal socket mutex on cleanup when handling error.");
         }
-    errorquit_onmtxapierr:
+    errorquit_afteralloc:
         allocs.free(ret);
-    errorquit_onalloc:
+    errorquit_afteropendesc:
         if (CLOSESOCKETDESC(desc))
         { panic_general(GETLASTTRANSLATEDSYSERR(), "Unable to close socket descriptor on cleanup when handling error."); }
     errorquit_generic:
-    return err;
+    return nerr;
 }
 
 NError socket_close(Socket *socket)
@@ -126,24 +140,32 @@ NError socket_bind(const Socket *socket, const SocketAddressInterface *sockaddr,
 NError socket_accept(Socket **acceptedsocket, const Socket *socket, SocketAddressInterface *sockaddr, socklen_t *sockaddrlen)
 {
     ENSURE_INIT;
-    NError err;
+    NError nerr;
 
     SOCKETDESCRIPTOR desc = accept(socket->desc, sockaddr, sockaddrlen);
-    if (desc == INVALID_SOCKET) { err = GETLASTTRANSLATEDSYSERR(); goto errorquit_generic; }
+    if (desc == INVALID_SOCKET) { nerr = GETLASTTRANSLATEDSYSERR(); goto errorquit_generic; }
+
+    #ifdef LIBSOCKET_OS_WINDOWS
+        if (setsockopt(desc, SOL_SOCKET, SO_EXCLUSIVEADDRUSE, &sockoptval_bool_true, sizeof(sockoptval_bool_true)))
+        { nerr = GETLASTTRANSLATEDSYSERR(); goto errorquit_afteropendesc; }
+    #else
+        if (setsockopt(desc, SOL_SOCKET, SO_REUSEADDR, &sockoptval_bool_true, sizeof(sockoptval_bool_true)))
+        { nerr = GETLASTTRANSLATEDSYSERR(); goto errorquit_afteropendesc; }
+    #endif
 
     Socket *ret = allocs.malloc(sizeof(Socket));
-    if (!ret) { err = NError_MemoryAllocationFailed; goto errorquit_onalloc; }
+    if (!ret) { nerr = NError_MemoryAllocationFailed; goto errorquit_afteropendesc; }
     ret->af = socket->af;
     ret->type = socket->type;
     ret->protocol = socket->protocol;
     ret->desc = desc;
 
-    if ((err = nthread_mutex_create(&ret->mutex_nonblocking)) != NError_Success) goto errorquit_onmtxapierr;
+    if ((nerr = nthread_mutex_create(&ret->mutex_nonblocking)) != NError_Success) goto errorquit_afteralloc;
 
-    if (((err = socket_setnonblocking(ret, false)) != NError_Success) || ((err = nthread_mutex_lock(sockslistmutex)) != NError_Success))
+    if (((nerr = socket_setnonblocking(ret, false)) != NError_Success) || ((nerr = nthread_mutex_lock(sockslistmutex)) != NError_Success))
     { goto errorquit_aftermutexcreate; }
-    
-    if ((err = n_unorderedset_addelement(sockslist, &ret)) != NError_Success) goto errorquit_afterlocksockslistmtx;
+
+    if ((nerr = n_unorderedset_addelement(sockslist, &ret)) != NError_Success) goto errorquit_afterlocksockslistmtx;
     SAFE_MUTEX_UNLOCK(sockslistmutex);
 
     *acceptedsocket = ret;
@@ -158,13 +180,13 @@ NError socket_accept(Socket **acceptedsocket, const Socket *socket, SocketAddres
             NError tmpnerr = nthread_mutex_destroy(ret->mutex_nonblocking);
             if (tmpnerr != NError_Success) panic_general(tmpnerr, "Unable to destroy internal socket mutex on cleanup when handling error.");
         }
-    errorquit_onmtxapierr:
+    errorquit_afteralloc:
         allocs.free(ret);
-    errorquit_onalloc:
+    errorquit_afteropendesc:
         if (CLOSESOCKETDESC(desc))
         { panic_general(GETLASTTRANSLATEDSYSERR(), "Unable to close socket descriptor on cleanup when handling error."); }
     errorquit_generic:
-    return err;
+    return nerr;
 }
 
 #define SOCKIOFUNCPROTO(func) \
