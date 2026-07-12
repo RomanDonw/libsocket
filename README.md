@@ -1,5 +1,4 @@
-# Universal cross-platform C99\*/C++ sockets library.
-\*this library has C99 API, but implementation wrote on C11. sorry guys :>, i need <stdatomic.h> support to have thread-safe init. functions.
+# Universal cross-platform C99/C++ sockets library.
 
 <!-- ========================================================================================================================================================== -->
 
@@ -20,7 +19,8 @@ Now this library supports both little- and big- -endian architectures, such as P
 <!-- ========================================================================================================================================================== -->
 
 ## Dependencies
-- [libmutex](https://github.com/RomanDonw/libmutex).
+- [libncore](https://github.com/RomanDonw/libncore).
+- [libnthread](https://github.com/RomanDonw/libnthread).
 
 ## Building the library
 
@@ -71,7 +71,7 @@ Also just run `sudo make install`. Library will be installed to your system.
 > [!WARNING]
 > Manual linking is not recommended library usage way. Please use CMake for correct linking with library.
 
-Include `<libnsocket.h>` header where you need to use this library. That link your executable with library by adding flag to command line `-lnsocket`. On Windows you already need to link you executable with WinSock2 library, so just add flag `-lws2_32` command line. If you use static version of this library, please specify definition `LIBNSOCKET_STATIC` when you compile file, where included <ins>libnsocket</ins> header.
+Include `<libnsocket.h>` header where you need to use this library. That link your executable with library by adding flag to command line `-lnsocket`. On Windows you already need to link you executable with WinSock2 library, so just add flag `-lws2_32` command line. If you use static version of this library, please specify definition `LIBNSOCKET_STATIC` when you compile file, where included <ins>libnsocket</ins> header. Also you need to link with required dependencies.
 
 ### CMake
 If you using CMake in your project, add `libnsocket` by same method or with using `find_package`:
