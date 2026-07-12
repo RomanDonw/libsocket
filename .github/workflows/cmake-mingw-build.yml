@@ -18,16 +18,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Checkout libmutex code
+      - name: Checkout libnthread code
         uses: actions/checkout@v4
         with:
-          repository: RomanDonw/libmutex
-          path: libmutex
+          repository: RomanDonw/libnthread
+          path: libnthread
 
       - name: Setup dependencies
         shell: msys2 {0}
         run: |
-            cd libmutex
+            cd libnthread
 
             mkdir build
             cd build
