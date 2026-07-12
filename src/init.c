@@ -51,8 +51,6 @@ NError libnsocket_startup(const LibNSocketStartupOptions *options, LibNSocketSta
     if ((nerr = nthread_mutex_create(&sockslistmutex)) != NError_Success) goto errorquit_aftercreatesockslist;
 
     #ifdef LIBNSOCKET_OS_WINDOWS
-        LibNSocketStartupResults res = {0};
-
         unsigned short winsock_version = options->winsock_version ? options->winsock_version : LIBNSOCKET_DEFAULT_WINSOCK_VERSION;
 
         WSADATA wsadata;
@@ -80,7 +78,7 @@ NError libnsocket_startup(const LibNSocketStartupOptions *options, LibNSocketSta
             {
                 .used_winsock_version = wsadata.wVersion,
                 .max_winsock_version = wsadata.wHighVersion,
-                .max_sockets_count = wsadata.iMaxNSockets,
+                .max_sockets_count = wsadata.iMaxSockets,
                 .max_datagram_size = wsadata.iMaxUdpDg
             };
 
@@ -92,7 +90,9 @@ NError libnsocket_startup(const LibNSocketStartupOptions *options, LibNSocketSta
 
     return NError_Success;
 
-    //errorquit_aftersockslistmtxcreate:
+    #ifdef LIBNSOCKET_OS_WINDOWS
+        errorquit_aftersockslistmtxcreate:
+    #endif
         if ((nerr = nthread_mutex_destroy(sockslistmutex)) != NError_Success) panic_general(nerr, "Unable to destroy mutex of sockets list during handling error.");
         sockslistmutex = NULL;
     errorquit_aftercreatesockslist:

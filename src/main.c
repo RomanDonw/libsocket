@@ -51,10 +51,10 @@ NError nsocket_open(NSocket **socket_, NSocketAddressFamily af, NSocketType type
     if (desc == NSOCKET_INVALIDDESCRIPTOR) { nerr = GETLASTTRANSLATEDSYSERR(); goto errorquit_generic; }
 
     #ifdef LIBNSOCKET_OS_WINDOWS
-        if (setsockopt(desc, SOL_SOCKET, SO_EXCLUSIVEADDRUSE, &sockoptval_bool_true, sizeof(sockoptval_bool_true)))
+        if (setsockopt(desc, SOL_SOCKET, SO_EXCLUSIVEADDRUSE, (void *)&sockoptval_bool_true, sizeof(sockoptval_bool_true)))
         { nerr = GETLASTTRANSLATEDSYSERR(); goto errorquit_afteropendesc; }
     #else
-        if (setsockopt(desc, SOL_SOCKET, SO_REUSEADDR, &sockoptval_bool_true, sizeof(sockoptval_bool_true)))
+        if (setsockopt(desc, SOL_SOCKET, SO_REUSEADDR, (void *)&sockoptval_bool_true, sizeof(sockoptval_bool_true)))
         { nerr = GETLASTTRANSLATEDSYSERR(); goto errorquit_afteropendesc; }
     #endif
 
@@ -146,10 +146,10 @@ NError nsocket_accept(NSocket **acceptedsocket, const NSocket *socket, NSocketAd
     if (desc == NSOCKET_INVALIDDESCRIPTOR) { nerr = GETLASTTRANSLATEDSYSERR(); goto errorquit_generic; }
 
     #ifdef LIBNSOCKET_OS_WINDOWS
-        if (setsockopt(desc, SOL_SOCKET, SO_EXCLUSIVEADDRUSE, &sockoptval_bool_true, sizeof(sockoptval_bool_true)))
+        if (setsockopt(desc, SOL_SOCKET, SO_EXCLUSIVEADDRUSE, (void *)&sockoptval_bool_true, sizeof(sockoptval_bool_true)))
         { nerr = GETLASTTRANSLATEDSYSERR(); goto errorquit_afteropendesc; }
     #else
-        if (setsockopt(desc, SOL_SOCKET, SO_REUSEADDR, &sockoptval_bool_true, sizeof(sockoptval_bool_true)))
+        if (setsockopt(desc, SOL_SOCKET, SO_REUSEADDR, (void *)&sockoptval_bool_true, sizeof(sockoptval_bool_true)))
         { nerr = GETLASTTRANSLATEDSYSERR(); goto errorquit_afteropendesc; }
     #endif
 

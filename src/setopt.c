@@ -157,7 +157,9 @@ NError nsocket_setopt(const NSocket *socket, NSocketOptionLevel level, NSocketOp
         load_dwint:
             optval = &val_dwint;
             optsize = sizeof(val_dwint);
-        processopt:
+        #ifndef LIBNSOCKET_OS_WINDOWS
+            processopt:
+        #endif
             if (setsockopt(socket->desc, level, optname, optval, optsize)) return GETLASTTRANSLATEDSYSERR();
         return NError_Success;
     }

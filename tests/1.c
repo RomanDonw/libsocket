@@ -28,7 +28,7 @@ void test(void)
     if ((err = nsocket_open(&s, NSocketAddressFamily_IPv4, NSocketType_Stream, NSocketProtocol_TCP)) != NError_Success) handlesockerror(err, "nsocket_open");
     puts(" === === [nsocket opened] === ===\n");
 
-    printf("NSocket descriptor: %i\n", nsocket_gethandle(s));
+    printf("NSocket descriptor: %lli\n", (long long)nsocket_gethandle(s));
 
     puts("");
 

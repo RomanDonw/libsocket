@@ -12,7 +12,7 @@ set(CMAKE_C_EXTENSIONS OFF)
 
 set(DEP_LIBNTHREAD_PACKAGENAME libnthread)
 set(DEP_LIBNTHREAD_TARGETNAME nthread)
-set(DEP_LIBNTHREAD_REQMINVER 0.2.2)
+set(DEP_LIBNTHREAD_REQMINVER 0.0)
 # ========== ======== ==========
 
 include(GNUInstallDirs)
