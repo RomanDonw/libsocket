@@ -45,7 +45,7 @@ NError libnsocket_startup(const LibNSocketStartupOptions *options, LibNSocketSta
 
     // =============================================================================
 
-    NError nerr = n_unorderedset_create(&sockslist, allocs, sizeof(NSocket *));
+    NError nerr = n_unorderedset_create(&sockslist, &allocs, sizeof(NSocket *));
     if (nerr != NError_Success) goto errorquit_generic;
 
     if ((nerr = nthread_mutex_create(&sockslistmutex)) != NError_Success) goto errorquit_aftercreatesockslist;
